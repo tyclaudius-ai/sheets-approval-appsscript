@@ -29,6 +29,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PKG_DIR = ROOT
 DEFAULT_INCLUDE = [
     "Code.gs",
+    "Docs.html",
     "appsscript.json",
     "README.md",
     "ONE_PAGER.md",

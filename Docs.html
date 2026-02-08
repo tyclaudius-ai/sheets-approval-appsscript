@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: Arial, sans-serif; padding: 12px; }
+      h2 { margin: 0 0 8px; }
+      code, pre { background: #f5f5f5; padding: 2px 4px; border-radius: 4px; }
+      .muted { color: #666; font-size: 12px; }
+      ul { padding-left: 18px; }
+      .callout { background: #eef6ff; border: 1px solid #cfe6ff; padding: 10px; border-radius: 8px; }
+    </style>
+  </head>
+  <body>
+    <h2>Sheets Approvals — Quick Help</h2>
+    <div class="muted">This sidebar is part of the copy/paste MVP (no Marketplace add-on required).</div>
+
+    <hr />
+
+    <div class="callout">
+      <b>Fast demo:</b>
+      <ol>
+        <li>Run <code>Approvals → Create demo setup</code></li>
+        <li>Go to <code>Requests</code>, click a row</li>
+        <li>Run <code>Approvals → Approve row</code></li>
+        <li>Check <code>Audit</code> for the appended event + hash</li>
+      </ol>
+    </div>
+
+    <h3>Re-approval on change</h3>
+    <ul>
+      <li>If an <code>APPROVED</code> row is edited, it can auto-revert to <code>PENDING</code> and log <code>REAPPROVAL_REQUIRED</code>.</li>
+      <li>Configure tracked/exempt columns in <code>CFG.REAPPROVAL_TRACKED_HEADERS</code> and <code>CFG.REAPPROVAL_EXEMPT_HEADERS</code>.</li>
+    </ul>
+
+    <h3>Row locking (optional)</h3>
+    <ul>
+      <li>On approval, the script can apply a row protection (warning-only by default).</li>
+      <li>Toggle via <code>CFG.LOCK_ROW_ON_APPROVE</code> and <code>CFG.LOCK_WARNING_ONLY</code>.</li>
+    </ul>
+
+    <h3>Docs</h3>
+    <ul>
+      <li><code>README.md</code> — install + overview</li>
+      <li><code>DEMO-TEMPLATE.md</code> — 2-minute demo script</li>
+      <li><code>SHEET-SCHEMA.md</code> — tab/column contract + config knobs</li>
+    </ul>
+
+    <p class="muted">Tip: If your domain blocks email visibility, Actor may show as <code>unknown</code>.</p>
+  </body>
+</html>

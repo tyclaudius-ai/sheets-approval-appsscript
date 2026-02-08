@@ -56,6 +56,8 @@ function onOpen() {
     .addItem('Reset to pending', 'resetSelectedRowToPending')
     .addSeparator()
     .addItem('Create demo setup', 'createDemoSetup')
+    .addSeparator()
+    .addItem('Help / Docs', 'showHelpSidebar')
     .addToUi();
 }
 
@@ -415,4 +417,12 @@ function ensureSheetWithHeaders_(ss, name, headers) {
   }
 
   return sheet;
+}
+
+function showHelpSidebar() {
+  const html = HtmlService.createHtmlOutputFromFile('Docs')
+    .setTitle('Approvals Help')
+    .setWidth(360);
+
+  SpreadsheetApp.getUi().showSidebar(html);
 }

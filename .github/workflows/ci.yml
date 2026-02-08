@@ -1,0 +1,22 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate repo
+        run: python3 scripts/validate_repo.py
+
+      - name: Package bundle (smoke)
+        run: python3 scripts/package_sheets_approval_appsscript.py --out /tmp/sheets-approval-appsscript.zip

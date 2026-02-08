@@ -24,12 +24,16 @@ import zipfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PKG_DIR = ROOT / "secret-project-2" / "sheets-approval-appsscript"
+# This script lives in the repo at: sheets-approval-appsscript/scripts/
+# Package files from the repo root.
+PKG_DIR = ROOT
 DEFAULT_INCLUDE = [
     "Code.gs",
+    "appsscript.json",
     "README.md",
     "ONE_PAGER.md",
     "SETUP-CHECKLIST.md",
+    "DEMO-TEMPLATE.md",
     "OUTREACH-TEMPLATES.md",
     "landing/index.html",
     "landing/style.css",

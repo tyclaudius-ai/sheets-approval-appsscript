@@ -47,7 +47,7 @@ For a clean, step-by-step “demo in 2 minutes” script (and suggested screensh
 
 ## Packaging (deliverable artifact)
 
-To hand this to a client as a single file, you can generate a zip bundle:
+To hand this to a client as a single zip bundle, you can generate a distributable artifact:
 
 ```bash
 python3 scripts/package_sheets_approval_appsscript.py

@@ -18,6 +18,7 @@
         <a class="btn primary" href="../README.md">Read the README</a>
         <a class="btn" href="../ONE_PAGER.md">One‑pager</a>
         <a class="btn" href="../SETUP-CHECKLIST.md">Setup checklist</a>
+        <a class="btn" href="../DEMO-TEMPLATE.md">Demo template</a>
       </div>
       <p class="fine">No add-ons. No external services. Runs in your Google Workspace.</p>
     </header>
@@ -56,11 +57,12 @@
       <div class="card">
         <h2>Demo checklist</h2>
         <ul>
-          <li>Create a new Sheet with columns: <code>id</code>, <code>status</code>, <code>notes</code></li>
-          <li>Approve a row; verify Audit sheet entry appears</li>
-          <li>Edit the row; approve again; verify hash changes</li>
+          <li>Paste <code>Code.gs</code> into your Sheet’s Apps Script project</li>
+          <li>Reload the Sheet; run <code>Approvals → Create demo setup</code></li>
+          <li>Approve a seeded request; verify an Audit entry appears</li>
+          <li>Edit an approved row; verify it reverts to <code>PENDING</code> + logs <code>REAPPROVAL_REQUIRED</code></li>
         </ul>
-        <p class="fine">(A simple GIF/screenshot can be dropped into this folder later.)</p>
+        <p class="fine">See <a href="../DEMO-TEMPLATE.md">Demo template</a> for copy/paste instructions.</p>
       </div>
     </section>
 

@@ -43,6 +43,8 @@ You should see **Approvals** in the menu bar.
 
 Use **Approvals → Create demo setup** to generate the `Requests` + `Audit` tabs (with correct headers) and seed a couple example requests.
 
+For a clean, step-by-step “demo in 2 minutes” script (and suggested screenshots), see: **`DEMO-TEMPLATE.md`**.
+
 ## Packaging (deliverable artifact)
 
 To hand this to a client as a single file, you can generate a zip bundle:

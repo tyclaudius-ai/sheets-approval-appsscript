@@ -18,9 +18,20 @@ const CFG = {
   // RequestId is generated if empty
   REQUEST_ID_HEADER: 'RequestId',
 
-  // If an already-approved row is edited, automatically revert it to PENDING
-  // (unless the edit was only to one of the exempt/decision columns).
+  // If an already-approved row is edited, automatically revert it to PENDING.
+  //
+  // Behavior:
+  // - Only runs for user edits (simple trigger).
+  // - Re-approval is required if the edited cells include at least one header that is:
+  //   - NOT in REAPPROVAL_EXEMPT_HEADERS, AND
+  //   - (if REAPPROVAL_TRACKED_HEADERS is non-empty) IS included in REAPPROVAL_TRACKED_HEADERS
   REAPPROVAL_ON_CHANGE: true,
+
+  // Optional allowlist: when set, ONLY edits to these columns can trigger re-approval.
+  // Leave empty to treat any non-exempt column as meaningful.
+  REAPPROVAL_TRACKED_HEADERS: [],
+
+  // Columns that will NOT trigger re-approval (decision + meta columns).
   REAPPROVAL_EXEMPT_HEADERS: [
     'RequestId',
     'Status',
@@ -61,8 +72,9 @@ function onEdit(e) {
   const sheet = e.range.getSheet();
   if (!sheet || sheet.getName() !== CFG.REQUESTS_SHEET) return;
 
-  const row = e.range.getRow();
-  if (row <= CFG.HEADER_ROW) return;
+  const startRow = e.range.getRow();
+  const numRows = e.range.getNumRows();
+  if (startRow <= CFG.HEADER_ROW) return;
 
   const lock = LockService.getDocumentLock();
   lock.waitLock(30 * 1000);
@@ -79,52 +91,61 @@ function onEdit(e) {
       editedHeaders.push(headers[startCol - 1 + i] || `Col${startCol + i}`);
     }
 
-    const meaningful = editedHeaders.some(h => CFG.REAPPROVAL_EXEMPT_HEADERS.indexOf(h) === -1);
+    const tracked = (CFG.REAPPROVAL_TRACKED_HEADERS || []).map(h => (h || '').toString().trim()).filter(Boolean);
+    const exempt = (CFG.REAPPROVAL_EXEMPT_HEADERS || []).map(h => (h || '').toString().trim()).filter(Boolean);
+
+    const meaningful = editedHeaders.some(h => exempt.indexOf(h) === -1 && (tracked.length === 0 || tracked.indexOf(h) !== -1));
     if (!meaningful) return;
 
-    // Read current row state *after* the user edit.
-    const rowValues = sheet.getRange(row, 1, 1, headers.length).getValues()[0];
-    const rowObj = rowToObject_(headers, rowValues);
-
-    const status = (rowObj.Status || '').toString().trim();
-    if (status !== CFG.STATUS.APPROVED) return;
-
-    const requestId = ensureRequestId_(sheet, headers, row, rowObj);
     const now = new Date();
     const userEmail = getUserEmail_();
 
-    // Force back to pending + clear decision fields.
-    setCellByHeader_(sheet, headers, row, 'Status', CFG.STATUS.PENDING);
-    setCellByHeader_(sheet, headers, row, 'Approver', '');
-    setCellByHeader_(sheet, headers, row, 'DecisionAt', '');
-    setCellByHeader_(sheet, headers, row, 'DecisionNotes', `Auto: re-approval required (edited: ${editedHeaders.join(', ')})`);
+    // Apply to every affected row (multi-row paste/edit).
+    for (let r = startRow; r < startRow + numRows; r++) {
+      if (r <= CFG.HEADER_ROW) continue;
 
-    // Remove row lock if present.
-    if (CFG.LOCK_ROW_ON_APPROVE) {
-      unprotectRow_(sheet, row);
+      // Read current row state *after* the user edit.
+      const rowValues = sheet.getRange(r, 1, 1, headers.length).getValues()[0];
+      const rowObj = rowToObject_(headers, rowValues);
+
+      const status = (rowObj.Status || '').toString().trim();
+      if (status !== CFG.STATUS.APPROVED) continue;
+
+      const requestId = ensureRequestId_(sheet, headers, r, rowObj);
+
+      // Force back to pending + clear decision fields.
+      setCellByHeader_(sheet, headers, r, 'Status', CFG.STATUS.PENDING);
+      setCellByHeader_(sheet, headers, r, 'Approver', '');
+      setCellByHeader_(sheet, headers, r, 'DecisionAt', '');
+      setCellByHeader_(sheet, headers, r, 'DecisionNotes', `Auto: re-approval required (edited: ${editedHeaders.join(', ')})`);
+
+      // Remove row lock if present.
+      if (CFG.LOCK_ROW_ON_APPROVE) {
+        unprotectRow_(sheet, r);
+      }
+
+      // Snapshot after forcing pending.
+      const newValues = sheet.getRange(r, 1, 1, headers.length).getValues()[0];
+      const newObj = rowToObject_(headers, newValues);
+
+      const snapshotJson = JSON.stringify({
+        ...newObj,
+        _reapproval: {
+          editedHeaders,
+          priorStatus: CFG.STATUS.APPROVED,
+        },
+      });
+
+      appendAuditEvent_(ss, {
+        eventAt: now,
+        actor: userEmail,
+        action: 'REAPPROVAL_REQUIRED',
+        requestId,
+        rowNumber: r,
+        snapshotJson,
+        snapshotHash: sha256Hex_(snapshotJson),
+      });
     }
-
-    // Snapshot after forcing pending.
-    const newValues = sheet.getRange(row, 1, 1, headers.length).getValues()[0];
-    const newObj = rowToObject_(headers, newValues);
-
-    const snapshotJson = JSON.stringify({
-      ...newObj,
-      _reapproval: {
-        editedHeaders,
-        priorStatus: CFG.STATUS.APPROVED,
-      },
-    });
-
-    appendAuditEvent_(ss, {
-      eventAt: now,
-      actor: userEmail,
-      action: 'REAPPROVAL_REQUIRED',
-      requestId,
-      rowNumber: row,
-      snapshotJson,
-      snapshotHash: sha256Hex_(snapshotJson),
-    });
   } finally {
     lock.releaseLock();
   }

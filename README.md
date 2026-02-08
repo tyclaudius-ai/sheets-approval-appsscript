@@ -47,6 +47,8 @@ For a clean, step-by-step “demo in 2 minutes” script, see: **`DEMO-TEMPLATE.
 
 For a quick checklist of suggested screenshots (useful for a demo/listing), see: **`SCREENSHOTS.md`**.
 
+For “one-click copy” template-link instructions, see: **`TEMPLATE-INSTRUCTIONS.md`**.
+
 For the exact tab/column schema (and what’s configurable), see: **`SHEET-SCHEMA.md`**.
 
 ## Packaging (deliverable artifact)

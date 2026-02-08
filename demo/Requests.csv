@@ -1,0 +1,3 @@
+RequestId,Title,Requester,Status,Approver,DecisionAt,DecisionNotes
+,Purchase approval: lab supplies,alex@example.com,PENDING,,,
+,Access request: shared drive,sam@example.com,PENDING,,,

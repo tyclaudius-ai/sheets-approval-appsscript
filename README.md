@@ -45,6 +45,8 @@ Use **Approvals → Create demo setup** to generate the `Requests` + `Audit` tab
 
 For a clean, step-by-step “demo in 2 minutes” script (and suggested screenshots), see: **`DEMO-TEMPLATE.md`**.
 
+For the exact tab/column schema (and what’s configurable), see: **`SHEET-SCHEMA.md`**.
+
 ## Packaging (deliverable artifact)
 
 To hand this to a client as a single zip bundle, you can generate a distributable artifact:

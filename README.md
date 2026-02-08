@@ -60,6 +60,10 @@ The zip includes Code.gs + docs + landing page and a `manifest.json` with sha256
 - Uses the active user email when available. Some domains may restrict `Session.getActiveUser().getEmail()`.
 - This MVP does not enforce role-based access; rely on Google Sheet sharing permissions.
 - Audit log is append-only by convention (it’s still a sheet). The stored **sha256 hash** makes casual tampering detectable. For stronger immutability, write events to an external store.
+- Optional (default ON): **re-approval required after change**.
+  - Implemented via a simple `onEdit(e)` trigger.
+  - If a user edits any non-decision column on a row with `Status=APPROVED`, the script will auto-set the row back to `PENDING` and append an audit event `REAPPROVAL_REQUIRED`.
+  - Configure exempt columns via `CFG.REAPPROVAL_EXEMPT_HEADERS`.
 - Optional (default ON): **row protection on approval**.
   - By default it’s **warning-only**, to avoid hard permission failures on some Google Workspace domains.
   - You can switch to enforced protection by setting `CFG.LOCK_WARNING_ONLY = false` (requires editor/owner rights to manage protections).

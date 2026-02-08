@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Google Sheets Approvals + Audit Trail (Template)</title>
+  <meta name="description" content="Add approve/reject workflow + append-only audit log to any Google Sheet in ~10 minutes." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <div class="badge">Microproduct • Apps Script</div>
+      <h1>Google Sheets Approvals + Audit Trail</h1>
+      <p class="sub">A copy/paste Apps Script template that adds <strong>Approve</strong>/<strong>Reject</strong> actions and an <strong>append-only audit log</strong> to any Google Sheet.</p>
+
+      <div class="cta-row">
+        <a class="btn primary" href="../README.md">Read the README</a>
+        <a class="btn" href="../ONE_PAGER.md">One‑pager</a>
+        <a class="btn" href="../SETUP-CHECKLIST.md">Setup checklist</a>
+      </div>
+      <p class="fine">No add-ons. No external services. Runs in your Google Workspace.</p>
+    </header>
+
+    <section class="grid">
+      <div class="card">
+        <h2>What you get</h2>
+        <ul>
+          <li>Custom menu: <code>Approvals → Approve / Reject</code></li>
+          <li>Append‑only Audit sheet (timestamp, user, action, row id, snapshot hash)</li>
+          <li>Optional “row lock” warning to prevent approving stale data</li>
+          <li>Docs + outreach copy for selling/implementing</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Fits use cases like</h2>
+        <ul>
+          <li>Expense approvals</li>
+          <li>Content approvals</li>
+          <li>Engineering change requests</li>
+          <li>Vendor onboarding checklists</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>How it works (high level)</h2>
+        <ol>
+          <li>Paste <code>Code.gs</code> into your Sheet’s Apps Script project</li>
+          <li>Reload the Sheet</li>
+          <li>Select a row → Approve/Reject</li>
+          <li>Audit log records who did what + when</li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <h2>Demo checklist</h2>
+        <ul>
+          <li>Create a new Sheet with columns: <code>id</code>, <code>status</code>, <code>notes</code></li>
+          <li>Approve a row; verify Audit sheet entry appears</li>
+          <li>Edit the row; approve again; verify hash changes</li>
+        </ul>
+        <p class="fine">(A simple GIF/screenshot can be dropped into this folder later.)</p>
+      </div>
+    </section>
+
+    <section class="footer">
+      <p class="fine">
+        This folder is a lightweight landing page you can host anywhere (GitHub Pages, Netlify, etc.).
+        It intentionally links to the markdown docs in this repo.
+      </p>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,38 @@
+:root{
+  --bg:#0b1020;
+  --card:#101a33;
+  --text:#e9eefc;
+  --muted:#b7c2e6;
+  --line:#22305a;
+  --accent:#7aa2ff;
+  --accent2:#5ef0c5;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  background: radial-gradient(1000px 600px at 20% 0%, #182654 0%, var(--bg) 60%);
+  color:var(--text);
+}
+.wrap{max-width:960px;margin:0 auto;padding:48px 20px}
+.hero{padding:28px;border:1px solid var(--line);background:linear-gradient(180deg, rgba(16,26,51,.9), rgba(16,26,51,.55));border-radius:16px}
+.badge{display:inline-block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:6px 10px;border-radius:999px;margin-bottom:14px}
+h1{margin:0 0 10px;font-size:40px;line-height:1.1}
+.sub{margin:0 0 18px;color:var(--muted);font-size:18px;line-height:1.45}
+.cta-row{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 8px}
+.btn{display:inline-block;text-decoration:none;color:var(--text);border:1px solid var(--line);padding:10px 14px;border-radius:10px;background:rgba(11,16,32,.35)}
+.btn:hover{border-color:#2f4280}
+.btn.primary{border-color:rgba(122,162,255,.8);background:rgba(122,162,255,.18)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.card{padding:18px;border:1px solid var(--line);background:rgba(16,26,51,.55);border-radius:14px}
+.card h2{margin:0 0 10px;font-size:18px}
+.card ul,.card ol{margin:0;padding-left:18px;color:var(--muted)}
+.card li{margin:6px 0}
+code{padding:2px 6px;border:1px solid var(--line);border-radius:8px;background:rgba(11,16,32,.35);color:var(--text)}
+.footer{margin-top:16px;padding:14px 18px;border:1px dashed var(--line);border-radius:14px;background:rgba(16,26,51,.35)}
+.fine{margin:0;color:var(--muted);font-size:13px;line-height:1.4}
+@media (max-width: 760px){
+  .grid{grid-template-columns:1fr}
+  h1{font-size:32px}
+}

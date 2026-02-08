@@ -21,6 +21,12 @@ Goal: let someone create their own copy of the demo Sheet + Apps Script with min
        - Original: `https://docs.google.com/spreadsheets/d/<SHEET_ID>/edit#gid=0`
        - Template copy: `https://docs.google.com/spreadsheets/d/<SHEET_ID>/copy`
 
+   Tip: if you have any Sheet URL (or just the Sheet ID), you can generate the `/copy` URL with:
+
+   ```bash
+   python3 scripts/make_sheet_copy_link.py "<sheet-url-or-id>"
+   ```
+
 ### What the user does
 
 1. Open the `/copy` link → clicks **Make a copy**.

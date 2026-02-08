@@ -43,7 +43,9 @@ You should see **Approvals** in the menu bar.
 
 Use **Approvals → Create demo setup** to generate the `Requests` + `Audit` tabs (with correct headers) and seed a couple example requests.
 
-For a clean, step-by-step “demo in 2 minutes” script (and suggested screenshots), see: **`DEMO-TEMPLATE.md`**.
+For a clean, step-by-step “demo in 2 minutes” script, see: **`DEMO-TEMPLATE.md`**.
+
+For a quick checklist of suggested screenshots (useful for a demo/listing), see: **`SCREENSHOTS.md`**.
 
 For the exact tab/column schema (and what’s configurable), see: **`SHEET-SCHEMA.md`**.
 

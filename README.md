@@ -73,6 +73,9 @@ The zip includes Code.gs + docs + landing page and a `manifest.json` with sha256
 - Optional (default ON): **re-approval required after change**.
   - Implemented via a simple `onEdit(e)` trigger.
   - If a user edits a previously-approved row (`Status=APPROVED`), the script can auto-set it back to `PENDING` and append an audit event `REAPPROVAL_REQUIRED`.
+  - If your domain disables/restricts simple triggers, you can install an **installable trigger** from the menu:
+    - **Approvals → Install re-approval trigger (optional)**
+    - This creates an installable handler `onEditInstallable(e)` that delegates to the same logic.
   - Configure **which edits count**:
     - Exempt columns (never trigger): `CFG.REAPPROVAL_EXEMPT_HEADERS`
     - Tracked columns (only these trigger, if set): `CFG.REAPPROVAL_TRACKED_HEADERS` (leave empty to treat any non-exempt column as meaningful)

@@ -57,8 +57,69 @@ function onOpen() {
     .addSeparator()
     .addItem('Create demo setup', 'createDemoSetup')
     .addSeparator()
+    .addItem('Install re-approval trigger (optional)', 'installReapprovalTrigger')
+    .addItem('Remove installed triggers', 'removeInstalledApprovalTriggers')
+    .addSeparator()
     .addItem('Help / Docs', 'showHelpSidebar')
     .addToUi();
+}
+
+/**
+ * Optional: install an installable onEdit trigger.
+ *
+ * Why:
+ * - Simple triggers can be constrained in some domains.
+ * - Installable triggers run under the authorizing user and can be easier to debug/permission.
+ *
+ * Note: if you keep the simple `onEdit(e)` function, Sheets will still call it.
+ * Installing this trigger creates an additional handler `onEditInstallable(e)`.
+ */
+function installReapprovalTrigger() {
+  const ss = SpreadsheetApp.getActive();
+  const existing = ScriptApp.getProjectTriggers().filter(t => {
+    return t.getEventType && t.getEventType() === ScriptApp.EventType.ON_EDIT && t.getHandlerFunction && t.getHandlerFunction() === 'onEditInstallable';
+  });
+
+  if (existing.length > 0) {
+    SpreadsheetApp.getUi().alert('Re-approval trigger already installed.');
+    return;
+  }
+
+  ScriptApp.newTrigger('onEditInstallable')
+    .forSpreadsheet(ss)
+    .onEdit()
+    .create();
+
+  SpreadsheetApp.getUi().alert('Installed installable re-approval trigger (onEditInstallable).');
+}
+
+function removeInstalledApprovalTriggers() {
+  const triggers = ScriptApp.getProjectTriggers();
+  let removed = 0;
+  triggers.forEach(t => {
+    const handler = t.getHandlerFunction && t.getHandlerFunction();
+    const type = t.getEventType && t.getEventType();
+    if (type === ScriptApp.EventType.ON_EDIT && (handler === 'onEditInstallable')) {
+      ScriptApp.deleteTrigger(t);
+      removed++;
+    }
+  });
+
+  SpreadsheetApp.getUi().alert(`Removed ${removed} installed trigger(s).`);
+}
+
+/**
+ * Installable trigger handler.
+ * Delegates to the simple trigger logic.
+ */
+function onEditInstallable(e) {
+  // Best-effort: if anything fails, we don't want to break the user's edit.
+  try {
+    onEdit(e);
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('onEditInstallable error:', err);
+  }
 }
 
 /**

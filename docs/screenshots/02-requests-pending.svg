@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <defs>
+    <style>
+      .bg{fill:#0b1020}
+      .panel{fill:#111a33;stroke:#2a3a6b;stroke-width:2}
+      .tab{fill:#1a2550}
+      .grid{stroke:#24335f;stroke-width:1}
+      .txt{fill:#e6ecff;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;font-size:24px}
+      .small{fill:#c7d2fe;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;font-size:18px}
+      .mono{fill:#93c5fd;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:18px}
+    </style>
+  </defs>
+  <rect class="bg" width="1200" height="675"/>
+  <rect class="panel" x="60" y="60" width="1080" height="555" rx="18"/>
+
+  <!-- tabs -->
+  <rect class="tab" x="100" y="90" width="170" height="46" rx="12"/>
+  <rect class="tab" x="280" y="90" width="150" height="46" rx="12" opacity="0.65"/>
+  <text class="txt" x="140" y="122">Requests</text>
+  <text class="txt" x="315" y="122" opacity="0.9">Audit</text>
+
+  <!-- table area -->
+  <rect x="90" y="155" width="1020" height="420" rx="10" fill="#0f1731"/>
+  <!-- header row -->
+  <rect x="90" y="155" width="1020" height="46" rx="10" fill="#18224a"/>
+  <text class="mono" x="115" y="186">RequestId</text>
+  <text class="mono" x="300" y="186">Title</text>
+  <text class="mono" x="520" y="186">Requester</text>
+  <text class="mono" x="720" y="186">Status</text>
+  <text class="mono" x="870" y="186">Approver</text>
+
+  <!-- grid lines -->
+  <line class="grid" x1="270" y1="155" x2="270" y2="575"/>
+  <line class="grid" x1="500" y1="155" x2="500" y2="575"/>
+  <line class="grid" x1="690" y1="155" x2="690" y2="575"/>
+  <line class="grid" x1="840" y1="155" x2="840" y2="575"/>
+
+  <!-- rows -->
+  <g class="small">
+    <text x="115" y="240">REQ-001</text>
+    <text x="300" y="240">Purchase: sensor</text>
+    <text x="520" y="240">A. Smith</text>
+    <text x="720" y="240">PENDING</text>
+    <text x="870" y="240">—</text>
+
+    <text x="115" y="290">REQ-002</text>
+    <text x="300" y="290">Travel reimbursement</text>
+    <text x="520" y="290">B. Chen</text>
+    <text x="720" y="290">PENDING</text>
+    <text x="870" y="290">—</text>
+
+    <text x="115" y="340">REQ-003</text>
+    <text x="300" y="340">Content approval</text>
+    <text x="520" y="340">J. Patel</text>
+    <text x="720" y="340">PENDING</text>
+    <text x="870" y="340">—</text>
+  </g>
+
+  <text class="small" x="95" y="610">Placeholder • show a couple rows in Requests with Status=PENDING</text>
+</svg>

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <defs>
+    <style>
+      .bg{fill:#0b1020}
+      .panel{fill:#111a33;stroke:#2a3a6b;stroke-width:2}
+      .tab{fill:#1a2550}
+      .grid{stroke:#24335f;stroke-width:1}
+      .txt{fill:#e6ecff;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;font-size:24px}
+      .small{fill:#c7d2fe;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;font-size:18px}
+      .mono{fill:#93c5fd;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:18px}
+      .hash{fill:#a5b4fc;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:16px}
+    </style>
+  </defs>
+  <rect class="bg" width="1200" height="675"/>
+  <rect class="panel" x="60" y="60" width="1080" height="555" rx="18"/>
+
+  <rect class="tab" x="100" y="90" width="150" height="46" rx="12"/>
+  <text class="txt" x="145" y="122">Audit</text>
+
+  <rect x="90" y="155" width="1020" height="420" rx="10" fill="#0f1731"/>
+  <rect x="90" y="155" width="1020" height="46" rx="10" fill="#18224a"/>
+  <text class="mono" x="115" y="186">At</text>
+  <text class="mono" x="260" y="186">Actor</text>
+  <text class="mono" x="460" y="186">Action</text>
+  <text class="mono" x="640" y="186">RequestId</text>
+  <text class="mono" x="800" y="186">SnapshotHash</text>
+
+  <line class="grid" x1="230" y1="155" x2="230" y2="575"/>
+  <line class="grid" x1="420" y1="155" x2="420" y2="575"/>
+  <line class="grid" x1="610" y1="155" x2="610" y2="575"/>
+  <line class="grid" x1="770" y1="155" x2="770" y2="575"/>
+
+  <rect x="90" y="212" width="1020" height="58" fill="#1a2550" opacity="0.75"/>
+  <g class="small">
+    <text x="115" y="250">2026-02-09 05:45</text>
+    <text x="260" y="250">you@domain.com</text>
+    <text x="460" y="250">APPROVE</text>
+    <text x="640" y="250">REQ-001</text>
+  </g>
+  <text class="hash" x="800" y="250">6f2c…c9aa</text>
+
+  <text class="small" x="95" y="610">Placeholder • show new Audit row appended after approving/rejecting</text>
+</svg>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <defs>
+    <style>
+      .bg{fill:#0b1020}
+      .panel{fill:#111a33;stroke:#2a3a6b;stroke-width:2}
+      .bar{fill:#1a2550}
+      .txt{fill:#e6ecff;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;font-size:28px}
+      .small{fill:#c7d2fe;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;font-size:20px}
+      .code{fill:#93c5fd;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:20px}
+    </style>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1200" height="675"/>
+  <rect class="panel" x="70" y="70" width="1060" height="535" rx="18"/>
+  <rect class="bar" x="70" y="70" width="1060" height="70" rx="18"/>
+  <text class="txt" x="100" y="115">Google Sheets</text>
+  <text class="small" x="320" y="115">File   Edit   View   Insert   Format   Data   Tools   Extensions   Help</text>
+  <rect x="790" y="90" width="260" height="36" rx="10" fill="#0ea5e9" opacity="0.22"/>
+  <text class="txt" x="812" y="118">Approvals</text>
+  <text class="small" x="100" y="200">Screenshot placeholder • replace with real screenshot for a listing</text>
+  <text class="code" x="100" y="240">Goal: show custom menu “Approvals” visible in the top bar</text>
+</svg>

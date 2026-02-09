@@ -30,9 +30,17 @@ h1{margin:0 0 10px;font-size:40px;line-height:1.1}
 .card ul,.card ol{margin:0;padding-left:18px;color:var(--muted)}
 .card li{margin:6px 0}
 code{padding:2px 6px;border:1px solid var(--line);border-radius:8px;background:rgba(11,16,32,.35);color:var(--text)}
+.gallery{margin-top:16px;padding:18px;border:1px solid var(--line);border-radius:14px;background:rgba(16,26,51,.45)}
+.gallery h2{margin:0 0 8px;font-size:18px}
+.shots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.shots figure{margin:0;padding:10px;border:1px solid var(--line);border-radius:12px;background:rgba(11,16,32,.25)}
+.shots img{width:100%;height:auto;display:block;border-radius:10px;border:1px solid rgba(34,48,90,.6)}
+.shots figcaption{margin-top:8px;color:var(--muted);font-size:13px}
+
 .footer{margin-top:16px;padding:14px 18px;border:1px dashed var(--line);border-radius:14px;background:rgba(16,26,51,.35)}
 .fine{margin:0;color:var(--muted);font-size:13px;line-height:1.4}
 @media (max-width: 760px){
+  .shots{grid-template-columns:1fr}
   .grid{grid-template-columns:1fr}
   h1{font-size:32px}
 }

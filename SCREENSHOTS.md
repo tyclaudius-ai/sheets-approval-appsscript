@@ -31,11 +31,22 @@ You can capture these in ~5 minutes to make the repo / landing page feel “real
 
 ## Where to put them
 
-- Create a folder: `docs/screenshots/`
-- Use simple names like:
+- Folder: `docs/screenshots/`
+- Recommended names:
   - `01-menu.png`
   - `02-requests-pending.png`
   - `03-approved-row.png`
   - `04-audit-entry.png`
 
-Then link them from the README or landing page.
+### Included placeholders
+
+This repo includes a minimal **SVG placeholder set** (so you can ship a “screenshot set” without real screenshots yet):
+
+- `docs/screenshots/01-menu.svg`
+- `docs/screenshots/02-requests-pending.svg`
+- `docs/screenshots/03-approved-row.svg`
+- `docs/screenshots/04-audit-entry.svg`
+
+They’re linked from `landing/index.html`.
+
+For a real listing, replace the SVGs with real screenshots (PNG) using the same base names.

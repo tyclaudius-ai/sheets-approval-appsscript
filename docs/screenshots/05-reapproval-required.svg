@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <defs>
+    <style>
+      .bg{fill:#0b1020}
+      .panel{fill:#111a33;stroke:#2a3a6b;stroke-width:2}
+      .bar{fill:#1a2550}
+      .cell{fill:#0f172a;stroke:#24345f;stroke-width:2}
+      .pill{fill:#334155;opacity:0.9}
+      .pill2{fill:#f97316;opacity:0.22}
+      .txt{fill:#e6ecff;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;font-size:28px}
+      .small{fill:#c7d2fe;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;font-size:20px}
+      .code{fill:#93c5fd;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:20px}
+      .warn{fill:#fdba74;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:20px}
+    </style>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1200" height="675"/>
+
+  <rect class="panel" x="70" y="70" width="1060" height="535" rx="18"/>
+  <rect class="bar" x="70" y="70" width="1060" height="70" rx="18"/>
+  <text class="txt" x="100" y="115">Requests</text>
+  <text class="small" x="260" y="115">(placeholder sheet)</text>
+
+  <text class="small" x="100" y="180">Scenario: user edits an APPROVED row → auto reverts to PENDING + logs REAPPROVAL_REQUIRED</text>
+
+  <!-- header row -->
+  <rect class="cell" x="100" y="220" width="1000" height="55" rx="10"/>
+  <text class="code" x="125" y="255">RequestId</text>
+  <text class="code" x="305" y="255">Title</text>
+  <text class="code" x="560" y="255">Status</text>
+  <text class="code" x="710" y="255">Approver</text>
+  <text class="code" x="880" y="255">DecisionAt</text>
+
+  <!-- data row -->
+  <rect class="cell" x="100" y="290" width="1000" height="70" rx="10"/>
+  <text class="small" x="125" y="332">REQ-102</text>
+  <text class="small" x="305" y="332">Vendor invoice — updated amount</text>
+
+  <rect class="pill2" x="545" y="305" width="140" height="40" rx="18"/>
+  <text class="txt" x="565" y="335">PENDING</text>
+
+  <rect class="pill" x="700" y="305" width="150" height="40" rx="18"/>
+  <text class="small" x="720" y="332">(cleared)</text>
+
+  <rect class="pill" x="865" y="305" width="215" height="40" rx="18"/>
+  <text class="small" x="885" y="332">(cleared)</text>
+
+  <text class="warn" x="100" y="410">Audit event appended: ACTION=REAPPROVAL_REQUIRED • reason=meaningful edit on previously-approved row</text>
+  <text class="code" x="100" y="450">Tip: capture both the Requests row reverting + the Audit tab showing REAPPROVAL_REQUIRED</text>
+
+  <text class="small" x="100" y="520">Screenshot placeholder • replace with real screenshot for a listing</text>
+</svg>

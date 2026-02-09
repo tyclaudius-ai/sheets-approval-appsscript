@@ -46,6 +46,8 @@ This repo includes a minimal **SVG placeholder set** (so you can ship a “scree
 - `docs/screenshots/02-requests-pending.svg`
 - `docs/screenshots/03-approved-row.svg`
 - `docs/screenshots/04-audit-entry.svg`
+- `docs/screenshots/05-reapproval-required.svg`
+- `docs/screenshots/06-help-sidebar.svg`
 
 They’re linked from `landing/index.html`.
 

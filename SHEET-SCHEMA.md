@@ -15,6 +15,7 @@ Row 1 must contain headers. The script expects (recommended exact names):
 - `Approver` — email (best-effort; may be `unknown`)
 - `DecisionAt` — timestamp
 - `DecisionNotes` — free text
+- `ApprovedHash` — optional; sha256 of last approved “meaningful fields” snapshot (used by drift scanner)
 
 You can add extra columns. They’ll be included in the audit snapshot JSON.
 
@@ -29,11 +30,21 @@ Headers:
 - `Action` — one of:
   - `APPROVED` / `REJECTED` / `PENDING`
   - `REAPPROVAL_REQUIRED`
+  - `APPROVAL_HASH_SET`
   - `DEMO_SETUP`
 - `RequestId`
 - `RowNumber` — row index in `Requests`
 - `SnapshotJSON` — JSON string of the row (plus extra metadata for some actions)
 - `SnapshotHash` — sha256 hex of SnapshotJSON (tamper-evidence)
+
+## Drift detection (optional but recommended)
+
+If you add a `ApprovedHash` column (header must match `CFG.APPROVED_HASH_HEADER`), the script will:
+
+- Write `ApprovedHash` when you approve a row
+- Let you run **Approvals → Scan approved rows for changes** to detect drift and automatically revert changed rows back to `PENDING`
+
+This helps when rows change *without* triggering `onEdit(e)` (imports, other scripts, API writes, etc.).
 
 ## Config knobs (in `Code.gs`)
 

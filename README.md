@@ -23,6 +23,7 @@ Put headers on row 1 (exact names recommended):
 - `Approver`
 - `DecisionAt` (timestamp)
 - `DecisionNotes`
+- `ApprovedHash` (optional; used for drift scanning)
 
 You can add extra columns; the script logs a row snapshot to the audit trail.
 
@@ -73,6 +74,7 @@ The zip includes Code.gs + docs + landing page and a `manifest.json` with sha256
 - This MVP does not enforce role-based access; rely on Google Sheet sharing permissions.
 - Audit log is append-only by convention (it’s still a sheet). The stored **sha256 hash** makes casual tampering detectable. For stronger immutability, write events to an external store.
 - Optional (default ON): **re-approval required after change**.
+  - The `onEdit(e)` trigger only catches user edits. For changes that happen outside `onEdit` (imports/other scripts), add an `ApprovedHash` column and use **Approvals → Scan approved rows for changes** to detect drift.
   - Implemented via a simple `onEdit(e)` trigger.
   - If a user edits a previously-approved row (`Status=APPROVED`), the script can auto-set it back to `PENDING` and append an audit event `REAPPROVAL_REQUIRED`.
   - If your domain disables/restricts simple triggers, you can install an **installable trigger** from the menu:

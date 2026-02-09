@@ -18,6 +18,12 @@ const CFG = {
   // RequestId is generated if empty
   REQUEST_ID_HEADER: 'RequestId',
 
+  // Optional: store a sha256 hash of the last approved *meaningful* snapshot on the row.
+  // If you add a column with this header, the script will write the hash on APPROVED
+  // and the menu action `Scan approved rows for changes` can detect drift even when
+  // changes happen outside a user edit (imports, other scripts, copy/paste that bypasses triggers, etc.).
+  APPROVED_HASH_HEADER: 'ApprovedHash',
+
   // If an already-approved row is edited, automatically revert it to PENDING.
   //
   // Behavior:
@@ -59,6 +65,8 @@ function onOpen() {
     .addItem('Reject row', 'rejectSelectedRow')
     .addSeparator()
     .addItem('Reset to pending', 'resetSelectedRowToPending')
+    .addSeparator()
+    .addItem('Scan approved rows for changes', 'scanForReapprovalNeeded')
     .addSeparator()
     .addItem('Create demo setup', 'createDemoSetup')
     .addSeparator()
@@ -222,6 +230,145 @@ function onEdit(e) {
   }
 }
 
+function computeMeaningfulSnapshotJson_(headers, rowValues) {
+  const obj = rowToObject_(headers, rowValues);
+
+  const tracked = (CFG.REAPPROVAL_TRACKED_HEADERS || []).map(h => (h || '').toString().trim()).filter(Boolean);
+  const exempt = (CFG.REAPPROVAL_EXEMPT_HEADERS || []).map(h => (h || '').toString().trim()).filter(Boolean);
+
+  // Build a stable, minimal snapshot of only the fields that matter for re-approval.
+  // - If tracked is set: only include tracked headers (minus exempt)
+  // - Else: include all headers (minus exempt)
+  const keys = [];
+  for (let i = 0; i < headers.length; i++) {
+    const h = (headers[i] || `Col${i + 1}`).toString().trim();
+    if (!h) continue;
+    if (exempt.indexOf(h) !== -1) continue;
+    if (tracked.length > 0 && tracked.indexOf(h) === -1) continue;
+    keys.push(h);
+  }
+  keys.sort();
+
+  const out = {};
+  keys.forEach(k => { out[k] = obj[k]; });
+  return JSON.stringify(out);
+}
+
+function computeMeaningfulHash_(headers, rowValues) {
+  return sha256Hex_(computeMeaningfulSnapshotJson_(headers, rowValues));
+}
+
+/**
+ * Menu action: scan approved rows to detect “drift” from the last approved snapshot.
+ *
+ * Why this exists:
+ * - `onEdit(e)` only fires for user edits.
+ * - Rows can still change via imports, other scripts, API writes, copy/paste edge cases, etc.
+ *
+ * If you add a column named `ApprovedHash` (CFG.APPROVED_HASH_HEADER),
+ * this tool will:
+ * - on APPROVED rows with empty ApprovedHash: set it to the current meaningful hash (and audit it)
+ * - on APPROVED rows with a mismatched ApprovedHash: revert to PENDING and log REAPPROVAL_REQUIRED
+ */
+function scanForReapprovalNeeded() {
+  const lock = LockService.getDocumentLock();
+  lock.waitLock(30 * 1000);
+
+  try {
+    const ss = SpreadsheetApp.getActive();
+    const reqSheet = ss.getSheetByName(CFG.REQUESTS_SHEET);
+    if (!reqSheet) throw new Error(`Missing sheet: ${CFG.REQUESTS_SHEET}`);
+
+    const headers = getHeaders_(reqSheet);
+    const idxStatus = headers.indexOf('Status');
+    const idxApprovedHash = headers.indexOf(CFG.APPROVED_HASH_HEADER);
+
+    if (idxStatus == -1) throw new Error('Missing required header: Status');
+    if (idxApprovedHash == -1) {
+      SpreadsheetApp.getUi().alert(`No column named “${CFG.APPROVED_HASH_HEADER}” found. Add it to Requests to enable drift scanning.`);
+      return;
+    }
+
+    const lastRow = reqSheet.getLastRow();
+    if (lastRow <= CFG.HEADER_ROW) {
+      SpreadsheetApp.getUi().alert('No data rows to scan.');
+      return;
+    }
+
+    const values = reqSheet.getRange(CFG.HEADER_ROW + 1, 1, lastRow - CFG.HEADER_ROW, headers.length).getValues();
+
+    const now = new Date();
+    const userEmail = getUserEmail_();
+    let setCount = 0;
+    let reapprovalCount = 0;
+
+    for (let i = 0; i < values.length; i++) {
+      const rowNumber = CFG.HEADER_ROW + 1 + i;
+      const rowValues = values[i];
+      const status = (rowValues[idxStatus] || '').toString().trim();
+      if (status !== CFG.STATUS.APPROVED) continue;
+
+      const requestId = ensureRequestId_(reqSheet, headers, rowNumber, rowToObject_(headers, rowValues));
+      const computed = computeMeaningfulHash_(headers, rowValues);
+      const stored = (rowValues[idxApprovedHash] || '').toString().trim();
+
+      if (!stored) {
+        // First-time: set it, but do not force re-approval.
+        reqSheet.getRange(rowNumber, idxApprovedHash + 1).setValue(computed);
+        setCount++;
+
+        appendAuditEvent_(ss, {
+          eventAt: now,
+          actor: userEmail,
+          action: 'APPROVAL_HASH_SET',
+          requestId,
+          rowNumber,
+          snapshotJson: JSON.stringify({ rowNumber, computedMeaningfulHash: computed }),
+          snapshotHash: sha256Hex_(`set:${computed}`),
+        });
+        continue;
+      }
+
+      if (stored !== computed) {
+        // Drift detected: revert to pending + clear decision fields.
+        setCellByHeader_(reqSheet, headers, rowNumber, 'Status', CFG.STATUS.PENDING);
+        setCellByHeader_(reqSheet, headers, rowNumber, 'Approver', '');
+        setCellByHeader_(reqSheet, headers, rowNumber, 'DecisionAt', '');
+        setCellByHeader_(reqSheet, headers, rowNumber, 'DecisionNotes', 'Auto: re-approval required (hash mismatch; run scan)');
+
+        if (CFG.LOCK_ROW_ON_APPROVE) unprotectRow_(reqSheet, rowNumber);
+
+        const postValues = reqSheet.getRange(rowNumber, 1, 1, headers.length).getValues()[0];
+        const postObj = rowToObject_(headers, postValues);
+        const snapshotJson = JSON.stringify({
+          ...postObj,
+          _reapproval: {
+            reason: 'hash_mismatch',
+            storedMeaningfulHash: stored,
+            computedMeaningfulHash: computed,
+          },
+        });
+
+        appendAuditEvent_(ss, {
+          eventAt: now,
+          actor: userEmail,
+          action: 'REAPPROVAL_REQUIRED',
+          requestId,
+          rowNumber,
+          snapshotJson,
+          snapshotHash: sha256Hex_(snapshotJson),
+        });
+
+        reapprovalCount++;
+      }
+    }
+
+    SpreadsheetApp.getUi().alert(`Scan complete. Set ApprovedHash on ${setCount} row(s). Re-opened ${reapprovalCount} row(s) for re-approval.`);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
 function approveSelectedRow() {
   decideOnSelectedRow_(CFG.STATUS.APPROVED);
 }
@@ -289,6 +436,12 @@ function decideOnSelectedRow_(status) {
     // Refresh snapshot for audit log
     const newValues = reqSheet.getRange(row, 1, 1, headers.length).getValues()[0];
     const newObj = rowToObject_(headers, newValues);
+
+    // If APPROVED, store a hash of the meaningful fields on the row (optional column).
+    if (status === CFG.STATUS.APPROVED) {
+      const mh = computeMeaningfulHash_(headers, newValues);
+      setCellByHeader_(reqSheet, headers, row, CFG.APPROVED_HASH_HEADER, mh);
+    }
 
     const snapshotJson = JSON.stringify(newObj);
     appendAuditEvent_(ss, {
@@ -449,7 +602,7 @@ function unprotectRow_(sheet, row) {
 function createDemoSetup() {
   const ss = SpreadsheetApp.getActive();
 
-  const requestsHeaders = ['RequestId', 'Title', 'Requester', 'Status', 'Approver', 'DecisionAt', 'DecisionNotes'];
+  const requestsHeaders = ['RequestId', 'Title', 'Requester', 'Status', 'Approver', 'DecisionAt', 'DecisionNotes', CFG.APPROVED_HASH_HEADER];
   const req = ensureSheetWithHeaders_(ss, CFG.REQUESTS_SHEET, requestsHeaders);
 
   // Seed a couple rows if sheet is empty (besides header).

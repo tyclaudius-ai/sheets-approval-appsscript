@@ -255,7 +255,7 @@ function decideOnSelectedRow_(status) {
         : 'Reset to pending';
 
     let notes = '';
-    if (status !== CFG.STATUS.PENDING) {
+    if (status === CFG.STATUS.APPROVED || status === CFG.STATUS.REJECTED) {
       const resp = ui.prompt(promptTitle, 'Optional decision notes:', ui.ButtonSet.OK_CANCEL);
       if (resp.getSelectedButton() !== ui.Button.OK) return;
       notes = (resp.getResponseText() || '').trim();
@@ -266,9 +266,17 @@ function decideOnSelectedRow_(status) {
 
     // Write decision back to row
     setCellByHeader_(reqSheet, headers, row, 'Status', status);
-    setCellByHeader_(reqSheet, headers, row, 'Approver', userEmail);
-    setCellByHeader_(reqSheet, headers, row, 'DecisionAt', now);
-    setCellByHeader_(reqSheet, headers, row, 'DecisionNotes', notes);
+
+    if (status === CFG.STATUS.PENDING) {
+      // Reset: clear decision metadata (do NOT attribute to a user/time).
+      setCellByHeader_(reqSheet, headers, row, 'Approver', '');
+      setCellByHeader_(reqSheet, headers, row, 'DecisionAt', '');
+      setCellByHeader_(reqSheet, headers, row, 'DecisionNotes', '');
+    } else {
+      setCellByHeader_(reqSheet, headers, row, 'Approver', userEmail);
+      setCellByHeader_(reqSheet, headers, row, 'DecisionAt', now);
+      setCellByHeader_(reqSheet, headers, row, 'DecisionNotes', notes);
+    }
 
     // Refresh snapshot for audit log
     const newValues = reqSheet.getRange(row, 1, 1, headers.length).getValues()[0];

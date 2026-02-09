@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.2 — 2026-02-09
+
+- **Reset behavior:** “Reset to pending” now clears `Approver`, `DecisionAt`, and `DecisionNotes` instead of attributing a user/time.
+
 ## v0.1.1 — 2026-02-09
 
 - **Re-approval reliability:** added an optional **installable** onEdit trigger (Approvals menu → *Install re-approval trigger*) for domains/environments where simple triggers are unreliable.

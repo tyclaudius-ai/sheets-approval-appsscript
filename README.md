@@ -81,6 +81,7 @@ The zip includes Code.gs + docs + landing page and a `manifest.json` with sha256
   - Configure **which edits count**:
     - Exempt columns (never trigger): `CFG.REAPPROVAL_EXEMPT_HEADERS`
     - Tracked columns (only these trigger, if set): `CFG.REAPPROVAL_TRACKED_HEADERS` (leave empty to treat any non-exempt column as meaningful)
+    - Statuses that re-open on edit: `CFG.REAPPROVAL_FROM_STATUSES` (default `[APPROVED]`)
 - Optional (default ON): **row protection on approval**.
   - By default it’s **warning-only**, to avoid hard permission failures on some Google Workspace domains.
   - You can switch to enforced protection by setting `CFG.LOCK_WARNING_ONLY = false` (requires editor/owner rights to manage protections).

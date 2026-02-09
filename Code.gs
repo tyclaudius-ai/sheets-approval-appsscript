@@ -31,6 +31,11 @@ const CFG = {
   // Leave empty to treat any non-exempt column as meaningful.
   REAPPROVAL_TRACKED_HEADERS: [],
 
+  // Which statuses should revert to PENDING when a meaningful edit occurs.
+  // Default: only APPROVED rows require re-approval.
+  // You may include 'REJECTED' if you want edits to rejected requests to re-open them.
+  REAPPROVAL_FROM_STATUSES: ['APPROVED'],
+
   // Columns that will NOT trigger re-approval (decision + meta columns).
   REAPPROVAL_EXEMPT_HEADERS: [
     'RequestId',
@@ -172,7 +177,10 @@ function onEdit(e) {
       const rowObj = rowToObject_(headers, rowValues);
 
       const status = (rowObj.Status || '').toString().trim();
-      if (status !== CFG.STATUS.APPROVED) continue;
+      const reapprovalStatuses = (CFG.REAPPROVAL_FROM_STATUSES || [CFG.STATUS.APPROVED])
+        .map(x => (x || '').toString().trim())
+        .filter(Boolean);
+      if (reapprovalStatuses.indexOf(status) === -1) continue;
 
       const requestId = ensureRequestId_(sheet, headers, r, rowObj);
 
@@ -180,7 +188,7 @@ function onEdit(e) {
       setCellByHeader_(sheet, headers, r, 'Status', CFG.STATUS.PENDING);
       setCellByHeader_(sheet, headers, r, 'Approver', '');
       setCellByHeader_(sheet, headers, r, 'DecisionAt', '');
-      setCellByHeader_(sheet, headers, r, 'DecisionNotes', `Auto: re-approval required (edited: ${editedHeaders.join(', ')})`);
+      setCellByHeader_(sheet, headers, r, 'DecisionNotes', `Auto: re-approval required (was ${status}; edited: ${editedHeaders.join(', ')})`);
 
       // Remove row lock if present.
       if (CFG.LOCK_ROW_ON_APPROVE) {
@@ -195,7 +203,7 @@ function onEdit(e) {
         ...newObj,
         _reapproval: {
           editedHeaders,
-          priorStatus: CFG.STATUS.APPROVED,
+          priorStatus: status,
         },
       });
 

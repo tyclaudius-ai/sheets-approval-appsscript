@@ -44,6 +44,7 @@ Key ones:
 - `REAPPROVAL_ON_CHANGE` (default: true)
 - `REAPPROVAL_EXEMPT_HEADERS` (default: decision/meta columns)
 - `REAPPROVAL_TRACKED_HEADERS` (default: empty → any non-exempt change triggers)
+- `REAPPROVAL_FROM_STATUSES` (default: `[APPROVED]`; set to `[APPROVED, REJECTED]` to re-open rejected rows on meaningful edits)
 - `LOCK_ROW_ON_APPROVE` (default: true)
 - `LOCK_WARNING_ONLY` (default: true)
 

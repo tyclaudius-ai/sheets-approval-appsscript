@@ -4,9 +4,21 @@ This repo is intentionally **copy/paste-first** (no Marketplace add-on install).
 
 If you want a clean demo in ~2 minutes, do this:
 
-## 1) Create a fresh Google Sheet
+## 1) Create a fresh Google Sheet (two options)
+
+### Option A — start from scratch
 - Google Drive → **New → Google Sheets**
 - Name it: `Approvals Demo`
+
+### Option B — use the prebuilt demo workbook (.xlsx)
+- Download: `demo/Sheets-Approvals-Demo.xlsx`
+- Upload it to Google Drive → open as a Google Sheet
+
+If you want to regenerate the .xlsx locally:
+```bash
+python3 -m pip install -r scripts/requirements.txt
+python3 scripts/make_demo_xlsx.py
+```
 
 ## 2) Install the script
 1. In the Sheet: **Extensions → Apps Script**

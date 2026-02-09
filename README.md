@@ -46,6 +46,8 @@ Use **Approvals → Create demo setup** to generate the `Requests` + `Audit` tab
 
 For a clean, step-by-step “demo in 2 minutes” script, see: **`DEMO-TEMPLATE.md`**.
 
+Offline demo assets (CSV + importable XLSX) live in `demo/` — start with **`demo/README.md`**.
+
 For a client-ready delivery checklist (template link vs zip vs done-for-you), see: **`CLIENT-HANDOFF.md`**.
 
 For a quick checklist of suggested screenshots (useful for a demo/listing), see: **`SCREENSHOTS.md`**.

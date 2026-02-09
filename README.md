@@ -45,6 +45,8 @@ Use **Approvals → Create demo setup** to generate the `Requests` + `Audit` tab
 
 For a clean, step-by-step “demo in 2 minutes” script, see: **`DEMO-TEMPLATE.md`**.
 
+For a client-ready delivery checklist (template link vs zip vs done-for-you), see: **`CLIENT-HANDOFF.md`**.
+
 For a quick checklist of suggested screenshots (useful for a demo/listing), see: **`SCREENSHOTS.md`**.
 
 For “one-click copy” template-link instructions, see: **`TEMPLATE-INSTRUCTIONS.md`**.

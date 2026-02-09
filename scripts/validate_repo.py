@@ -23,6 +23,7 @@ REQUIRED_FILES = [
     "ONE_PAGER.md",
     "SETUP-CHECKLIST.md",
     "DEMO-TEMPLATE.md",
+    "CLIENT-HANDOFF.md",
     "OUTREACH-TEMPLATES.md",
     "SHEET-SCHEMA.md",
     "SCREENSHOTS.md",

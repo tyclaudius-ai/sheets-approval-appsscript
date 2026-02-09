@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.3 — 2026-02-09
+
+- Docs: added a concrete example for `REAPPROVAL_TRACKED_HEADERS` + `REAPPROVAL_FROM_STATUSES`.
+
 ## v0.1.2 — 2026-02-09
 
 - **Reset behavior:** “Reset to pending” now clears `Approver`, `DecisionAt`, and `DecisionNotes` instead of attributing a user/time.

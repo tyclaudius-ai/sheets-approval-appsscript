@@ -82,6 +82,16 @@ The zip includes Code.gs + docs + landing page and a `manifest.json` with sha256
     - Exempt columns (never trigger): `CFG.REAPPROVAL_EXEMPT_HEADERS`
     - Tracked columns (only these trigger, if set): `CFG.REAPPROVAL_TRACKED_HEADERS` (leave empty to treat any non-exempt column as meaningful)
     - Statuses that re-open on edit: `CFG.REAPPROVAL_FROM_STATUSES` (default `[APPROVED]`)
+
+  Example: only require re-approval when *money/requirements* change, and also re-open rejected requests if they were modified:
+
+  ```js
+  // Only these columns can trigger re-approval (when edited).
+  CFG.REAPPROVAL_TRACKED_HEADERS = ['Amount', 'Vendor', 'Title', 'DueDate'];
+
+  // Re-open both approved and rejected requests on meaningful edits.
+  CFG.REAPPROVAL_FROM_STATUSES = ['APPROVED', 'REJECTED'];
+  ```
 - Optional (default ON): **row protection on approval**.
   - By default it’s **warning-only**, to avoid hard permission failures on some Google Workspace domains.
   - You can switch to enforced protection by setting `CFG.LOCK_WARNING_ONLY = false` (requires editor/owner rights to manage protections).

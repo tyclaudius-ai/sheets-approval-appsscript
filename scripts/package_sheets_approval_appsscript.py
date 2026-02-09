@@ -35,9 +35,13 @@ DEFAULT_INCLUDE = [
     "ONE_PAGER.md",
     "SETUP-CHECKLIST.md",
     "DEMO-TEMPLATE.md",
+    "SCREENSHOTS.md",
     "OUTREACH-TEMPLATES.md",
     "landing/index.html",
     "landing/style.css",
+    # Include placeholder screenshot SVGs + demo workbook/assets.
+    "docs/screenshots",
+    "demo",
 ]
 
 
@@ -80,12 +84,26 @@ def main() -> int:
 
     missing: list[str] = []
     files: list[tuple[Path, str]] = []
-    for rel in include:
+
+    def add_path(rel: str) -> None:
         p = PKG_DIR / rel
         if not p.exists():
             missing.append(rel)
-            continue
-        files.append((p, rel))
+            return
+
+        if p.is_dir():
+            for sub in sorted(p.rglob("*")):
+                if sub.is_dir():
+                    continue
+                if sub.name in {".DS_Store"}:
+                    continue
+                rel_sub = str(sub.relative_to(PKG_DIR))
+                files.append((sub, rel_sub))
+        else:
+            files.append((p, rel))
+
+    for rel in include:
+        add_path(rel)
 
     if missing:
         raise SystemExit(f"Missing expected files: {missing}")

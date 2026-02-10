@@ -72,10 +72,22 @@ Right now those files exist as **copies of the placeholders** (generated PNGs). 
 
 ## After capture
 
+### Option A — Manual rename/move
+
 1) Rename/move screenshots to exactly the filenames above.
 2) Sanity check locally by opening:
    - `landing/index.html`
    - confirm the gallery now shows the real screenshots.
+
+### Option B — Use the helper script (recommended)
+
+If you captured your screenshots to Desktop with macOS’ default naming ("Screenshot … .png"), you can install them with:
+
+```bash
+python3 scripts/install_real_screenshots.py --from ~/Desktop
+```
+
+It will prompt you to pick which captured file maps to each target filename and copy them into `docs/screenshots/`.
 
 ## If you want *zero* personal info visible
 

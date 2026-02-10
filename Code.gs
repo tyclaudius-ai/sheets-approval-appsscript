@@ -596,8 +596,12 @@ function unprotectRow_(sheet, row) {
 }
 
 /**
- * Demo helper: creates the required sheets, headers, and a couple example requests.
- * Safe to run multiple times; it will not overwrite existing data rows.
+ * Demo helper: creates the required sheets, headers, and a screenshot-friendly
+ * set of example requests.
+ *
+ * Safe to run multiple times:
+ * - It will NOT overwrite existing data rows.
+ * - It WILL apply light formatting (freeze header row, set widths, header style).
  */
 function createDemoSetup() {
   const ss = SpreadsheetApp.getActive();
@@ -605,13 +609,57 @@ function createDemoSetup() {
   const requestsHeaders = ['RequestId', 'Title', 'Requester', 'Status', 'Approver', 'DecisionAt', 'DecisionNotes', CFG.APPROVED_HASH_HEADER];
   const req = ensureSheetWithHeaders_(ss, CFG.REQUESTS_SHEET, requestsHeaders);
 
-  // Seed a couple rows if sheet is empty (besides header).
-  if (req.getLastRow() <= CFG.HEADER_ROW) {
-    req.appendRow(['', 'Purchase approval: lab supplies', 'alex@example.com', CFG.STATUS.PENDING, '', '', '']);
-    req.appendRow(['', 'Access request: shared drive', 'sam@example.com', CFG.STATUS.PENDING, '', '', '']);
+  // Apply formatting even if there is already data.
+  try {
+    formatRequestsSheetForScreenshots_(req, requestsHeaders);
+  } catch (e) {
+    // Best-effort; formatting isn't critical.
   }
 
-  // Ensure audit sheet exists + headers are correct.
+  // Seed only when sheet is empty (besides header).
+  if (req.getLastRow() <= CFG.HEADER_ROW) {
+    // Deterministic, screenshot-ready rows.
+    // Note: use explicit RequestIds so screenshots remain stable.
+    const now = new Date();
+    const iso = Utilities.formatDate(now, ss.getSpreadsheetTimeZone(), 'yyyy-MM-dd HH:mm');
+
+    // Row 2: pending
+    req.appendRow(['REQ-0001', 'Purchase approval: lab supplies', 'alex@example.com', CFG.STATUS.PENDING, '', '', '', '']);
+
+    // Row 3: approved (clean)
+    req.appendRow(['REQ-0002', 'Vendor onboarding: ACME Co.', 'sam@example.com', CFG.STATUS.APPROVED, 'approver@example.com', iso, 'Approved for Q1; within budget.', '']);
+
+    // Row 4: rejected
+    req.appendRow(['REQ-0003', 'Access request: finance drive', 'taylor@example.com', CFG.STATUS.REJECTED, 'approver@example.com', iso, 'Rejected: least privilege — request specific folder.', '']);
+
+    // Row 5: approved (drift example) — stored hash will mismatch after we mutate the Title.
+    req.appendRow(['REQ-0004', 'Equipment purchase: thermal camera', 'jordan@example.com', CFG.STATUS.APPROVED, 'approver@example.com', iso, 'Approved: use preferred vendor.', '']);
+
+    // Set ApprovedHash on APPROVED rows, then introduce drift on REQ-0004.
+    const headers = getHeaders_(req);
+    const idxApprovedHash = headers.indexOf(CFG.APPROVED_HASH_HEADER);
+    if (idxApprovedHash !== -1) {
+      // Set hashes for rows 3 and 5.
+      [3, 5].forEach(r => {
+        const rowValues = req.getRange(r, 1, 1, headers.length).getValues()[0];
+        const computed = computeMeaningfulHash_(headers, rowValues);
+        req.getRange(r, idxApprovedHash + 1).setValue(computed);
+      });
+
+      // Mutate Title on REQ-0004 after hashing so scanForReapprovalNeeded() will catch it.
+      // (Simulates drift from imports/other scripts.)
+      req.getRange(5, headers.indexOf('Title') + 1).setValue('Equipment purchase: thermal camera (spec updated)');
+    }
+
+    // Cosmetic: auto-fit rows/columns around seeded data.
+    try {
+      req.autoResizeColumns(1, requestsHeaders.length);
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // Ensure audit sheet exists + log setup event.
   getOrCreateAuditSheet_(ss);
   appendAuditEvent_(ss, {
     eventAt: new Date(),
@@ -623,7 +671,48 @@ function createDemoSetup() {
     snapshotHash: sha256Hex_('demo'),
   });
 
-  SpreadsheetApp.getUi().alert('Demo setup complete. Select a row in “Requests” and use Approvals → Approve/Reject.');
+  SpreadsheetApp.getUi().alert(
+    'Demo setup complete.\n\n' +
+    'Suggested screenshots:\n' +
+    '1) Select REQ-0001 and Approvals → Approve row.\n' +
+    '2) Run Approvals → Scan approved rows for changes (REQ-0004 will reopen).\n' +
+    '3) Open Approvals → Help / Docs.'
+  );
+}
+
+function formatRequestsSheetForScreenshots_(sheet, headers) {
+  // Freeze header row.
+  sheet.setFrozenRows(1);
+
+  // Header style.
+  const headerRange = sheet.getRange(1, 1, 1, headers.length);
+  headerRange
+    .setFontWeight('bold')
+    .setBackground('#f1f3f4')
+    .setHorizontalAlignment('center');
+
+  // Set some reasonable default widths for clean screenshots.
+  const widths = {
+    RequestId: 110,
+    Title: 320,
+    Requester: 220,
+    Status: 110,
+    Approver: 220,
+    DecisionAt: 160,
+    DecisionNotes: 360,
+    ApprovedHash: 220,
+  };
+
+  headers.forEach((h, i) => {
+    const w = widths[h] || 160;
+    try { sheet.setColumnWidth(i + 1, w); } catch (e) { /* ignore */ }
+  });
+
+  // Wrap notes for nicer screenshots.
+  const idxNotes = headers.indexOf('DecisionNotes');
+  if (idxNotes !== -1) {
+    sheet.getRange(2, idxNotes + 1, Math.max(1, sheet.getMaxRows() - 1), 1).setWrap(true);
+  }
 }
 
 function ensureSheetWithHeaders_(ss, name, headers) {

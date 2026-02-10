@@ -56,6 +56,10 @@ For “one-click copy” template-link instructions, see: **`TEMPLATE-INSTRUCTIO
 
 For ready-to-paste marketplace listing copy (Gumroad/Ko-fi/Upwork Project Catalog), see: **`LISTING.md`**.
 
+If you want this installed/customized into your own sheet as a fixed-price setup, see:
+- `SALES.md`
+- `INTAKE_QUESTIONS.md`
+
 For the exact tab/column schema (and what’s configurable), see: **`SHEET-SCHEMA.md`**.
 
 ## Packaging (deliverable artifact)

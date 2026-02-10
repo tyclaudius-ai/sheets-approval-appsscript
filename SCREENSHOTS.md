@@ -38,7 +38,7 @@ You can capture these in ~5 minutes to make the repo / landing page feel “real
   - `03-approved-row.png`
   - `04-audit-entry.png`
 
-### Included placeholders
+### Included placeholders + generated PNGs
 
 This repo includes a minimal **SVG placeholder set** (so you can ship a “screenshot set” without real screenshots yet):
 
@@ -51,4 +51,13 @@ This repo includes a minimal **SVG placeholder set** (so you can ship a “scree
 
 They’re linked from `landing/index.html`.
 
-For a real listing, replace the SVGs with real screenshots (PNG) using the same base names.
+A matching **PNG set** is also available (generated from the SVG placeholders):
+
+- `docs/screenshots/png/01-menu.png`
+- `docs/screenshots/png/02-requests-pending.png`
+- `docs/screenshots/png/03-approved-row.png`
+- `docs/screenshots/png/04-audit-entry.png`
+- `docs/screenshots/png/05-reapproval-required.png`
+- `docs/screenshots/png/06-help-sidebar.png`
+
+For a real listing, replace these with real screenshots (PNG) using the same base names.

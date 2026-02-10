@@ -32,11 +32,13 @@ You can capture these in ~5 minutes to make the repo / landing page feel “real
 ## Where to put them
 
 - Folder: `docs/screenshots/`
-- Recommended names:
-  - `01-menu.png`
-  - `02-requests-pending.png`
-  - `03-approved-row.png`
-  - `04-audit-entry.png`
+- Recommended names (these are what the landing page should reference):
+  - `docs/screenshots/01-menu.png`
+  - `docs/screenshots/02-requests-pending.png`
+  - `docs/screenshots/03-approved-row.png`
+  - `docs/screenshots/04-audit-entry.png`
+
+Tip: see `REAL_SCREENSHOTS_GUIDE.md` for a 5–10 minute capture flow.
 
 ### Included placeholders + generated PNGs
 
@@ -60,4 +62,13 @@ A matching **PNG set** is also available (generated from the SVG placeholders):
 - `docs/screenshots/png/05-reapproval-required.png`
 - `docs/screenshots/png/06-help-sidebar.png`
 
-For a real listing, replace these with real screenshots (PNG) using the same base names.
+This repo also includes *top-level* PNGs at:
+
+- `docs/screenshots/01-menu.png`
+- `docs/screenshots/02-requests-pending.png`
+- `docs/screenshots/03-approved-row.png`
+- `docs/screenshots/04-audit-entry.png`
+- `docs/screenshots/05-reapproval-required.png`
+- `docs/screenshots/06-help-sidebar.png`
+
+Right now they are just copies of the placeholders. For a real listing, overwrite the top-level PNGs with real screenshots using the same filenames.

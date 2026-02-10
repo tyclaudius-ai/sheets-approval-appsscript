@@ -34,6 +34,16 @@ Goal: let someone create their own copy of the demo Sheet + Apps Script with min
 3. Use **Approvals → Create demo setup** (if not already present) and then **Approve row**.
 4. First run will prompt Google authorization.
 
+#### Optional: auto-generate a filled install guide
+
+If you have the Sheet URL/ID, you can generate a ready-to-send Markdown guide (email/Upwork/Notion):
+
+```bash
+python3 scripts/make_template_instructions.py "<sheet-url-or-id>" > TEMPLATE-INSTALL.md
+```
+
+This outputs a clean “Make a copy → authorize → demo” checklist with your exact `/copy` link.
+
 ## Option B: “Copy/paste installer” (works even without template)
 
 If you can’t (or don’t want to) host a template sheet:

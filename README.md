@@ -62,6 +62,8 @@ If you want this installed/customized into your own sheet as a fixed-price setup
 
 For the exact tab/column schema (and what’s configurable), see: **`SHEET-SCHEMA.md`**.
 
+If something doesn’t work (menus/permissions/triggers), see: **`TROUBLESHOOTING.md`**.
+
 ## Packaging (deliverable artifact)
 
 To hand this to a client as a single zip bundle, you can generate a distributable artifact:

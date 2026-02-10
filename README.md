@@ -70,6 +70,16 @@ python3 scripts/package_sheets_approval_appsscript.py --out dist/sheets-approval
 
 The zip includes Code.gs + docs + landing page and a `manifest.json` with sha256 checksums.
 
+## Optional: GitHub Pages demo site
+
+This repo includes a tiny GitHub Pages deploy workflow.
+
+- Build script: `scripts/build_gh_pages_site.py`
+- Output: `dist/site/`
+- Workflow: `.github/workflows/deploy-pages.yml`
+
+Once GitHub Pages is enabled in repo settings, pushes to `main` will deploy the landing page + docs + screenshots.
+
 ## Notes / Security
 
 - Uses the active user email when available. Some domains may restrict `Session.getActiveUser().getEmail()`.

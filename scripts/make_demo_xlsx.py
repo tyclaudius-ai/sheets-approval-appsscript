@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import csv
+from datetime import datetime
 
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
@@ -50,6 +51,13 @@ def autosize_columns(ws, max_width: int = 60, min_width: int = 10):
 
 def main() -> None:
     wb = Workbook()
+
+    # Make output reproducible: Excel metadata timestamps can otherwise change on each run.
+    fixed_dt = datetime(2000, 1, 1, 0, 0, 0)
+    wb.properties.created = fixed_dt
+    wb.properties.modified = fixed_dt
+    wb.properties.creator = "sheets-approval-appsscript"
+    wb.properties.lastModifiedBy = "sheets-approval-appsscript"
 
     # Requests
     ws_req = wb.active

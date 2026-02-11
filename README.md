@@ -62,6 +62,16 @@ You can also sanity-check whether `docs/screenshots/*.png` are still placeholder
 python3 scripts/check_screenshots.py
 ```
 
+Or run the full screenshots pipeline (check → regenerate gallery → optional optimize):
+
+```bash
+python3 scripts/screenshots_pipeline.py
+# strict mode (fails if any placeholders remain)
+python3 scripts/screenshots_pipeline.py --fail-on-placeholders
+# macOS-only: also create docs/screenshots/optimized/*.jpg
+python3 scripts/screenshots_pipeline.py --optimize --width 1400
+```
+
 ### Preview the landing page locally
 
 Because `landing/index.html` references `../docs/...` and other repo files, you’ll want to serve the **repo root** (not the `landing/` folder directly):

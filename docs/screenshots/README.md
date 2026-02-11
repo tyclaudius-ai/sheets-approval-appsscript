@@ -44,9 +44,7 @@ In-sheet Help sidebar for quick onboarding and usage.
 
 ## Capturing real screenshots
 
-Quick path: [`CAPTURE-CHEATSHEET.md`](./CAPTURE-CHEATSHEET.md)
-
-Full guide: [`REAL_SCREENSHOTS_GUIDE.md`](../../REAL_SCREENSHOTS_GUIDE.md)
+Follow: [`REAL_SCREENSHOTS_GUIDE.md`](../../REAL_SCREENSHOTS_GUIDE.md)
 
 After capturing, verify none are still placeholders:
 
@@ -58,12 +56,4 @@ Optional: regenerate this README + the HTML gallery from the manifest:
 
 ```bash
 python3 scripts/render_screenshots_gallery.py
-```
-
-## Optimized versions (for listings / smaller READMEs)
-
-Generate resized, compressed copies under `docs/screenshots/optimized/` (macOS-only; uses `sips`):
-
-```bash
-node scripts/optimize_screenshots.mjs --width 1400 --format jpg
 ```

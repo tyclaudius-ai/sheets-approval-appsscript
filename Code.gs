@@ -63,8 +63,11 @@ function onOpen() {
     .createMenu('Approvals')
     .addItem('Approve row', 'approveSelectedRow')
     .addItem('Reject row', 'rejectSelectedRow')
+    .addItem('Approve selected rows…', 'approveSelectedRows')
+    .addItem('Reject selected rows…', 'rejectSelectedRows')
     .addSeparator()
     .addItem('Reset to pending', 'resetSelectedRowToPending')
+    .addItem('Reset selected rows to pending', 'resetSelectedRowsToPending')
     .addSeparator()
     .addItem('Scan approved rows for changes', 'scanForReapprovalNeeded')
     .addSeparator()
@@ -377,8 +380,20 @@ function rejectSelectedRow() {
   decideOnSelectedRow_(CFG.STATUS.REJECTED);
 }
 
+function approveSelectedRows() {
+  decideOnSelectedRows_(CFG.STATUS.APPROVED);
+}
+
+function rejectSelectedRows() {
+  decideOnSelectedRows_(CFG.STATUS.REJECTED);
+}
+
 function resetSelectedRowToPending() {
   decideOnSelectedRow_(CFG.STATUS.PENDING);
+}
+
+function resetSelectedRowsToPending() {
+  decideOnSelectedRows_(CFG.STATUS.PENDING);
 }
 
 function decideOnSelectedRow_(status) {
@@ -396,28 +411,70 @@ function decideOnSelectedRow_(status) {
     const row = range.getRow();
     if (row <= CFG.HEADER_ROW) throw new Error('Select a data row (not the header).');
 
-    const headers = getHeaders_(reqSheet);
-    const rowValues = reqSheet.getRange(row, 1, 1, headers.length).getValues()[0];
-    const rowObj = rowToObject_(headers, rowValues);
+    decideOnRowsImpl_({ ss, reqSheet, status, rows: [row] });
+  } finally {
+    lock.releaseLock();
+  }
+}
 
-    const requestId = ensureRequestId_(reqSheet, headers, row, rowObj);
+function decideOnSelectedRows_(status) {
+  const lock = LockService.getDocumentLock();
+  lock.waitLock(30 * 1000);
 
-    const ui = SpreadsheetApp.getUi();
-    const promptTitle = status === CFG.STATUS.APPROVED
-      ? 'Approve request'
-      : status === CFG.STATUS.REJECTED
-        ? 'Reject request'
-        : 'Reset to pending';
+  try {
+    const ss = SpreadsheetApp.getActive();
+    const reqSheet = ss.getSheetByName(CFG.REQUESTS_SHEET);
+    if (!reqSheet) throw new Error(`Missing sheet: ${CFG.REQUESTS_SHEET}`);
 
-    let notes = '';
-    if (status === CFG.STATUS.APPROVED || status === CFG.STATUS.REJECTED) {
-      const resp = ui.prompt(promptTitle, 'Optional decision notes:', ui.ButtonSet.OK_CANCEL);
-      if (resp.getSelectedButton() !== ui.Button.OK) return;
-      notes = (resp.getResponseText() || '').trim();
+    const range = reqSheet.getActiveRange();
+    if (!range) throw new Error('No active selection');
+
+    const startRow = range.getRow();
+    const numRows = range.getNumRows();
+
+    const rows = [];
+    for (let r = startRow; r < startRow + numRows; r++) {
+      if (r > CFG.HEADER_ROW) rows.push(r);
     }
 
-    const now = new Date();
-    const userEmail = getUserEmail_();
+    if (rows.length === 0) throw new Error('Select at least one data row (not the header).');
+
+    decideOnRowsImpl_({ ss, reqSheet, status, rows });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function decideOnRowsImpl_({ ss, reqSheet, status, rows }) {
+  if (!ss) throw new Error('Missing ss');
+  if (!reqSheet) throw new Error('Missing reqSheet');
+  if (!Array.isArray(rows) || rows.length === 0) throw new Error('No rows selected');
+
+  const headers = getHeaders_(reqSheet);
+  const ui = SpreadsheetApp.getUi();
+
+  const promptTitle = status === CFG.STATUS.APPROVED
+    ? 'Approve request(s)'
+    : status === CFG.STATUS.REJECTED
+      ? 'Reject request(s)'
+      : 'Reset to pending';
+
+  let notes = '';
+  if (status === CFG.STATUS.APPROVED || status === CFG.STATUS.REJECTED) {
+    const resp = ui.prompt(promptTitle, `Optional decision notes (applied to ${rows.length} row(s)):` , ui.ButtonSet.OK_CANCEL);
+    if (resp.getSelectedButton() !== ui.Button.OK) return;
+    notes = (resp.getResponseText() || '').trim();
+  }
+
+  const now = new Date();
+  const userEmail = getUserEmail_();
+
+  rows.forEach(row => {
+    if (row <= CFG.HEADER_ROW) return;
+
+    const rowValues = reqSheet.getRange(row, 1, 1, headers.length).getValues()[0];
+    const rowObj = rowToObject_(headers, rowValues);
+    const requestId = ensureRequestId_(reqSheet, headers, row, rowObj);
 
     // Write decision back to row
     setCellByHeader_(reqSheet, headers, row, 'Status', status);
@@ -463,9 +520,7 @@ function decideOnSelectedRow_(status) {
         unprotectRow_(reqSheet, row);
       }
     }
-  } finally {
-    lock.releaseLock();
-  }
+  });
 }
 
 function getHeaders_(sheet) {

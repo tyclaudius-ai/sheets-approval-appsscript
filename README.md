@@ -52,6 +52,8 @@ For a client-ready delivery checklist (template link vs zip vs done-for-you), se
 
 For a quick checklist of suggested screenshots (useful for a demo/listing), see: **`SCREENSHOTS.md`**.
 
+For a simple rendered gallery (once you’ve overwritten placeholders with real PNGs): **`docs/screenshots/README.md`**.
+
 If you want to replace the included placeholder screenshots with **real** screenshots, see: **`REAL_SCREENSHOTS_GUIDE.md`**.
 
 You can also sanity-check whether `docs/screenshots/*.png` are still placeholder copies:

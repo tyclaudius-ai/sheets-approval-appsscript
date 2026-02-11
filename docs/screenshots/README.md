@@ -59,3 +59,11 @@ Optional: regenerate this README + the HTML gallery from the manifest:
 ```bash
 python3 scripts/render_screenshots_gallery.py
 ```
+
+## Optimized versions (for listings / smaller READMEs)
+
+Generate resized, compressed copies under `docs/screenshots/optimized/` (macOS-only; uses `sips`):
+
+```bash
+node scripts/optimize_screenshots.mjs --width 1400 --format jpg
+```

@@ -2,6 +2,8 @@
 
 Goal: replace the placeholder images with **real** screenshots while keeping filenames stable so the landing page and docs don’t need edits.
 
+Note: if you need something that looks non-placeholder *without* signing into Google, you can run `python3 scripts/generate_realish_screenshots.py`. It generates “real‑ish” screenshots by adding simple browser/Sheets chrome around the placeholder images. True Google Sheets captures are still preferred when available.
+
 ## Quick rules (so the shots look clean)
 
 - Use a **fresh demo copy** of the sheet (no client names/data).

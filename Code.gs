@@ -713,6 +713,47 @@ function formatRequestsSheetForScreenshots_(sheet, headers) {
   if (idxNotes !== -1) {
     sheet.getRange(2, idxNotes + 1, Math.max(1, sheet.getMaxRows() - 1), 1).setWrap(true);
   }
+
+  // Conditional formatting for Status (makes screenshots immediately readable).
+  const idxStatus = headers.indexOf('Status');
+  if (idxStatus !== -1) {
+    const statusRange = sheet.getRange(2, idxStatus + 1, Math.max(1, sheet.getMaxRows() - 1), 1);
+
+    // Keep any existing rules that do NOT apply to the Status column.
+    const existing = sheet.getConditionalFormatRules() || [];
+    const keep = existing.filter(rule => {
+      try {
+        const ranges = rule.getRanges ? rule.getRanges() : [];
+        return !ranges.some(r => r.getColumn() === idxStatus + 1);
+      } catch (e) {
+        // If introspection fails, keep the rule.
+        return true;
+      }
+    });
+
+    const rules = [
+      SpreadsheetApp.newConditionalFormatRule()
+        .whenTextEqualTo(CFG.STATUS.APPROVED)
+        .setBackground('#d9ead3')
+        .setFontColor('#0b8043')
+        .setRanges([statusRange])
+        .build(),
+      SpreadsheetApp.newConditionalFormatRule()
+        .whenTextEqualTo(CFG.STATUS.PENDING)
+        .setBackground('#fff2cc')
+        .setFontColor('#7a4f01')
+        .setRanges([statusRange])
+        .build(),
+      SpreadsheetApp.newConditionalFormatRule()
+        .whenTextEqualTo(CFG.STATUS.REJECTED)
+        .setBackground('#f4cccc')
+        .setFontColor('#a61c00')
+        .setRanges([statusRange])
+        .build(),
+    ];
+
+    sheet.setConditionalFormatRules(keep.concat(rules));
+  }
 }
 
 function ensureSheetWithHeaders_(ss, name, headers) {

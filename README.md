@@ -52,6 +52,14 @@ For a client-ready delivery checklist (template link vs zip vs done-for-you), se
 
 For a quick checklist of suggested screenshots (useful for a demo/listing), see: **`SCREENSHOTS.md`**.
 
+If you want to replace the included placeholder screenshots with **real** screenshots, see: **`REAL_SCREENSHOTS_GUIDE.md`**.
+
+You can also sanity-check whether `docs/screenshots/*.png` are still placeholder copies:
+
+```bash
+python3 scripts/check_screenshots.py
+```
+
 For “one-click copy” template-link instructions, see: **`TEMPLATE-INSTRUCTIONS.md`**.
 
 For ready-to-paste marketplace listing copy (Gumroad/Ko-fi/Upwork Project Catalog), see: **`LISTING.md`**.

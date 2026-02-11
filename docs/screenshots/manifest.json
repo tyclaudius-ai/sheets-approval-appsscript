@@ -1,0 +1,41 @@
+{
+  "title": "Sheets Approvals — Screenshot Set",
+  "items": [
+    {
+      "id": "01-menu",
+      "file": "01-menu.png",
+      "heading": "1) Menu (Approvals)",
+      "caption": "Custom menu entry for Approvals actions (Approve/Reject, Create demo, Help)."
+    },
+    {
+      "id": "02-requests-pending",
+      "file": "02-requests-pending.png",
+      "heading": "2) Requests sheet (pending)",
+      "caption": "Example request rows in PENDING state, ready for review/approval."
+    },
+    {
+      "id": "03-approved-row",
+      "file": "03-approved-row.png",
+      "heading": "3) Approved row",
+      "caption": "A request row marked APPROVED (showing status + timestamp/user columns as configured)."
+    },
+    {
+      "id": "04-audit-entry",
+      "file": "04-audit-entry.png",
+      "heading": "4) Audit trail entry",
+      "caption": "Append-only audit log row capturing who approved/rejected what and when."
+    },
+    {
+      "id": "05-reapproval-required",
+      "file": "05-reapproval-required.png",
+      "heading": "5) Re-approval required",
+      "caption": "An edit to tracked cells triggers REAPPROVAL_REQUIRED (or reverts to PENDING), with an audit event." 
+    },
+    {
+      "id": "06-help-sidebar",
+      "file": "06-help-sidebar.png",
+      "heading": "6) Help / Docs sidebar",
+      "caption": "In-sheet Help sidebar for quick onboarding and usage." 
+    }
+  ]
+}

@@ -60,6 +60,14 @@ You can also sanity-check whether `docs/screenshots/*.png` are still placeholder
 python3 scripts/check_screenshots.py
 ```
 
+### Preview the landing page locally
+
+Because `landing/index.html` references `../docs/...` and other repo files, you’ll want to serve the **repo root** (not the `landing/` folder directly):
+
+```bash
+python3 scripts/serve_landing.py --open
+```
+
 For “one-click copy” template-link instructions, see: **`TEMPLATE-INSTRUCTIONS.md`**.
 
 For ready-to-paste marketplace listing copy (Gumroad/Ko-fi/Upwork Project Catalog), see: **`LISTING.md`**.

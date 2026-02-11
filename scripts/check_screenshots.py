@@ -87,7 +87,12 @@ def main() -> int:
         print("[screenshots] PLACEHOLDER copies detected (top-level PNG matches placeholder PNG):")
         for n in placeholders:
             print(f"  - docs/screenshots/{n}")
-        print("\nTo replace with real screenshots, see REAL_SCREENSHOTS_GUIDE.md")
+
+        print("\nNext steps:")
+        print("  - Quick cheatsheet: docs/screenshots/CAPTURE-CHEATSHEET.md")
+        print("  - Full guide: REAL_SCREENSHOTS_GUIDE.md")
+        print("  - Helper installer: python3 scripts/install_real_screenshots.py --from ~/Desktop")
+
         if args.fail_on_placeholders:
             return 2
         return 0

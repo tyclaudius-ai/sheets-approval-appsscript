@@ -44,7 +44,9 @@ In-sheet Help sidebar for quick onboarding and usage.
 
 ## Capturing real screenshots
 
-Follow: [`REAL_SCREENSHOTS_GUIDE.md`](../../REAL_SCREENSHOTS_GUIDE.md)
+Quick path: [`CAPTURE-CHEATSHEET.md`](./CAPTURE-CHEATSHEET.md)
+
+Full guide: [`REAL_SCREENSHOTS_GUIDE.md`](../../REAL_SCREENSHOTS_GUIDE.md)
 
 After capturing, verify none are still placeholders:
 

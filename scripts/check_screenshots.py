@@ -55,6 +55,11 @@ def main() -> int:
         action="store_true",
         help="Exit non-zero if any top-level screenshot PNG is still a placeholder copy.",
     )
+    ap.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit machine-readable JSON (still prints nothing else).",
+    )
     args = ap.parse_args()
 
     missing: list[str] = []
@@ -76,6 +81,22 @@ def main() -> int:
                 placeholders.append(name)
         except OSError:
             missing.append(name)
+
+    if args.json:
+        # Keep it tiny/stable; callers can infer meaning from rc.
+        import json
+
+        payload = {
+            "ok": not missing and not placeholders,
+            "missing": missing,
+            "placeholders": [f"docs/screenshots/{n}" for n in placeholders],
+        }
+        print(json.dumps(payload, indent=2))
+        if missing:
+            return 3
+        if placeholders and args.fail_on_placeholders:
+            return 2
+        return 0
 
     if missing:
         print("[screenshots] MISSING files:")

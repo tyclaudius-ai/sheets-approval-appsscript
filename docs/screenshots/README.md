@@ -2,11 +2,7 @@
 
 These images are what the landing page (and a product listing) should reference.
 
-If you haven’t captured real screenshots yet, you have two options:
-
-- **Mock (“real-ish”) screenshots**: run `python3 scripts/generate_realish_screenshots.py --optimize` to generate *non-identical* PNGs that look like screenshots (adds simple browser chrome + fake Sheets header). This helps the README/landing page look real without requiring a Google login.
-  - Note: this writes `docs/screenshots/realish-hashes.json` so we can later detect whether the repo is still using generated mocks.
-- **True screenshots**: capture from a real Google Sheet and overwrite `docs/screenshots/*.png` 1:1 (preferred for a real product listing).
+If you haven’t captured real screenshots yet, the repo ships placeholder PNGs with the same filenames.
 
 ## Screenshot set
 

@@ -121,8 +121,14 @@ python3 scripts/install_real_screenshots.py --from ~/Desktop
 python3 scripts/check_screenshots.py --fail-on-placeholders
 ```
 
-Optional: generate optimized JPGs for a marketplace listing:
+Optional: run the full pipeline (install → validate → optimize):
 
 ```bash
-python3 scripts/screenshots_pipeline.py --optimize --width 1400
+python3 scripts/screenshots_pipeline.py --from ~/Desktop --check --fail-on-placeholders --optimize --width 1400
+```
+
+Optional: re-render the screenshots README + HTML gallery from `manifest.json`:
+
+```bash
+python3 scripts/screenshots_pipeline.py --render-gallery
 ```

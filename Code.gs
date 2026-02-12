@@ -78,6 +78,7 @@ function onOpen() {
     .addItem('Scan approved rows for changes', 'scanForReapprovalNeeded')
     .addSeparator()
     .addItem('Create demo setup', 'createDemoSetup')
+    .addItem('Screenshot tour (capture helper)', 'showScreenshotTourSidebar')
     .addSeparator()
     .addItem('Install re-approval trigger (optional)', 'installReapprovalTrigger')
     .addItem('Remove installed triggers', 'removeInstalledApprovalTriggers')
@@ -876,4 +877,181 @@ function showHelpSidebar() {
     .setWidth(360);
 
   SpreadsheetApp.getUi().showSidebar(html);
+}
+
+/**
+ * Screenshot tour sidebar: guides you through staging consistent UI states
+ * for capturing the README/landing page screenshots.
+ */
+function showScreenshotTourSidebar() {
+  const html = HtmlService.createHtmlOutputFromFile('Tour')
+    .setTitle('Screenshot tour')
+    .setWidth(360);
+
+  SpreadsheetApp.getUi().showSidebar(html);
+}
+
+/**
+ * Server-side helper for the screenshot tour.
+ *
+ * Note: The sidebar runs client-side; it calls this function via google.script.run.
+ */
+function screenshotTourAction_(action) {
+  const ss = SpreadsheetApp.getActive();
+  const ui = SpreadsheetApp.getUi();
+
+  // Ensure demo is present so buttons do something predictable.
+  ensureDemoSetupForTour_(ss);
+
+  const req = ss.getSheetByName(CFG.REQUESTS_SHEET);
+  const audit = ss.getSheetByName(CFG.AUDIT_SHEET);
+  if (!req || !audit) {
+    ui.alert('Demo sheets missing. Run Approvals → Create demo setup first.');
+    return;
+  }
+
+  if (action === 'go_requests') {
+    ss.setActiveSheet(req);
+    req.setActiveSelection('A1');
+    return;
+  }
+
+  if (action === 'open_menu_hint') {
+    // No programmatic menu-open in Sheets; this is just a no-op action the UI can call.
+    return;
+  }
+
+  if (action === 'select_first_pending') {
+    const headers = getHeaders_(req);
+    const statusCol = headers.indexOf('Status') + 1;
+    if (statusCol <= 0) {
+      ui.alert('Could not find Status column in Requests.');
+      return;
+    }
+
+    const lastRow = req.getLastRow();
+    if (lastRow <= CFG.HEADER_ROW) {
+      ui.alert('No data rows found in Requests. Click “Reset demo” in the tour.');
+      return;
+    }
+
+    const statuses = req.getRange(CFG.HEADER_ROW + 1, statusCol, lastRow - CFG.HEADER_ROW, 1).getValues();
+    let targetRow = null;
+    for (let i = 0; i < statuses.length; i++) {
+      const v = (statuses[i][0] || '').toString().trim();
+      if (v === CFG.STATUS.PENDING) {
+        targetRow = CFG.HEADER_ROW + 1 + i;
+        break;
+      }
+    }
+
+    if (!targetRow) {
+      ui.alert('No PENDING rows found. Click “Reset demo” in the tour.');
+      return;
+    }
+
+    ss.setActiveSheet(req);
+    req.setActiveSelection(req.getRange(targetRow, 1, 1, Math.max(6, req.getLastColumn())));
+    return;
+  }
+
+  if (action === 'approve_active_row') {
+    ss.setActiveSheet(req);
+    // Uses current selection.
+    approveSelectedRow();
+    return;
+  }
+
+  if (action === 'trigger_reapproval') {
+    const headers = getHeaders_(req);
+    const statusCol = headers.indexOf('Status') + 1;
+    if (statusCol <= 0) {
+      ui.alert('Could not find Status column in Requests.');
+      return;
+    }
+
+    // Find first APPROVED row.
+    const lastRow = req.getLastRow();
+    const statuses = req.getRange(CFG.HEADER_ROW + 1, statusCol, Math.max(0, lastRow - CFG.HEADER_ROW), 1).getValues();
+    let targetRow = null;
+    for (let i = 0; i < statuses.length; i++) {
+      const v = (statuses[i][0] || '').toString().trim();
+      if (v === CFG.STATUS.APPROVED) {
+        targetRow = CFG.HEADER_ROW + 1 + i;
+        break;
+      }
+    }
+
+    if (!targetRow) {
+      ui.alert('No APPROVED rows found. Click “Approve active row” first.');
+      return;
+    }
+
+    // Pick a "meaningful" column to edit: first non-exempt header.
+    const exempt = (CFG.REAPPROVAL_EXEMPT_HEADERS || []).map(h => (h || '').toString().trim());
+    let editCol = null;
+    for (let c = 1; c <= headers.length; c++) {
+      const h = (headers[c - 1] || '').toString().trim();
+      if (!h) continue;
+      if (exempt.indexOf(h) !== -1) continue;
+      editCol = c;
+      break;
+    }
+
+    if (!editCol) {
+      ui.alert('Could not find a meaningful (non-exempt) column to edit for re-approval.');
+      return;
+    }
+
+    ss.setActiveSheet(req);
+    const cell = req.getRange(targetRow, editCol);
+    const cur = cell.getValue();
+    const next = `${cur || ''}`.trim() ? `${cur} (edited)` : 'Edited';
+    cell.setValue(next);
+
+    // onEdit won't fire for script edits; call the core handler manually to simulate.
+    // We pass a minimal event object shape.
+    try {
+      onEdit({ range: cell });
+    } catch (err) {
+      // Best-effort; if it fails, still leave the edit.
+      console.error('trigger_reapproval onEdit simulation failed:', err);
+    }
+
+    req.setActiveSelection(req.getRange(targetRow, 1, 1, Math.max(6, req.getLastColumn())));
+    return;
+  }
+
+  if (action === 'go_audit_last') {
+    ss.setActiveSheet(audit);
+    const lastRow = audit.getLastRow();
+    if (lastRow <= CFG.HEADER_ROW) {
+      audit.setActiveSelection('A1');
+      return;
+    }
+    audit.setActiveSelection(audit.getRange(lastRow, 1, 1, Math.max(6, audit.getLastColumn())));
+    return;
+  }
+
+  if (action === 'open_help') {
+    showHelpSidebar();
+    return;
+  }
+
+  if (action === 'reset_demo') {
+    createDemoSetup();
+    ss.setActiveSheet(req);
+    req.setActiveSelection('A1');
+    return;
+  }
+
+  ui.alert(`Unknown screenshot tour action: ${action}`);
+}
+
+function ensureDemoSetupForTour_(ss) {
+  const req = ss.getSheetByName(CFG.REQUESTS_SHEET);
+  const audit = ss.getSheetByName(CFG.AUDIT_SHEET);
+  if (!req || !audit) {
+    createDemoSetup();
+  }
 }

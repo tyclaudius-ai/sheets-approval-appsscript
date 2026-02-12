@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+  <head>
+    <base target="_top" />
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; padding: 12px; }
+      h2 { margin: 0 0 8px; font-size: 16px; }
+      p { margin: 6px 0; color: #222; font-size: 13px; line-height: 1.35; }
+      .step { border: 1px solid #eee; border-radius: 10px; padding: 10px; margin: 10px 0; }
+      .step h3 { margin: 0 0 6px; font-size: 13px; }
+      button { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 10px; background: #fff; cursor: pointer; font-size: 13px; }
+      button:hover { background: #f7f7f7; }
+      .muted { color: #666; }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .danger { border-color: #f1c5c5; }
+    </style>
+  </head>
+  <body>
+    <h2>Screenshot tour</h2>
+    <p class="muted">
+      This sidebar helps you stage consistent sheet states for capturing the docs/landing screenshots.
+      It can’t open the Sheets menu for you (Google limitation), but it can switch tabs, select rows,
+      approve a row, and simulate the re-approval flow.
+    </p>
+
+    <div class="step danger">
+      <h3>Reset / seed demo</h3>
+      <p>Use this anytime the state gets weird.</p>
+      <button onclick="run('reset_demo')">Reset demo (Create demo setup)</button>
+    </div>
+
+    <div class="step">
+      <h3>01 — Custom menu visible (manual)</h3>
+      <p>Click this to go to <b>Requests</b>, then manually open the <b>Approvals</b> menu and capture <code>01-menu.png</code>.</p>
+      <button onclick="run('go_requests')">Go to Requests tab</button>
+    </div>
+
+    <div class="step">
+      <h3>02 — Pending rows</h3>
+      <p>Selects the first PENDING row to make a clean <code>02-requests-pending.png</code>.</p>
+      <div class="row">
+        <button onclick="run('go_requests')">Go to Requests</button>
+        <button onclick="run('select_first_pending')">Select first PENDING row</button>
+      </div>
+    </div>
+
+    <div class="step">
+      <h3>03 — Approved row</h3>
+      <p>Approves the currently selected row (make sure you selected a PENDING row first).</p>
+      <button onclick="run('approve_active_row')">Approve active row</button>
+    </div>
+
+    <div class="step">
+      <h3>04 — Audit entry</h3>
+      <p>Jumps to Audit and selects the last row for <code>04-audit-entry.png</code>.</p>
+      <button onclick="run('go_audit_last')">Go to Audit (select last row)</button>
+    </div>
+
+    <div class="step">
+      <h3>05 — Re-approval required</h3>
+      <p>
+        Edits a meaningful cell on the first APPROVED row and then calls the same re-approval logic
+        to revert it back to PENDING (since script edits don’t trigger <code>onEdit</code> automatically).
+      </p>
+      <button onclick="run('trigger_reapproval')">Trigger re-approval on an APPROVED row</button>
+    </div>
+
+    <div class="step">
+      <h3>06 — Help / Docs sidebar</h3>
+      <p>Opens the help sidebar so you can capture <code>06-help-sidebar.png</code>.</p>
+      <button onclick="run('open_help')">Open Help sidebar</button>
+    </div>
+
+    <p id="status" class="muted"></p>
+
+    <script>
+      function run(action) {
+        const el = document.getElementById('status');
+        el.textContent = 'Running…';
+        google.script.run
+          .withSuccessHandler(() => {
+            el.textContent = 'Done.';
+            setTimeout(() => (el.textContent = ''), 1200);
+          })
+          .withFailureHandler((err) => {
+            el.textContent = 'Error: ' + (err && err.message ? err.message : String(err));
+          })
+          .screenshotTourAction_(action);
+      }
+    </script>
+  </body>
+</html>

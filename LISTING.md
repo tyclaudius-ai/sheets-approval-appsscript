@@ -8,6 +8,7 @@ Use it when you want non-technical teammates to request edits, reviewers to appr
 
 - **Request / Approve / Reject** changes via a custom **Approvals** menu
 - Writes an **append-only Audit** tab (timestamped events)
+  - Optional: **hash chain** (`PrevChainHash` + `ChainHash`) for stronger tamper-evidence
 - **Auto re-approval on edit**: if an **APPROVED** row is changed, it automatically flips back to **PENDING** and logs a `REAPPROVAL_REQUIRED` event
 - Optional **tracked headers allowlist** so only meaningful columns trigger re-approval
 - Optional **row lock warning** (warning-only by default)

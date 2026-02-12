@@ -8,6 +8,7 @@ This is a minimal, copy-pasteable **Google Apps Script** that turns a Google She
 - Operates on the **currently selected row** in a `Requests` sheet
 - Writes approval state back onto the request row (status, approver, timestamp, notes)
 - Appends an immutable-ish event into an `Audit` sheet (who/when/what/row snapshot + sha256 hash)
+  - Optional: **hash chain** (`PrevChainHash` → `ChainHash`) so later edits are easier to detect
 
 ## Sheet setup
 

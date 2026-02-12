@@ -56,6 +56,12 @@ const CFG = {
   LOCK_ROW_ON_APPROVE: true,
   LOCK_WARNING_ONLY: true,
   LOCK_DESCRIPTION_PREFIX: 'ApprovalsLock',
+
+  // Optional: add a simple “hash chain” to the Audit sheet so tampering is easier to detect.
+  // Each audit row stores PrevChainHash + ChainHash where:
+  //   ChainHash = sha256(prevChainHash + "\n" + SnapshotHash)
+  // This gives you a spreadsheet-friendly, blockchain-ish integrity check.
+  AUDIT_HASH_CHAIN: true,
 };
 
 function onOpen() {
@@ -563,18 +569,42 @@ function setCellByHeader_(sheet, headers, row, headerName, value) {
 
 function appendAuditEvent_(ss, evt) {
   const audit = getOrCreateAuditSheet_(ss);
-  const headers = ['EventAt', 'Actor', 'Action', 'RequestId', 'RowNumber', 'SnapshotJSON', 'SnapshotHash'];
 
+  const baseHeaders = ['EventAt', 'Actor', 'Action', 'RequestId', 'RowNumber', 'SnapshotJSON', 'SnapshotHash'];
+  const headers = CFG.AUDIT_HASH_CHAIN
+    ? baseHeaders.concat(['PrevChainHash', 'ChainHash'])
+    : baseHeaders;
+
+  // Ensure header row exists/updated.
   if (audit.getLastRow() === 0) {
     audit.getRange(1, 1, 1, headers.length).setValues([headers]);
-  } else if (audit.getLastRow() === 1) {
-    // ensure headers exist
-    const existing = audit.getRange(1, 1, 1, headers.length).getValues()[0];
-    const needs = existing.some((v, i) => (v || '').toString().trim() !== headers[i]);
-    if (needs) audit.getRange(1, 1, 1, headers.length).setValues([headers]);
+  } else {
+    const existing = audit.getRange(1, 1, 1, Math.max(headers.length, audit.getLastColumn())).getValues()[0]
+      .slice(0, headers.length)
+      .map(v => (v || '').toString().trim());
+    const needs = existing.length !== headers.length || existing.some((v, i) => v !== headers[i]);
+    if (needs) {
+      audit.getRange(1, 1, 1, headers.length).setValues([headers]);
+    }
   }
 
-  audit.appendRow([
+  let prevChainHash = '';
+  let chainHash = '';
+  if (CFG.AUDIT_HASH_CHAIN) {
+    // Get previous chain hash from the last data row (best-effort).
+    const lastRow = audit.getLastRow();
+    const idxChain = headers.indexOf('ChainHash');
+    if (lastRow >= 2 && idxChain !== -1) {
+      try {
+        prevChainHash = (audit.getRange(lastRow, idxChain + 1).getValue() || '').toString().trim();
+      } catch (e) {
+        prevChainHash = '';
+      }
+    }
+    chainHash = sha256Hex_(`${prevChainHash}\n${evt.snapshotHash}`);
+  }
+
+  const row = [
     evt.eventAt,
     evt.actor,
     evt.action,
@@ -582,7 +612,13 @@ function appendAuditEvent_(ss, evt) {
     evt.rowNumber,
     evt.snapshotJson,
     evt.snapshotHash,
-  ]);
+  ];
+
+  if (CFG.AUDIT_HASH_CHAIN) {
+    row.push(prevChainHash, chainHash);
+  }
+
+  audit.appendRow(row);
 }
 
 function sha256Hex_(str) {

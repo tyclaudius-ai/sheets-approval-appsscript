@@ -44,7 +44,9 @@ You should see **Approvals** in the menu bar.
 
 Use **Approvals → Create demo setup** to generate the `Requests` + `Audit` tabs (with correct headers) and seed a couple example requests.
 
-For a clean, step-by-step “demo in 2 minutes” script, see: **`DEMO-TEMPLATE.md`**.
+Fastest start (90 seconds): **`QUICKSTART.md`**.
+
+For a clean, step-by-step “demo in 2 minutes” talk-track, see: **`DEMO-TEMPLATE.md`**.
 
 Offline demo assets (CSV + importable XLSX) live in `demo/` — start with **`demo/README.md`**.
 

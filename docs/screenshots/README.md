@@ -65,3 +65,14 @@ If you run the screenshot optimizer, it will generate:
 - `docs/screenshots/optimized/*.jpg`
 
 The landing page will automatically prefer these when present (via a `<picture>` tag), falling back to the PNGs.
+
+## Optional: animated preview GIF
+
+You can generate a lightweight marketing/README preview GIF from the optimized JPGs:
+
+```bash
+python3 scripts/make_screenshot_gif.py
+```
+
+Output:
+- `docs/screenshots/approval-flow.gif`

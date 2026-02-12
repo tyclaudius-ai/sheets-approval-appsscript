@@ -31,6 +31,9 @@ from dataclasses import dataclass
 from pathlib import Path
 import argparse
 import subprocess
+import hashlib
+import json
+from datetime import datetime, timezone
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
@@ -96,6 +99,10 @@ def main() -> int:
 
     wrote = 0
     missing = 0
+
+    # Write a hash manifest so we can later distinguish "real-ish" mocks from
+    # true Google Sheets captures.
+    out_hashes: dict[str, str] = {}
 
     # Brand-ish colors
     sheets_green = (15, 157, 88, 255)  # Google-ish green
@@ -223,12 +230,31 @@ def main() -> int:
 
         # Save PNG
         canvas.convert("RGB").save(out_path, format="PNG", optimize=True)
+
+        # Record hash for later detection.
+        h = hashlib.sha256(out_path.read_bytes()).hexdigest()
+        out_hashes[shot.filename] = h
+
         wrote += 1
         print(f"Wrote: {out_path.relative_to(ROOT)}")
 
     if missing:
         print(f"\nDone (with missing inputs). wrote={wrote}, missing={missing}")
         return 2
+
+    # Persist a manifest of the generated hashes so check_screenshots.py can
+    # warn/fail if a listing accidentally uses mocks.
+    try:
+        manifest_path = TOP_DIR / "realish-hashes.json"
+        payload = {
+            "kind": "realish-hashes",
+            "generatedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "files": out_hashes,
+        }
+        manifest_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+        print(f"Wrote: {manifest_path.relative_to(ROOT)}")
+    except Exception as e:
+        print(f"WARN: failed to write realish-hashes.json: {e}")
 
     if args.optimize:
         try:

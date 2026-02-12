@@ -1,0 +1,12 @@
+{
+  "kind": "realish-hashes",
+  "generatedAt": "2026-02-12T10:17:00.250204Z",
+  "files": {
+    "01-menu.png": "a0cebf75755ca0890eb5ada08d8505ed23bf9f6d26ee7f23a6771081b9405650",
+    "02-requests-pending.png": "1d9817cd2f5533ac3f51627348c4593676c5d967fcc136f1ac1afdd4649147f9",
+    "03-approved-row.png": "01a10ed50d46d083ee15b262df3d4ee566389244713f349a73bcb0cac87f4582",
+    "04-audit-entry.png": "16678d2a61a5dc103c2e3fc5de5983dcd24af2ed55393d5fba27638a659fecc6",
+    "05-reapproval-required.png": "defdec30e28d0b8f802eabd2c306e3bfc93e7429dcc7ba9f924d87ae7f61ab1f",
+    "06-help-sidebar.png": "f7f7cc47f90e852de3176ee1b9fb841208204c76028ccc90648b03f37c7be51a"
+  }
+}

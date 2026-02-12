@@ -32,7 +32,7 @@ from pathlib import Path
 import argparse
 import subprocess
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[1]
 TOP_DIR = ROOT / "docs" / "screenshots"
@@ -55,6 +55,31 @@ SHOTS: list[Shot] = [
 ]
 
 
+def load_font(size: int) -> ImageFont.ImageFont:
+    """Best-effort: use a system UI font if present; otherwise fall back."""
+
+    candidates = [
+        # macOS (common)
+        "/System/Library/Fonts/SFNS.ttf",
+        "/System/Library/Fonts/SFNSDisplay.ttf",
+        "/System/Library/Fonts/SFNSRounded.ttf",
+        "/System/Library/Fonts/Supplemental/Arial.ttf",
+        "/System/Library/Fonts/Supplemental/Helvetica.ttf",
+        # Linux-ish
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    ]
+
+    for p in candidates:
+        try:
+            if Path(p).exists():
+                return ImageFont.truetype(p, size=size)
+        except Exception:
+            continue
+
+    # Fallback: PIL's bundled bitmap font
+    return ImageFont.load_default()
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
@@ -66,11 +91,16 @@ def main() -> int:
 
     TOP_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Fonts: use default bitmap font to avoid system dependencies.
-    font = ImageFont.load_default()
+    font_sm = load_font(14)
+    font_md = load_font(16)
 
     wrote = 0
     missing = 0
+
+    # Brand-ish colors
+    sheets_green = (15, 157, 88, 255)  # Google-ish green
+    chrome_bg = (245, 246, 248, 255)
+    chrome_border = (220, 222, 227, 255)
 
     for shot in SHOTS:
         in_path = PLACEHOLDER_DIR / shot.filename
@@ -83,22 +113,25 @@ def main() -> int:
 
         base = Image.open(in_path).convert("RGBA")
 
-        # Chrome sizes (in pixels)
-        pad = 18
+        # Layout sizes (in pixels)
+        pad = 20
         browser_h = 54
-        sheets_h = 64
+        sheets_h = 66
         header_h = browser_h + sheets_h
 
         w, h = base.size
-        canvas = Image.new("RGBA", (w + pad * 2, h + header_h + pad * 2), (255, 255, 255, 255))
+        out_w = w + pad * 2
+        out_h = h + header_h + pad * 2
+
+        canvas = Image.new("RGBA", (out_w, out_h), (255, 255, 255, 255))
         draw = ImageDraw.Draw(canvas)
 
-        # Browser chrome background
+        # --- Top browser chrome (rounded container) ---
         draw.rounded_rectangle(
             (pad, pad, pad + w, pad + browser_h),
             radius=14,
-            fill=(245, 245, 247, 255),
-            outline=(220, 220, 225, 255),
+            fill=chrome_bg,
+            outline=chrome_border,
             width=1,
         )
 
@@ -117,32 +150,76 @@ def main() -> int:
             (ab_x0, ab_y0, ab_x1, ab_y1),
             radius=12,
             fill=(255, 255, 255, 255),
-            outline=(210, 210, 215, 255),
+            outline=(210, 212, 217, 255),
             width=1,
         )
-        addr = "https://docs.google.com/spreadsheets/d/…"
-        draw.text((ab_x0 + 12, ab_y0 + 10), addr, fill=(90, 90, 95, 255), font=font)
+        addr = "docs.google.com/spreadsheets/d/…"
+        draw.text((ab_x0 + 12, ab_y0 + 9), addr, fill=(90, 92, 98, 255), font=font_sm)
 
-        # Fake Sheets toolbar area
+        # --- Fake Google Sheets header ---
         y2 = pad + browser_h
-        draw.rectangle((pad, y2, pad + w, y2 + sheets_h), fill=(255, 255, 255, 255), outline=(225, 225, 230, 255))
-        # Green Sheets icon
+        draw.rectangle(
+            (pad, y2, pad + w, y2 + sheets_h),
+            fill=(255, 255, 255, 255),
+            outline=(225, 227, 232, 255),
+        )
+
+        # Sheets icon (green doc w/ white grid)
         icon_x = pad + 18
         icon_y = y2 + 18
-        draw.rounded_rectangle((icon_x, icon_y, icon_x + 28, icon_y + 28), radius=6, fill=(26, 115, 232, 255))
-        draw.rectangle((icon_x + 6, icon_y + 6, icon_x + 22, icon_y + 22), fill=(255, 255, 255, 255))
+        draw.rounded_rectangle((icon_x, icon_y, icon_x + 28, icon_y + 28), radius=6, fill=sheets_green)
+        # White inner sheet
+        draw.rounded_rectangle(
+            (icon_x + 7, icon_y + 6, icon_x + 22, icon_y + 22),
+            radius=2,
+            fill=(255, 255, 255, 255),
+        )
+        # Tiny grid hint
+        for gx in [icon_x + 12, icon_x + 17]:
+            draw.line((gx, icon_y + 8, gx, icon_y + 20), fill=(220, 220, 220, 255), width=1)
+        for gy in [icon_y + 12, icon_y + 16]:
+            draw.line((icon_x + 9, gy, icon_x + 20, gy), fill=(220, 220, 220, 255), width=1)
 
         title = f"{shot.sheet_title} — Google Sheets"
-        draw.text((icon_x + 40, y2 + 22), title, fill=(25, 25, 28, 255), font=font)
+        draw.text((icon_x + 40, y2 + 21), title, fill=(25, 25, 28, 255), font=font_md)
 
-        # Subtle toolbar hint line (buttons)
+        # Subtle toolbar hint line (pill buttons)
         tool_y = y2 + 44
-        for i in range(10):
-            x0 = icon_x + 40 + i * 34
-            draw.rounded_rectangle((x0, tool_y, x0 + 24, tool_y + 14), radius=4, fill=(245, 245, 247, 255), outline=(230, 230, 235, 255))
+        x_start = icon_x + 40
+        for i in range(11):
+            x0 = x_start + i * 34
+            draw.rounded_rectangle(
+                (x0, tool_y, x0 + 24, tool_y + 14),
+                radius=5,
+                fill=(246, 247, 249, 255),
+                outline=(232, 234, 238, 255),
+            )
 
-        # Paste the content image
-        canvas.alpha_composite(base, (pad, pad + header_h))
+        # --- Content card shadow + base image ---
+        content_x = pad
+        content_y = pad + header_h
+
+        # Shadow layer
+        shadow = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+        sdraw = ImageDraw.Draw(shadow)
+        sdraw.rounded_rectangle(
+            (content_x + 2, content_y + 4, content_x + w + 2, content_y + h + 4),
+            radius=10,
+            fill=(0, 0, 0, 45),
+        )
+        shadow = shadow.filter(ImageFilter.GaussianBlur(radius=6))
+        canvas.alpha_composite(shadow)
+
+        # White card border behind content
+        draw.rounded_rectangle(
+            (content_x - 1, content_y - 1, content_x + w + 1, content_y + h + 1),
+            radius=10,
+            fill=(255, 255, 255, 255),
+            outline=(230, 232, 236, 255),
+            width=1,
+        )
+
+        canvas.alpha_composite(base, (content_x, content_y))
 
         # Save PNG
         canvas.convert("RGB").save(out_path, format="PNG", optimize=True)
@@ -155,12 +232,14 @@ def main() -> int:
 
     if args.optimize:
         try:
-            # Keep it best-effort: this is for convenience in local dev.
+            # Best-effort convenience.
             subprocess.run(["node", "scripts/optimize_screenshots.mjs"], cwd=ROOT, check=True)
         except FileNotFoundError:
             print("[optimize] Skipped: node not found")
         except subprocess.CalledProcessError as e:
-            print(f"[optimize] Failed (exit={e.returncode}). You can rerun manually: node scripts/optimize_screenshots.mjs")
+            print(
+                f"[optimize] Failed (exit={e.returncode}). You can rerun manually: node scripts/optimize_screenshots.mjs"
+            )
 
     print(f"\nDone. wrote={wrote}")
     return 0

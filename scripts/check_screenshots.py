@@ -26,6 +26,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import shutil
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -68,6 +70,37 @@ def load_realish_hashes() -> dict[str, str]:
     return {}
 
 
+def sips_px(p: Path) -> tuple[int | None, int | None]:
+    """Best-effort pixel dimensions (macOS only). Returns (w, h) or (None, None)."""
+    if shutil.which("sips") is None:
+        return (None, None)
+    try:
+        proc = subprocess.run(
+            ["sips", "-g", "pixelWidth", "-g", "pixelHeight", str(p)],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        out = (proc.stdout or "") + "\n" + (proc.stderr or "")
+        w: int | None = None
+        h: int | None = None
+        for line in out.splitlines():
+            line = line.strip()
+            if line.startswith("pixelWidth:"):
+                try:
+                    w = int(line.split(":", 1)[1].strip())
+                except Exception:
+                    pass
+            if line.startswith("pixelHeight:"):
+                try:
+                    h = int(line.split(":", 1)[1].strip())
+                except Exception:
+                    pass
+        return (w, h)
+    except Exception:
+        return (None, None)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument(
@@ -85,11 +118,18 @@ def main() -> int:
         action="store_true",
         help="Emit machine-readable JSON (still prints nothing else).",
     )
+    ap.add_argument(
+        "--show-info",
+        action="store_true",
+        help="Print file size + best-effort pixel dimensions for each screenshot (uses macOS `sips` if available).",
+    )
     args = ap.parse_args()
 
     missing: list[str] = []
     placeholders: list[str] = []
     realish: list[str] = []
+
+    info: dict[str, dict[str, int | None]] = {}
 
     realish_hashes = load_realish_hashes()
 
@@ -110,6 +150,13 @@ def main() -> int:
                 placeholders.append(name)
             elif realish_hashes.get(name) == top_h:
                 realish.append(name)
+
+            w, h = sips_px(top)
+            try:
+                size = top.stat().st_size
+            except Exception:
+                size = None
+            info[name] = {"bytes": size, "width": w, "height": h}
         except OSError:
             missing.append(name)
 
@@ -121,6 +168,8 @@ def main() -> int:
             "missing": missing,
             "placeholders": [f"docs/screenshots/{n}" for n in placeholders],
             "realish": [f"docs/screenshots/{n}" for n in realish],
+            "info": {k: {"bytes": v.get("bytes"), "width": v.get("width"), "height": v.get("height")} for k, v in info.items()},
+            "infoNote": "Pixel dimensions are best-effort (macOS uses `sips`).",
         }
         print(json.dumps(payload, indent=2))
         if missing:
@@ -130,6 +179,18 @@ def main() -> int:
         if realish and args.fail_on_realish:
             return 4
         return 0
+
+    if args.show_info and not missing:
+        print("[screenshots] INFO (size + pixels):")
+        for name in NAMES:
+            v = info.get(name) or {}
+            b = v.get("bytes")
+            w = v.get("width")
+            h = v.get("height")
+            px = f"{w}×{h}" if (w and h) else "(px unknown)"
+            bs = f"{b}" if b is not None else "(bytes unknown)"
+            print(f"  - {name}: {bs} bytes, {px}")
+        print("")
 
     if missing:
         print("[screenshots] MISSING files:")

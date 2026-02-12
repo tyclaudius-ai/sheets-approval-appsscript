@@ -98,6 +98,10 @@ def main() -> int:
                 if sub.name in {".DS_Store"}:
                     continue
                 rel_sub = str(sub.relative_to(PKG_DIR))
+                # Avoid packaging duplicate placeholder PNGs under docs/screenshots/png/.
+                # Canonical screenshot filenames live at docs/screenshots/*.png
+                if rel_sub.startswith("docs/screenshots/png/"):
+                    continue
                 files.append((sub, rel_sub))
         else:
             files.append((p, rel))

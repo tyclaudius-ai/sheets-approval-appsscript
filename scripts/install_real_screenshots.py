@@ -21,6 +21,8 @@ Options:
   --include-jpg         Also include *.jpg/*.jpeg matches (off by default)
   --non-interactive     Take the newest N files in order and map to 01..06 (risky)
   --dry-run             Print actions without copying
+  --check               After copying, run scripts/check_screenshots.py
+  --optimize            After copying, run scripts/optimize_screenshots.mjs (reads manifest.json)
 
 Tip:
   Capture screenshots in order 01..06 so the default newest-first list is easy.
@@ -107,6 +109,8 @@ def main() -> int:
     ap.add_argument("--include-jpg", action="store_true", help="Also include Screenshot*.jpg/jpeg")
     ap.add_argument("--non-interactive", action="store_true", help="Map newest N files to targets without prompts")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--check", action="store_true", help="Run scripts/check_screenshots.py after copying")
+    ap.add_argument("--optimize", action="store_true", help="Run scripts/optimize_screenshots.mjs after copying")
     args = ap.parse_args()
 
     src_dir = expand(args.src)
@@ -197,7 +201,23 @@ def main() -> int:
         copied += 1
 
     print(f"\nDone. Copied {copied} file(s).")
-    print("Sanity check: open landing/index.html and confirm the screenshot gallery looks right.")
+
+    repo_root = Path(__file__).resolve().parent.parent
+
+    if args.check:
+        print("\n[screenshots] Running check_screenshots.py …")
+        import subprocess
+
+        subprocess.run([sys.executable, str(repo_root / "scripts" / "check_screenshots.py")])
+
+    if args.optimize:
+        print("\n[screenshots] Running optimize_screenshots.mjs …")
+        import subprocess
+
+        subprocess.run(["node", str(repo_root / "scripts" / "optimize_screenshots.mjs")], cwd=str(repo_root))
+
+    print("\nSanity check: open landing/index.html and confirm the screenshot gallery looks right.")
+    print("Preview helper: python3 scripts/serve_landing.py --open")
     return 0
 
 

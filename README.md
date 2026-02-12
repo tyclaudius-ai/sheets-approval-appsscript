@@ -75,6 +75,8 @@ python3 scripts/screenshots_pipeline.py
 python3 scripts/screenshots_pipeline.py --fail-on-placeholders
 # macOS-only: also create docs/screenshots/optimized/*.jpg
 python3 scripts/screenshots_pipeline.py --optimize --width 1400
+# then generate the small animated preview GIF used in docs/screenshots/
+python3 scripts/screenshots_pipeline.py --make-gif --gif-width 900 --gif-ms 900
 ```
 
 ### Preview the landing page locally

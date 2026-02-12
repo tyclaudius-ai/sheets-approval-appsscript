@@ -132,3 +132,9 @@ Optional: re-render the screenshots README + HTML gallery from `manifest.json`:
 ```bash
 python3 scripts/screenshots_pipeline.py --render-gallery
 ```
+
+Optional: generate the animated GIF preview (requires optimized JPGs):
+
+```bash
+python3 scripts/screenshots_pipeline.py --make-gif --gif-width 900 --gif-ms 900
+```

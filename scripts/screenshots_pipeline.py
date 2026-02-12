@@ -12,6 +12,9 @@ Examples
 # Install real screenshots from Desktop, then validate, then build optimized JPGs
 python3 scripts/screenshots_pipeline.py --from ~/Desktop --check --fail-on-placeholders --optimize --width 1400
 
+# Then generate the approval-flow.gif used in README/landing previews
+python3 scripts/screenshots_pipeline.py --make-gif --gif-width 900 --gif-ms 900
+
 # Just validate what's currently in docs/screenshots
 python3 scripts/screenshots_pipeline.py --check --fail-on-placeholders
 
@@ -69,6 +72,23 @@ def main() -> int:
         action="store_true",
         help="Regenerate docs/screenshots/README.md + gallery.html from manifest.json.",
     )
+    ap.add_argument(
+        "--make-gif",
+        action="store_true",
+        help="Generate docs/screenshots/approval-flow.gif from optimized JPGs.",
+    )
+    ap.add_argument(
+        "--gif-width",
+        type=int,
+        default=900,
+        help="Frame resize width for --make-gif (default: 900).",
+    )
+    ap.add_argument(
+        "--gif-ms",
+        type=int,
+        default=900,
+        help="Frame duration in ms for --make-gif (default: 900).",
+    )
 
     args = ap.parse_args()
 
@@ -79,6 +99,7 @@ def main() -> int:
         or args.fail_on_placeholders
         or args.optimize
         or args.render_gallery
+        or args.make_gif
     ):
         args.check = True
         args.render_gallery = True
@@ -99,6 +120,18 @@ def main() -> int:
 
     if args.render_gallery:
         run([sys.executable, "scripts/render_screenshots_gallery.py"])
+
+    if args.make_gif:
+        run(
+            [
+                sys.executable,
+                "scripts/make_screenshot_gif.py",
+                "--width",
+                str(args.gif_width),
+                "--ms",
+                str(args.gif_ms),
+            ]
+        )
 
     return 0
 

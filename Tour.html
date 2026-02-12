@@ -71,21 +71,61 @@
       <button onclick="run('open_help')">Open Help sidebar</button>
     </div>
 
+    <div class="step">
+      <h3>Filenames (copy)</h3>
+      <p class="muted">Click a button to copy the exact target filename for that screenshot.</p>
+      <div class="row">
+        <button onclick="copyText('01-menu.png')">Copy 01-menu.png</button>
+        <button onclick="copyText('02-requests-pending.png')">Copy 02-requests-pending.png</button>
+        <button onclick="copyText('03-approved-row.png')">Copy 03-approved-row.png</button>
+        <button onclick="copyText('04-audit-entry.png')">Copy 04-audit-entry.png</button>
+        <button onclick="copyText('05-reapproval-required.png')">Copy 05-reapproval-required.png</button>
+        <button onclick="copyText('06-help-sidebar.png')">Copy 06-help-sidebar.png</button>
+      </div>
+    </div>
+
     <p id="status" class="muted"></p>
 
     <script>
-      function run(action) {
+      function setStatus(msg, ms = 1200) {
         const el = document.getElementById('status');
-        el.textContent = 'Running…';
+        el.textContent = msg;
+        if (ms) setTimeout(() => (el.textContent = ''), ms);
+      }
+
+      function run(action) {
+        setStatus('Running…', 0);
         google.script.run
-          .withSuccessHandler(() => {
-            el.textContent = 'Done.';
-            setTimeout(() => (el.textContent = ''), 1200);
-          })
+          .withSuccessHandler(() => setStatus('Done.'))
           .withFailureHandler((err) => {
-            el.textContent = 'Error: ' + (err && err.message ? err.message : String(err));
+            setStatus('Error: ' + (err && err.message ? err.message : String(err)), 2500);
           })
           .screenshotTourAction_(action);
+      }
+
+      async function copyText(txt) {
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(txt);
+            setStatus('Copied: ' + txt);
+            return;
+          }
+        } catch (e) {
+          // fall through
+        }
+
+        // Fallback for older environments.
+        const ta = document.createElement('textarea');
+        ta.value = txt;
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          setStatus('Copied: ' + txt);
+        } catch (e) {
+          setStatus('Could not copy automatically. Text: ' + txt, 2500);
+        }
+        document.body.removeChild(ta);
       }
     </script>
   </body>

@@ -42,7 +42,8 @@ Right now those files exist as **copies of the placeholders** (generated PNGs). 
 
 2) **Seed demo data**
    - Run `Approvals → Create demo setup`.
-   - (Optional) Open `Approvals → Screenshot tour (capture helper)` for one-click staging.
+   - Open `Approvals → Screenshot tour (capture helper)` for one-click staging.
+     - Bonus: the tour sidebar includes **copy buttons** for the exact target filenames (01–06), so renaming is painless.
    - Confirm you now have two tabs: `Requests` and `Audit`.
 
 3) Capture each screenshot (use macOS screenshot tool)

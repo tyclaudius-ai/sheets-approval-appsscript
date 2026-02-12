@@ -1,66 +1,85 @@
 # Demo Template (copy/paste) — Sheets Approvals + Audit Trail
 
-This repo is intentionally **copy/paste-first** (no Marketplace add-on install).
+Goal: a **clean 2–3 minute demo** showing (1) approve/reject workflow, (2) append-only audit trail, (3) “re-approval required after change”.
 
-If you want a clean demo in ~2 minutes, do this:
+This repo is intentionally **copy/paste-first** (no Marketplace add-on).
 
-## 1) Create a fresh Google Sheet (two options)
+## Prep (pick one)
 
-### Option A — start from scratch
-- Google Drive → **New → Google Sheets**
-- Name it: `Approvals Demo`
+### Option A — fastest live demo (blank Sheet)
+1. Google Drive → **New → Google Sheets**
+2. Name it: `Approvals Demo`
 
-### Option B — use the prebuilt demo workbook (.xlsx)
-- Download: `demo/Sheets-Approvals-Demo.xlsx`
-- Upload it to Google Drive → open as a Google Sheet
+### Option B — offline-ish demo workbook
+1. Download: `demo/Sheets-Approvals-Demo.xlsx`
+2. Upload to Drive → open as a Google Sheet
 
-If you want to regenerate the .xlsx locally:
+If you want to regenerate the `.xlsx` locally:
+
 ```bash
 python3 -m pip install -r scripts/requirements.txt
 python3 scripts/make_demo_xlsx.py
 ```
 
-## 2) Install the script
+## 1) Install the script (60–90s)
 1. In the Sheet: **Extensions → Apps Script**
-2. Delete any default code, then paste in `Code.gs` from this repo
+2. Delete any default code → paste `Code.gs` from this repo
 3. **Save**
-4. Go back to the Sheet tab and **reload** the page
+4. Go back to the Sheet tab and **reload**
 
 You should now see a menu called **Approvals**.
 
-## 3) Generate the demo data (one click)
+> First run note: Google will prompt for authorization the first time you use a menu action.
+
+## 2) Generate demo data (10s)
 In the Sheet: **Approvals → Create demo setup**
 
 This will:
 - create `Requests` and `Audit` tabs
-- add the correct headers
+- add headers
 - seed a few example rows
 
-## 4) Run the approval flow
+## 3) Demo the approval flow (45s)
 1. Open the `Requests` tab
 2. Click any seeded row (row 2+)
 3. Run **Approvals → Approve row**
-4. Check the `Audit` tab: you should see a new event with:
-   - action name
-   - actor (email if available)
-   - row snapshot
-   - sha256 hash
 
-## 5) Demo “re-approval required after change”
-1. Approve a row
-2. Edit a tracked cell on that row (e.g., `Title`)
-3. The row should automatically revert to `PENDING`
-4. The `Audit` tab should include a `REAPPROVAL_REQUIRED` event
+Callouts:
+- `Status` becomes `APPROVED`
+- `Approver` + `DecisionAt` populated
 
-### Configuration note
-The “which edits count” behavior is controlled by these constants in `Code.gs`:
+Then open the `Audit` tab and call out:
+- appended event row (who/when/what)
+- **row snapshot** (so the audit is explainable)
+- **sha256 hash** (tamper-detection)
+
+## 4) Demo “re-approval required after change” (45s)
+1. Go back to `Requests`
+2. Edit a meaningful cell on the approved row (e.g., `Title`)
+
+Expected:
+- row reverts to `PENDING`
+- `Audit` gets a `REAPPROVAL_REQUIRED` event
+
+### If it doesn’t revert to PENDING
+Some Google Workspace domains restrict simple triggers.
+
+Fallback:
+- run **Approvals → Install re-approval trigger (optional)**
+- then edit the approved row again
+
+## 5) (Optional) Quick config explanation (15s)
+In `Code.gs`, these knobs control what edits require re-approval:
 - `CFG.REAPPROVAL_EXEMPT_HEADERS`
 - `CFG.REAPPROVAL_TRACKED_HEADERS`
 
-If `REAPPROVAL_TRACKED_HEADERS` is empty, any non-exempt edit triggers re-approval.
+If `REAPPROVAL_TRACKED_HEADERS` is empty, **any non-exempt edit** triggers re-approval.
 
-## Suggested screenshots (for a sales page)
-1. The **Approvals** menu visible in the Sheet
-2. A `Requests` row before/after approval (Status, Approver, DecisionAt)
-3. The `Audit` sheet showing appended rows + hashes
-4. Editing an approved row → automatic revert to PENDING + audit event
+## Suggested screenshot set (for a listing / landing page)
+1. Approvals menu visible
+2. Requests sheet (pending)
+3. Approved outcome (Status/Approver/DecisionAt)
+4. Audit entry appended (hash visible)
+5. Edit approved row → revert to PENDING + audit event
+
+(See `SCREENSHOTS.md` + `REAL_SCREENSHOTS_GUIDE.md` for the exact filenames/workflow.)

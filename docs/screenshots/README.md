@@ -57,3 +57,11 @@ Optional: regenerate this README + the HTML gallery from the manifest:
 ```bash
 python3 scripts/render_screenshots_gallery.py
 ```
+
+## Optional: optimized JPGs
+
+If you run the screenshot optimizer, it will generate:
+
+- `docs/screenshots/optimized/*.jpg`
+
+The landing page will automatically prefer these when present (via a `<picture>` tag), falling back to the PNGs.

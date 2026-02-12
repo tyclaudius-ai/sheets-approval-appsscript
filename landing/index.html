@@ -79,8 +79,8 @@
       -->
       <h2>Screenshot set</h2>
       <p class="fine">
-        The landing page references <code>docs/screenshots/*.png</code>.
-        By default those are placeholder images — overwrite them with real screenshots using the same filenames.
+        The landing page references <code>docs/screenshots/*.png</code> (with optional <code>docs/screenshots/optimized/*.jpg</code> for faster loading).
+        By default the PNGs are placeholder images — overwrite them with real screenshots using the same filenames.
       </p>
 
       <div class="cta-row" style="margin-top: 10px; margin-bottom: 6px;">
@@ -89,27 +89,45 @@
 
       <div class="shots">
         <figure>
-          <img src="../docs/screenshots/01-menu.png" alt="Custom Approvals menu" />
+          <picture>
+            <source srcset="../docs/screenshots/optimized/01-menu.jpg" type="image/jpeg" />
+            <img src="../docs/screenshots/01-menu.png" alt="Custom Approvals menu" />
+          </picture>
           <figcaption>01 — Custom menu visible</figcaption>
         </figure>
         <figure>
-          <img src="../docs/screenshots/02-requests-pending.png" alt="Requests sheet with PENDING rows" />
+          <picture>
+            <source srcset="../docs/screenshots/optimized/02-requests-pending.jpg" type="image/jpeg" />
+            <img src="../docs/screenshots/02-requests-pending.png" alt="Requests sheet with PENDING rows" />
+          </picture>
           <figcaption>02 — Requests (pending)</figcaption>
         </figure>
         <figure>
-          <img src="../docs/screenshots/03-approved-row.png" alt="Approved row" />
+          <picture>
+            <source srcset="../docs/screenshots/optimized/03-approved-row.jpg" type="image/jpeg" />
+            <img src="../docs/screenshots/03-approved-row.png" alt="Approved row" />
+          </picture>
           <figcaption>03 — Approved outcome</figcaption>
         </figure>
         <figure>
-          <img src="../docs/screenshots/04-audit-entry.png" alt="Audit entry appended" />
+          <picture>
+            <source srcset="../docs/screenshots/optimized/04-audit-entry.jpg" type="image/jpeg" />
+            <img src="../docs/screenshots/04-audit-entry.png" alt="Audit entry appended" />
+          </picture>
           <figcaption>04 — Audit trail entry</figcaption>
         </figure>
         <figure>
-          <img src="../docs/screenshots/05-reapproval-required.png" alt="Re-approval required after edit" />
+          <picture>
+            <source srcset="../docs/screenshots/optimized/05-reapproval-required.jpg" type="image/jpeg" />
+            <img src="../docs/screenshots/05-reapproval-required.png" alt="Re-approval required after edit" />
+          </picture>
           <figcaption>05 — Re-approval required</figcaption>
         </figure>
         <figure>
-          <img src="../docs/screenshots/06-help-sidebar.png" alt="Help/Docs sidebar" />
+          <picture>
+            <source srcset="../docs/screenshots/optimized/06-help-sidebar.jpg" type="image/jpeg" />
+            <img src="../docs/screenshots/06-help-sidebar.png" alt="Help/Docs sidebar" />
+          </picture>
           <figcaption>06 — Help/Docs sidebar</figcaption>
         </figure>
       </div>

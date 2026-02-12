@@ -14,11 +14,15 @@ This intentionally makes the top-level PNG hashes differ from the placeholder
 PNGs so `scripts/check_screenshots.py` passes.
 
 Usage:
-  python3 scripts/generate_realish_screenshots.py [--optimize]
+  python3 scripts/generate_realish_screenshots.py [--optimize] [--watermark] [--watermark-text TEXT]
 
 Options:
-  --optimize   Also run the screenshot optimizer after writing PNGs
-              (generates docs/screenshots/optimized/*.jpg).
+  --optimize         Also run the screenshot optimizer after writing PNGs
+                    (generates docs/screenshots/optimized/*.jpg).
+  --watermark        Add a safety watermark ("DEMO (generated)") to the output PNGs.
+                    Useful when you want to share mocks publicly without risking
+                    them being mistaken for real Google Sheets captures.
+  --watermark-text   Customize the watermark text (implies --watermark).
 
 Notes:
 - If you later capture true screenshots from Google Sheets, you can overwrite
@@ -89,6 +93,16 @@ def main() -> int:
         "--optimize",
         action="store_true",
         help="Also run the screenshot optimizer (writes docs/screenshots/optimized/*.jpg)",
+    )
+    ap.add_argument(
+        "--watermark",
+        action="store_true",
+        help='Add a safety watermark ("DEMO (generated)") to the output PNGs',
+    )
+    ap.add_argument(
+        "--watermark-text",
+        default=None,
+        help="Custom watermark text (implies --watermark)",
     )
     args = ap.parse_args()
 
@@ -227,6 +241,27 @@ def main() -> int:
         )
 
         canvas.alpha_composite(base, (content_x, content_y))
+
+        # Optional safety watermark.
+        watermark_text = args.watermark_text or ("DEMO (generated)" if args.watermark else None)
+        if watermark_text:
+            overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+            odraw = ImageDraw.Draw(overlay)
+            bbox = odraw.textbbox((0, 0), watermark_text, font=font_sm)
+            tw = bbox[2] - bbox[0]
+            th = bbox[3] - bbox[1]
+            # Bottom-right, inside padding.
+            x = out_w - pad - tw - 10
+            y = out_h - pad - th - 10
+            # Soft background pill for legibility.
+            odraw.rounded_rectangle(
+                (x - 8, y - 6, x + tw + 8, y + th + 6),
+                radius=10,
+                fill=(255, 255, 255, 190),
+                outline=(0, 0, 0, 60),
+            )
+            odraw.text((x, y), watermark_text, fill=(0, 0, 0, 160), font=font_sm)
+            canvas.alpha_composite(overlay)
 
         # Save PNG
         canvas.convert("RGB").save(out_path, format="PNG", optimize=True)

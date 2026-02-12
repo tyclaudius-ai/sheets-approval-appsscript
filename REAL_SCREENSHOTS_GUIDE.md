@@ -4,6 +4,8 @@ Goal: replace the placeholder images with **real** screenshots while keeping fil
 
 Note: if you need something that looks non-placeholder *without* signing into Google, you can run `python3 scripts/generate_realish_screenshots.py`. It generates “real‑ish” screenshots by adding simple browser/Sheets chrome around the placeholder images. True Google Sheets captures are still preferred when available.
 
+Safety tip: when sharing the mocks publicly, consider `--watermark` (or `--watermark-text "…"`) so they can't be mistaken for true Google Sheets screenshots.
+
 ## Quick rules (so the shots look clean)
 
 - Use a **fresh demo copy** of the sheet (no client names/data).

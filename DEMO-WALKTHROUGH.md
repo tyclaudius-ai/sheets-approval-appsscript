@@ -76,6 +76,8 @@ If you’re not logged into Google on this machine, you can still generate *real
 
 ```bash
 python3 scripts/generate_realish_screenshots.py --optimize
+# Optional safety: add a watermark so mocks can't be mistaken for real captures
+# python3 scripts/generate_realish_screenshots.py --optimize --watermark
 python3 scripts/screenshots_pipeline.py
 ```
 

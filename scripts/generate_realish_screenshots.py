@@ -14,7 +14,11 @@ This intentionally makes the top-level PNG hashes differ from the placeholder
 PNGs so `scripts/check_screenshots.py` passes.
 
 Usage:
-  python3 scripts/generate_realish_screenshots.py
+  python3 scripts/generate_realish_screenshots.py [--optimize]
+
+Options:
+  --optimize   Also run the screenshot optimizer after writing PNGs
+              (generates docs/screenshots/optimized/*.jpg).
 
 Notes:
 - If you later capture true screenshots from Google Sheets, you can overwrite
@@ -25,6 +29,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+import argparse
+import subprocess
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -50,6 +56,14 @@ SHOTS: list[Shot] = [
 
 
 def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument(
+        "--optimize",
+        action="store_true",
+        help="Also run the screenshot optimizer (writes docs/screenshots/optimized/*.jpg)",
+    )
+    args = ap.parse_args()
+
     TOP_DIR.mkdir(parents=True, exist_ok=True)
 
     # Fonts: use default bitmap font to avoid system dependencies.
@@ -138,6 +152,15 @@ def main() -> int:
     if missing:
         print(f"\nDone (with missing inputs). wrote={wrote}, missing={missing}")
         return 2
+
+    if args.optimize:
+        try:
+            # Keep it best-effort: this is for convenience in local dev.
+            subprocess.run(["node", "scripts/optimize_screenshots.mjs"], cwd=ROOT, check=True)
+        except FileNotFoundError:
+            print("[optimize] Skipped: node not found")
+        except subprocess.CalledProcessError as e:
+            print(f"[optimize] Failed (exit={e.returncode}). You can rerun manually: node scripts/optimize_screenshots.mjs")
 
     print(f"\nDone. wrote={wrote}")
     return 0

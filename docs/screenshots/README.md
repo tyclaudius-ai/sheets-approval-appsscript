@@ -68,7 +68,11 @@ The landing page will automatically prefer these when present (via a `<picture>`
 
 ## Optional: animated preview GIF
 
-You can generate a lightweight marketing/README preview GIF from the optimized JPGs:
+Quick animated preview (useful for READMEs / listings):
+
+![approval-flow](./approval-flow.gif)
+
+You can (re)generate it from the optimized JPGs:
 
 ```bash
 python3 scripts/make_screenshot_gif.py

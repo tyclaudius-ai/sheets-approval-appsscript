@@ -71,7 +71,8 @@ The marketplace pack is designed to be uploaded as the downloadable artifact.
 
 ## 4) Listing copy
 
-- [ ] Use `LISTING.md` as the canonical copy source
+- [ ] Use `LISTING.md` as the canonical copy source (long-form)
+- [ ] Use `MARKETPLACE-LISTING-COPY.md` for **copy/paste** titles, bullets, and FAQ snippets
 - [ ] Confirm the “What it does” section matches the current feature set
 - [ ] Decide if you are selling **MIT-licensed source** (this repo) or a curated download bundle
 

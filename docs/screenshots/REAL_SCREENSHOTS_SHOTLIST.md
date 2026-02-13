@@ -124,7 +124,7 @@ python3 scripts/check_screenshots.py --fail-on-placeholders
 Optional: run the full pipeline (install → validate → optimize):
 
 ```bash
-python3 scripts/screenshots_pipeline.py --from ~/Desktop --check --fail-on-placeholders --optimize --width 1400
+python3 scripts/screenshots_pipeline.py --from ~/Desktop --check --require-real-screenshots --optimize --width 1400
 ```
 
 Optional: re-render the screenshots README + HTML gallery from `manifest.json`:

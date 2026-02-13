@@ -57,6 +57,16 @@ def main() -> int:
         help="Fail if docs/screenshots/*.png are still placeholders.",
     )
     ap.add_argument(
+        "--fail-on-realish",
+        action="store_true",
+        help="Fail if docs/screenshots/*.png are still known generated 'real-ish' mocks.",
+    )
+    ap.add_argument(
+        "--require-real-screenshots",
+        action="store_true",
+        help="Convenience flag: equivalent to --fail-on-placeholders --fail-on-realish.",
+    )
+    ap.add_argument(
         "--optimize",
         action="store_true",
         help="Generate optimized JPGs under docs/screenshots/optimized/.",
@@ -97,11 +107,18 @@ def main() -> int:
 
     args = ap.parse_args()
 
+    # Convenience: 'real screenshots' means neither placeholders nor known generated "real-ish" mocks.
+    if args.require_real_screenshots:
+        args.fail_on_placeholders = True
+        args.fail_on_realish = True
+
     # Default behavior: quick sanity check + refresh rendered gallery docs.
     if not (
         args.from_dir
         or args.check
         or args.fail_on_placeholders
+        or args.fail_on_realish
+        or args.require_real_screenshots
         or args.optimize
         or args.render_gallery
         or args.status
@@ -115,10 +132,12 @@ def main() -> int:
         from_dir = os.path.expanduser(args.from_dir)
         run([sys.executable, "scripts/install_real_screenshots.py", "--from", from_dir])
 
-    if args.check or args.fail_on_placeholders:
+    if args.check or args.fail_on_placeholders or args.fail_on_realish:
         cmd = [sys.executable, "scripts/check_screenshots.py"]
         if args.fail_on_placeholders:
             cmd.append("--fail-on-placeholders")
+        if args.fail_on_realish:
+            cmd.append("--fail-on-realish")
         run(cmd)
 
     if args.optimize:

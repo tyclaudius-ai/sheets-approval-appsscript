@@ -46,15 +46,17 @@ In-sheet Help sidebar for quick onboarding and usage.
 
 Follow: [`REAL_SCREENSHOTS_GUIDE.md`](../../REAL_SCREENSHOTS_GUIDE.md)
 
-After capturing, verify none are still placeholders:
+After capturing, the easiest path is to run the all-in-one pipeline (installs, validates, refreshes STATUS.md, and re-renders the gallery):
+
+```bash
+python3 scripts/screenshots_pipeline.py --from ~/Desktop --check --fail-on-placeholders --status --render-gallery
+```
+
+If you prefer individual commands:
 
 ```bash
 python3 scripts/check_screenshots.py
-```
-
-Optional: regenerate this README + the HTML gallery from the manifest:
-
-```bash
+python3 scripts/screenshot_status.py --write
 python3 scripts/render_screenshots_gallery.py
 ```
 

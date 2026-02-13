@@ -9,8 +9,8 @@ This script bundles the common commands into one repeatable pipeline.
 
 Examples
 --------
-# Install real screenshots from Desktop, then validate, then build optimized JPGs
-python3 scripts/screenshots_pipeline.py --from ~/Desktop --check --fail-on-placeholders --optimize --width 1400
+# Install real screenshots from Desktop, then validate, update STATUS.md, then build optimized JPGs
+python3 scripts/screenshots_pipeline.py --from ~/Desktop --check --fail-on-placeholders --status --optimize --width 1400
 
 # Then generate the approval-flow.gif used in README/landing previews
 python3 scripts/screenshots_pipeline.py --make-gif --gif-width 900 --gif-ms 900
@@ -73,6 +73,11 @@ def main() -> int:
         help="Regenerate docs/screenshots/README.md + gallery.html from manifest.json.",
     )
     ap.add_argument(
+        "--status",
+        action="store_true",
+        help="Regenerate docs/screenshots/STATUS.md (placeholder vs real-ish vs custom).",
+    )
+    ap.add_argument(
         "--make-gif",
         action="store_true",
         help="Generate docs/screenshots/approval-flow.gif from optimized JPGs.",
@@ -99,10 +104,12 @@ def main() -> int:
         or args.fail_on_placeholders
         or args.optimize
         or args.render_gallery
+        or args.status
         or args.make_gif
     ):
         args.check = True
         args.render_gallery = True
+        args.status = True
 
     if args.from_dir:
         from_dir = os.path.expanduser(args.from_dir)
@@ -117,6 +124,9 @@ def main() -> int:
     if args.optimize:
         # The optimizer is best-effort and uses macOS sips; keep it separate.
         run(["node", "scripts/optimize_screenshots.mjs", "--width", str(args.width)])
+
+    if args.status:
+        run([sys.executable, "scripts/screenshot_status.py", "--write"])
 
     if args.render_gallery:
         run([sys.executable, "scripts/render_screenshots_gallery.py"])

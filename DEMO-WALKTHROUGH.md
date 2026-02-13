@@ -1,5 +1,7 @@
 # Demo Walkthrough (2–5 minutes)
 
+> Recommended starting point: **`DEMO.md`** (single consolidated demo doc).
+
 This is a simple, repeatable demo flow you can run live in a Google Sheet.
 
 ## 0) Setup (30–60s)

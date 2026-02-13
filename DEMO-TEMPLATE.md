@@ -1,5 +1,7 @@
 # Demo Template (copy/paste) — Sheets Approvals + Audit Trail
 
+> Recommended starting point: **`DEMO.md`** (single consolidated demo doc).
+
 Goal: a **clean 2–3 minute demo** showing (1) approve/reject workflow, (2) append-only audit trail, (3) “re-approval required after change”.
 
 This repo is intentionally **copy/paste-first** (no Marketplace add-on).

@@ -47,9 +47,10 @@ Use **Approvals → Create demo setup** to generate the `Requests` + `Audit` tab
 
 Fastest start (90 seconds): **`QUICKSTART.md`**.
 
-For a clean, step-by-step “demo in 2 minutes” talk-track, see: **`DEMO-TEMPLATE.md`**.
+For the recommended 2–5 minute live demo flow (talk-track + screenshots), start here:
+- **`DEMO.md`**
 
-For a repeatable live demo flow (2–5 min), see: **`DEMO-WALKTHROUGH.md`**.
+(Older/alternate formats: `DEMO-TEMPLATE.md` and `DEMO-WALKTHROUGH.md`.)
 
 Offline demo assets (CSV + importable XLSX) live in `demo/` — start with **`demo/README.md`**.
 

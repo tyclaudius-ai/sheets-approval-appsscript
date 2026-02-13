@@ -78,6 +78,12 @@ The marketplace pack is designed to be uploaded as the downloadable artifact.
 
 ## 5) QA sanity checks (before you post)
 
+- [ ] Validate marketplace pack contents (recommended):
+
+```bash
+python3 scripts/validate_marketplace_pack.py dist/marketplace-pack-*.zip
+```
+
 - [ ] `python3 scripts/package_sheets_approval_appsscript.py --check` (if supported)
 - [ ] Landing page renders locally:
 

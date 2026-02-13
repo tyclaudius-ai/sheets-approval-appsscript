@@ -117,7 +117,7 @@ Tip: If Google prompts for permissions, complete the authorization once; after t
 2) Run:
 
 ```bash
-python3 scripts/install_real_screenshots.py --from ~/Desktop
+python3 scripts/install_real_screenshots.py --from ~/Desktop --check --optimize
 python3 scripts/check_screenshots.py --fail-on-placeholders
 ```
 

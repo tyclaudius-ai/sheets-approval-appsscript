@@ -90,10 +90,17 @@ Right now those files exist as **copies of the placeholders** (generated PNGs). 
 If you captured your screenshots to Desktop with macOS’ default naming ("Screenshot … .png"), you can install them with:
 
 ```bash
-python3 scripts/install_real_screenshots.py --from ~/Desktop
+# interactive mapping (recommended)
+python3 scripts/install_real_screenshots.py --from ~/Desktop --check --optimize
+
+# fastest path if you just took the screenshots in the right order (newest → oldest)
+# python3 scripts/install_real_screenshots.py --from ~/Desktop --non-interactive --check --optimize
 ```
 
-It will prompt you to pick which captured file maps to each target filename and copy them into `docs/screenshots/`.
+- `--check` runs `scripts/check_screenshots.py` after copying (fails if any placeholders/"real-ish" mocks remain).
+- `--optimize` runs the JPG/PNG optimizer after copying to shrink file sizes.
+
+The installer will prompt you to pick which captured file maps to each target filename and copy them into `docs/screenshots/`. (With `--non-interactive`, it auto-maps the newest files to 01→06.)
 
 ## If you want *zero* personal info visible
 

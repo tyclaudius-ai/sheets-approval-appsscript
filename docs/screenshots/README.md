@@ -46,6 +46,12 @@ In-sheet Help sidebar for quick onboarding and usage.
 
 Follow: [`REAL_SCREENSHOTS_GUIDE.md`](../../REAL_SCREENSHOTS_GUIDE.md)
 
+If you want a “handoff bundle” to send to whoever will do the capture, you can build a small zip with the shotlist + install/check scripts:
+
+```bash
+python3 scripts/make_real_screenshot_capture_pack.py
+```
+
 After capturing, the easiest path is to run the all-in-one pipeline (installs, validates, refreshes STATUS.md, and re-renders the gallery):
 
 ```bash

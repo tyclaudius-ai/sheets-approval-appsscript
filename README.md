@@ -92,6 +92,8 @@ For “one-click copy” template-link instructions, see: **`TEMPLATE-INSTRUCTIO
 
 For ready-to-paste marketplace listing copy (Gumroad/Ko-fi/Upwork Project Catalog), see: **`LISTING.md`**.
 
+For a “ready to publish” checklist (screenshots → pack → QA), see: **`MARKETPLACE-CHECKLIST.md`**.
+
 If you want this installed/customized into your own sheet as a fixed-price setup, see:
 - `SALES.md`
 - `INTAKE_QUESTIONS.md`

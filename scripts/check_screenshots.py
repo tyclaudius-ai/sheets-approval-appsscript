@@ -114,6 +114,11 @@ def main() -> int:
         help="Exit non-zero if any top-level screenshot PNG is still a 'real-ish' mock (generated).",
     )
     ap.add_argument(
+        "--require-real-screenshots",
+        action="store_true",
+        help="Convenience flag: equivalent to --fail-on-placeholders --fail-on-realish.",
+    )
+    ap.add_argument(
         "--json",
         action="store_true",
         help="Emit machine-readable JSON (still prints nothing else).",
@@ -124,6 +129,11 @@ def main() -> int:
         help="Print file size + best-effort pixel dimensions for each screenshot (uses macOS `sips` if available).",
     )
     args = ap.parse_args()
+
+    # Convenience: 'real screenshots' means neither placeholders nor known generated "real-ish" mocks.
+    if args.require_real_screenshots:
+        args.fail_on_placeholders = True
+        args.fail_on_realish = True
 
     missing: list[str] = []
     placeholders: list[str] = []

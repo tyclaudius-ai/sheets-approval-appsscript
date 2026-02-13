@@ -82,3 +82,14 @@ python3 scripts/make_screenshot_gif.py
 
 Output:
 - `docs/screenshots/approval-flow.gif`
+
+## Packaging a listing-ready ZIP
+
+To generate a single ZIP you can upload to marketplaces:
+
+```bash
+python3 scripts/make_screenshot_pack.py
+```
+
+Output:
+- `dist/screenshot-pack-YYYYMMDD-HHMM.zip`

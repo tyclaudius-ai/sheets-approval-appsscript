@@ -12,6 +12,8 @@ are currently in docs/screenshots/*.png (placeholders or real).
 Usage:
   python3 scripts/make_marketplace_pack.py
   python3 scripts/make_marketplace_pack.py --out dist/marketplace-pack.zip
+  # enforce only true screenshots (fails on placeholders + known real-ish mocks)
+  python3 scripts/make_marketplace_pack.py --require-real-screenshots
 
 Outputs:
   dist/marketplace-pack-<timestamp>.zip (default)
@@ -51,11 +53,25 @@ def main() -> int:
         default=None,
         help="Override output path for the screenshot pack zip (default: timestamped in dist/)",
     )
+    ap.add_argument(
+        "--require-real-screenshots",
+        action="store_true",
+        help="Fail the build if docs/screenshots/*.png are placeholders or known 'real-ish' mocks.",
+    )
     args = ap.parse_args()
 
     ts = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%d-%H%M%SZ")
     out_path = Path(args.out) if args.out else (DIST / f"marketplace-pack-{ts}.zip")
     out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # 0) Optional guardrails: ensure screenshots are truly captured (not placeholders / not known mocks).
+    if args.require_real_screenshots:
+        _run([
+            "python3",
+            "scripts/check_screenshots.py",
+            "--fail-on-placeholders",
+            "--fail-on-realish",
+        ])
 
     # 1) Build the inner artifacts.
     bundle_out = args.bundle_out

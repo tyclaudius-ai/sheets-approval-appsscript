@@ -113,6 +113,7 @@ def main() -> int:
         "SCREENSHOTS.md",
         "REAL_SCREENSHOTS_GUIDE.md",
         "TROUBLESHOOTING.md",
+        "MARKETPLACE-CHECKLIST.md",
     ]
 
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as z:

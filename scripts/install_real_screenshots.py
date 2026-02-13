@@ -17,8 +17,9 @@ Usage:
 
 Options:
   --from DIR            Directory to scan for source images (default: ~/Desktop)
-  --glob PATTERN        Glob to match (default: 'Screenshot*.png')
+  --glob PATTERN        Glob pattern(s). Repeatable. (defaults: Screenshot*.png, Screen Shot*.png)
   --include-jpg         Also include *.jpg/*.jpeg matches (off by default)
+  --open               When selecting a candidate, open it in Preview (macOS `open`).
   --non-interactive     Take the newest N files in order and map to 01..06 (risky)
   --dry-run             Print actions without copying
   --check               After copying, run scripts/check_screenshots.py
@@ -34,8 +35,10 @@ import argparse
 import glob
 import os
 import shutil
+import subprocess
 import sys
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 
 
@@ -75,6 +78,7 @@ def find_candidates(src_dir: Path, patterns: list[str]) -> list[Candidate]:
 
     # newest first
     hits.sort(key=lambda c: c.mtime, reverse=True)
+
     # de-dupe exact paths
     seen: set[Path] = set()
     out: list[Candidate] = []
@@ -94,6 +98,13 @@ def fmt_bytes(n: int) -> str:
     return f"{n}B"
 
 
+def fmt_mtime(ts: float) -> str:
+    try:
+        return datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M")
+    except Exception:
+        return str(ts)
+
+
 def prompt(msg: str) -> str:
     try:
         return input(msg)
@@ -105,8 +116,18 @@ def prompt(msg: str) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--from", dest="src", default="~/Desktop", help="Directory to scan for screenshots")
-    ap.add_argument("--glob", dest="glob", default="Screenshot*.png", help="Glob pattern (relative to --from)")
+    ap.add_argument(
+        "--glob",
+        dest="globs",
+        action="append",
+        help="Glob pattern (relative to --from). Repeatable.",
+    )
     ap.add_argument("--include-jpg", action="store_true", help="Also include Screenshot*.jpg/jpeg")
+    ap.add_argument(
+        "--open",
+        action="store_true",
+        help="When selecting a candidate, open it in Preview (macOS `open`).",
+    )
     ap.add_argument("--non-interactive", action="store_true", help="Map newest N files to targets without prompts")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--check", action="store_true", help="Run scripts/check_screenshots.py after copying")
@@ -118,9 +139,16 @@ def main() -> int:
         print(f"Source dir does not exist: {src_dir}", file=sys.stderr)
         return 2
 
-    patterns = [args.glob]
+    base_globs = args.globs or ["Screenshot*.png", "Screen Shot*.png"]
+
+    patterns: list[str] = []
+    patterns.extend(base_globs)
     if args.include_jpg:
-        patterns += [args.glob.replace(".png", ".jpg"), args.glob.replace(".png", ".jpeg")]
+        for g in base_globs:
+            if g.lower().endswith(".png"):
+                patterns += [g[:-4] + ".jpg", g[:-4] + ".jpeg"]
+            else:
+                patterns += [g + ".jpg", g + ".jpeg"]
 
     candidates = find_candidates(src_dir, patterns)
     if not candidates:
@@ -132,16 +160,19 @@ def main() -> int:
 
     print("Found candidates (newest first):")
     for i, c in enumerate(candidates[:20], start=1):
-        print(f"  [{i:2d}] {c.path.name}  ({fmt_bytes(c.size)})")
+        print(f"  [{i:2d}] {c.path.name}  ({fmt_mtime(c.mtime)} · {fmt_bytes(c.size)})")
     if len(candidates) > 20:
         print(f"  ... and {len(candidates) - 20} more")
     print("")
 
-    chosen: list[Path] = []
+    chosen: list[Path | None] = []
 
     if args.non_interactive:
         if len(candidates) < len(TARGETS):
-            print(f"Need at least {len(TARGETS)} files for non-interactive mode; found {len(candidates)}", file=sys.stderr)
+            print(
+                f"Need at least {len(TARGETS)} files for non-interactive mode; found {len(candidates)}",
+                file=sys.stderr,
+            )
             return 2
         chosen = [c.path for c in candidates[: len(TARGETS)]]
         # non-interactive uses oldest-to-newest ordering so 01..06 aligns with capture order
@@ -149,39 +180,49 @@ def main() -> int:
     else:
         print("For each target, type the candidate number to use (or Enter to skip).")
         print("Tip: capture shots in order 01..06 so the newest list is easy to map.")
+        if args.open:
+            print("Tip: --open will open each selection in Preview so you can sanity-check framing.")
         print("")
 
         for (fname, desc) in TARGETS:
             resp = prompt(f"Select for {fname} — {desc} [1-{min(len(candidates), 99)} / Enter=skip]: ").strip()
             if not resp:
-                chosen.append(None)  # type: ignore
+                chosen.append(None)
                 continue
             try:
                 idx = int(resp)
             except ValueError:
                 print("  Not a number; skipping.")
-                chosen.append(None)  # type: ignore
+                chosen.append(None)
                 continue
             if idx < 1 or idx > len(candidates):
                 print("  Out of range; skipping.")
-                chosen.append(None)  # type: ignore
+                chosen.append(None)
                 continue
-            chosen.append(candidates[idx - 1].path)
+            p = candidates[idx - 1].path
+            if args.open:
+                try:
+                    subprocess.run(["open", str(p)], check=False)
+                except Exception:
+                    pass
+            chosen.append(p)
 
     # execute
     print("\nPlanned actions:")
-    actions = []
+    actions: list[tuple[Path | None, Path, str]] = []
     for (target_fname, desc), src_path in zip(TARGETS, chosen):
         if src_path is None:
             actions.append((None, dest_dir / target_fname, desc))
         else:
             actions.append((Path(src_path), dest_dir / target_fname, desc))
 
+    repo_root = Path(__file__).resolve().parent.parent
+
     for src_path, dest_path, desc in actions:
         if src_path is None:
             print(f"  - SKIP {dest_path.name} ({desc})")
         else:
-            print(f"  - COPY {src_path.name} -> {dest_path.relative_to(Path(__file__).resolve().parent.parent)} ({desc})")
+            print(f"  - COPY {src_path.name} -> {dest_path.relative_to(repo_root)} ({desc})")
 
     if args.dry_run:
         print("\nDry run; no files copied.")
@@ -202,19 +243,13 @@ def main() -> int:
 
     print(f"\nDone. Copied {copied} file(s).")
 
-    repo_root = Path(__file__).resolve().parent.parent
-
     if args.check:
         print("\n[screenshots] Running check_screenshots.py …")
-        import subprocess
-
-        subprocess.run([sys.executable, str(repo_root / "scripts" / "check_screenshots.py")])
+        subprocess.run([sys.executable, str(repo_root / "scripts" / "check_screenshots.py")], check=False)
 
     if args.optimize:
         print("\n[screenshots] Running optimize_screenshots.mjs …")
-        import subprocess
-
-        subprocess.run(["node", str(repo_root / "scripts" / "optimize_screenshots.mjs")], cwd=str(repo_root))
+        subprocess.run(["node", str(repo_root / "scripts" / "optimize_screenshots.mjs")], cwd=str(repo_root), check=False)
 
     print("\nSanity check: open landing/index.html and confirm the screenshot gallery looks right.")
     print("Preview helper: python3 scripts/serve_landing.py --open")

@@ -34,7 +34,8 @@ Use macOS screenshot tool (Cmd+Shift+4) and capture tight rectangles (avoid brow
 If your screenshots are on Desktop (default macOS naming), run:
 
 ```bash
-python3 scripts/install_real_screenshots.py --from ~/Desktop --check --optimize
+# Interactive mapping (recommended). Use --open to preview each pick in Preview.
+python3 scripts/install_real_screenshots.py --from ~/Desktop --open --check --optimize
 ```
 
 ## Verify they’re not placeholders

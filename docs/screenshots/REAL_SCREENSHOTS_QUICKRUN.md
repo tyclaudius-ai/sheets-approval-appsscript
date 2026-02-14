@@ -41,6 +41,17 @@ Expected output filenames:
 - `05-reapproval-required.png`
 - `06-help-sidebar.png`
 
+## Optional: guided capture + install (fastest, least error-prone)
+
+If you want to avoid hunting through a pile of Desktop screenshots, you can run the installer in **guided** mode.
+It will step through 01..06, wait for a **new** screenshot each time, and install them automatically.
+
+```bash
+python3 scripts/install_real_screenshots.py --from ~/Desktop --guided
+```
+
+Then run the pipeline below to validate + optimize + render the gallery.
+
 ## Install + verify (fast path)
 
 After capturing (usually they land on your Desktop), run:

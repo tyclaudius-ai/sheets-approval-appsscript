@@ -38,7 +38,11 @@ You can capture these in ~5 minutes to make the repo / landing page feel “real
   - `docs/screenshots/03-approved-row.png`
   - `docs/screenshots/04-audit-entry.png`
 
-Tip: see `REAL_SCREENSHOTS_GUIDE.md` for a 5–10 minute capture flow.
+Tip: see `REAL_SCREENSHOTS_GUIDE.md` for the full 5–10 minute capture flow.
+
+Also useful:
+- Shot list: `docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md`
+- Quick run: `docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md`
 
 ### Included placeholders + generated PNGs
 

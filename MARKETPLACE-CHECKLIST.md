@@ -23,7 +23,7 @@ If you’re doing both, publish the DIY download and use it as an upsell into se
 
 ## 2) Screenshots (real, if possible)
 
-Recommended: capture these real screenshots (see `SCREENSHOTS.md` for the shot list).
+Recommended: capture these real screenshots (shot list: `docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md`; quick flow: `docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md`).
 
 ### Check placeholder status
 

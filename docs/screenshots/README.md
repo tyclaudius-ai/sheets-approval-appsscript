@@ -44,7 +44,9 @@ In-sheet Help sidebar for quick onboarding and usage.
 
 ## Capturing real screenshots
 
-Follow: [`REAL_SCREENSHOTS_GUIDE.md`](../../REAL_SCREENSHOTS_GUIDE.md)
+Fast path (10 minutes): [`REAL_SCREENSHOTS_QUICKRUN.md`](./REAL_SCREENSHOTS_QUICKRUN.md)
+
+Full guide: [`REAL_SCREENSHOTS_GUIDE.md`](../../REAL_SCREENSHOTS_GUIDE.md)
 
 If you want a “handoff bundle” to send to whoever will do the capture, you can build a small zip with the shotlist + install/check scripts:
 

@@ -34,11 +34,13 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 
 INCLUDE_PATHS = [
+    Path("docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md"),
     Path("docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md"),
     Path("docs/screenshots/CAPTURE-CHEATSHEET.md"),
     Path("docs/screenshots/manifest.json"),
     Path("scripts/install_real_screenshots.py"),
     Path("scripts/check_screenshots.py"),
+    Path("scripts/screenshots_pipeline.py"),
     Path("scripts/requirements.txt"),
 ]
 
@@ -85,14 +87,15 @@ Goal:
   Replace placeholder screenshots under docs/screenshots/*.png with REAL captures.
 
 Start here:
+  docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md
   docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md
 
 Workflow (macOS example):
   1) Capture screenshots to Desktop (cmd+shift+4 / cmd+shift+5)
-  2) Run installer (renames + copies into docs/screenshots/*.png):
-       python3 scripts/install_real_screenshots.py --from ~/Desktop
-  3) Verify repo now has REAL screenshots:
-       python3 scripts/check_screenshots.py --require-real-screenshots
+  2) Run the all-in-one pipeline (install + verify + optimize + refresh docs):
+       python3 scripts/screenshots_pipeline.py --from ~/Desktop --check --require-real-screenshots --optimize --width 1400 --status --render-gallery
+  3) (Optional) Animated preview:
+       python3 scripts/screenshots_pipeline.py --make-gif --gif-width 900 --gif-ms 900
 
 Notes:
   - This pack intentionally does NOT include any screenshots.

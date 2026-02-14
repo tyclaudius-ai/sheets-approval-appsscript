@@ -31,30 +31,67 @@ def main() -> int:
     items = data.get("items", [])
 
     # README.md
-    md = []
-    md.append("# Screenshots\n")
-    md.append("\n")
-    md.append("These images are what the landing page (and a product listing) should reference.\n")
-    md.append("\n")
-    md.append("If you haven’t captured real screenshots yet, the repo ships placeholder PNGs with the same filenames.\n")
-    md.append("\n")
+    # NOTE: This generator is meant to match the human-friendly README content
+    # (with richer capture/packaging instructions), while keeping the screenshot
+    # list itself manifest-driven.
+    md: list[str] = []
+    md.append("# Screenshots\n\n")
+    md.append("These images are what the landing page (and a product listing) should reference.\n\n")
+    md.append("If you haven’t captured real screenshots yet, the repo ships placeholder PNGs with the same filenames.\n\n")
+
     md.append("## Screenshot set\n")
 
     for it in items:
         heading = it.get("heading") or it.get("id")
         file = it.get("file")
-        caption = it.get("caption", "")
+        caption = (it.get("caption") or "").strip()
         md.append(f"\n{heading}\n\n")
         if caption:
             md.append(f"{caption}\n\n")
         md.append(f"![{it.get('id','screenshot')}](./{file})\n")
 
     md.append("\n## Capturing real screenshots\n\n")
-    md.append("Follow: [`REAL_SCREENSHOTS_GUIDE.md`](../../REAL_SCREENSHOTS_GUIDE.md)\n\n")
-    md.append("After capturing, verify none are still placeholders:\n\n")
-    md.append("```bash\npython3 scripts/check_screenshots.py\n```\n")
-    md.append("\nOptional: regenerate this README + the HTML gallery from the manifest:\n\n")
-    md.append("```bash\npython3 scripts/render_screenshots_gallery.py\n```\n")
+    md.append("Fast path (10 minutes): [`REAL_SCREENSHOTS_QUICKRUN.md`](./REAL_SCREENSHOTS_QUICKRUN.md)\n\n")
+    md.append("Full guide: [`REAL_SCREENSHOTS_GUIDE.md`](../../REAL_SCREENSHOTS_GUIDE.md)\n\n")
+    md.append(
+        "If you want a “handoff bundle” to send to whoever will do the capture, you can build a small zip with the shotlist + install/check scripts:\n\n"
+    )
+    md.append("```bash\npython3 scripts/make_real_screenshot_capture_pack.py\n```\n\n")
+
+    md.append(
+        "After capturing, the easiest path is to run the all-in-one pipeline (installs, validates, refreshes STATUS.md, and re-renders the gallery):\n\n"
+    )
+    md.append(
+        "```bash\npython3 scripts/screenshots_pipeline.py --from ~/Desktop --check --fail-on-placeholders --status --render-gallery\n```\n\n"
+    )
+
+    md.append("If you prefer individual commands:\n\n")
+    md.append(
+        "```bash\n"
+        "python3 scripts/check_screenshots.py\n"
+        "python3 scripts/screenshot_status.py --write\n"
+        "python3 scripts/render_screenshots_gallery.py\n"
+        "```\n"
+    )
+
+    md.append("\n## Optional: optimized JPGs\n\n")
+    md.append("If you run the screenshot optimizer, it will generate:\n\n")
+    md.append("- `docs/screenshots/optimized/*.jpg`\n\n")
+    md.append(
+        "The landing page will automatically prefer these when present (via a `<picture>` tag), falling back to the PNGs.\n"
+    )
+
+    md.append("\n## Optional: animated preview GIF\n\n")
+    md.append("Quick animated preview (useful for READMEs / listings):\n\n")
+    md.append("![approval-flow](./approval-flow.gif)\n\n")
+    md.append("You can (re)generate it from the optimized JPGs:\n\n")
+    md.append("```bash\npython3 scripts/make_screenshot_gif.py\n```\n\n")
+    md.append("Output:\n- `docs/screenshots/approval-flow.gif`\n\n")
+
+    md.append("## Packaging a listing-ready ZIP\n\n")
+    md.append("To generate a single ZIP you can upload to marketplaces:\n\n")
+    md.append("```bash\npython3 scripts/make_screenshot_pack.py\n```\n\n")
+    md.append("Output:\n- `dist/screenshot-pack-YYYYMMDD-HHMM.zip`\n")
 
     OUT_README.write_text("".join(md), encoding="utf-8")
 

@@ -99,11 +99,12 @@ def find_candidates(src_dir: Path, patterns: list[str]) -> list[Candidate]:
 
 
 def fmt_bytes(n: int) -> str:
+    size = float(n)
     for unit in ["B", "KB", "MB", "GB"]:
-        if n < 1024 or unit == "GB":
-            return f"{n:.0f}{unit}" if unit == "B" else f"{n/1024:.1f}{unit}"
-        n /= 1024
-    return f"{n}B"
+        if size < 1024.0 or unit == "GB":
+            return f"{size:.0f}{unit}" if unit == "B" else f"{size:.1f}{unit}"
+        size /= 1024.0
+    return f"{size:.0f}B"
 
 
 def fmt_mtime(ts: float) -> str:

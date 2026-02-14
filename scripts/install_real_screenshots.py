@@ -124,6 +124,11 @@ def main() -> int:
     )
     ap.add_argument("--include-jpg", action="store_true", help="Also include Screenshot*.jpg/jpeg")
     ap.add_argument(
+        "--since-minutes",
+        type=int,
+        help="Only consider candidate files modified in the last N minutes (helps avoid picking old screenshots).",
+    )
+    ap.add_argument(
         "--open",
         action="store_true",
         help="When selecting a candidate, open it in Preview (macOS `open`).",
@@ -151,14 +156,22 @@ def main() -> int:
                 patterns += [g + ".jpg", g + ".jpeg"]
 
     candidates = find_candidates(src_dir, patterns)
+
+    if args.since_minutes is not None:
+        cutoff = datetime.now().timestamp() - (args.since_minutes * 60)
+        candidates = [c for c in candidates if c.mtime >= cutoff]
+
     if not candidates:
-        print(f"No candidates found in {src_dir} matching {patterns}", file=sys.stderr)
+        note = "" if args.since_minutes is None else f" (after since-minutes={args.since_minutes})"
+        print(f"No candidates found in {src_dir} matching {patterns}{note}", file=sys.stderr)
         return 1
 
     dest_dir = Path(__file__).resolve().parent.parent / "docs" / "screenshots"
     dest_dir.mkdir(parents=True, exist_ok=True)
 
     print("Found candidates (newest first):")
+    if args.since_minutes is not None:
+        print(f"  (filtered to last {args.since_minutes} minutes)")
     for i, c in enumerate(candidates[:20], start=1):
         print(f"  [{i:2d}] {c.path.name}  ({fmt_mtime(c.mtime)} · {fmt_bytes(c.size)})")
     if len(candidates) > 20:

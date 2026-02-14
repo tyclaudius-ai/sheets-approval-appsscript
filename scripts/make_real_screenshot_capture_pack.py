@@ -34,10 +34,16 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 
 INCLUDE_PATHS = [
+    # The script itself (so the capture machine doesn't need a full repo checkout)
+    Path("Code.gs"),
+
+    # The actual capture instructions
     Path("docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md"),
     Path("docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md"),
     Path("docs/screenshots/CAPTURE-CHEATSHEET.md"),
     Path("docs/screenshots/manifest.json"),
+
+    # Install + verification helpers
     Path("scripts/install_real_screenshots.py"),
     Path("scripts/check_screenshots.py"),
     Path("scripts/screenshots_pipeline.py"),
@@ -81,27 +87,54 @@ def main() -> int:
     # Write zip
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
         # Helpful top-level README inside the zip
-        readme = """Sheets Approvals — REAL screenshots capture pack
+        readme = """# Sheets Approvals — REAL screenshots capture pack
 
-Goal:
-  Replace placeholder screenshots under docs/screenshots/*.png with REAL captures.
+Goal: replace placeholder screenshots under `docs/screenshots/*.png` with **REAL** captures from an actual Google Sheet.
 
-Start here:
-  docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md
-  docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md
+## What’s included
 
-Workflow (macOS example):
-  1) Capture screenshots to Desktop (cmd+shift+4 / cmd+shift+5)
-  2) Run the all-in-one pipeline (install + verify + optimize + refresh docs):
-       python3 scripts/screenshots_pipeline.py --from ~/Desktop --check --require-real-screenshots --optimize --width 1400 --status --render-gallery
-  3) (Optional) Animated preview:
-       python3 scripts/screenshots_pipeline.py --make-gif --gif-width 900 --gif-ms 900
+- `Code.gs` (paste into Apps Script)
+- Shotlist + framing guide under `docs/screenshots/`
+- Helper scripts to install + validate screenshots (`scripts/*`)
+
+## Capture workflow (macOS example)
+
+1) Create a new Google Sheet.
+2) Extensions → **Apps Script**.
+3) Paste `Code.gs` (from this zip) into the editor.
+4) Save, then reload the Sheet.
+5) Run **Approvals → Create demo setup**.
+6) Capture the 6 screenshots from:
+   - `docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md`
+
+## Install + verify
+
+Your screenshots usually land on Desktop. From the unzipped folder:
+
+```bash
+python3 -m pip install -r scripts/requirements.txt
+
+python3 scripts/screenshots_pipeline.py \
+  --from ~/Desktop \
+  --check \
+  --require-real-screenshots \
+  --optimize \
+  --width 1400 \
+  --status \
+  --render-gallery
+```
+
+Optional animated preview:
+
+```bash
+python3 scripts/screenshots_pipeline.py --make-gif --gif-width 900 --gif-ms 900
+```
 
 Notes:
-  - This pack intentionally does NOT include any screenshots.
-  - No Google login automation is attempted.
+- This pack intentionally does NOT include any screenshots.
+- No Google login automation is attempted.
 """
-        z.writestr("README_CAPTURE_PACK.txt", readme)
+        z.writestr("README_CAPTURE_PACK.md", readme)
 
         for rel in INCLUDE_PATHS:
             src = ROOT / rel

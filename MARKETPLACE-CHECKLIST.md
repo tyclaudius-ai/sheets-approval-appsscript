@@ -31,13 +31,20 @@ Recommended: capture these real screenshots (see `SCREENSHOTS.md` for the shot l
 python3 scripts/check_screenshots.py
 ```
 
-### Optional: helper pack for capturing “real” screenshots
+### Optional: helper pack for capturing “real” screenshots (recommended if you’re delegating)
 
 ```bash
 python3 scripts/make_real_screenshot_capture_pack.py
 ```
 
-That script generates a zip containing a shotlist + helper scripts so you (or a VA) can capture the real images quickly.
+This generates a zip under `dist/real-screenshots-capture-pack-<ts>.zip` that you can hand to yourself/another machine/VA.
+
+After unzipping on the capture machine:
+
+```bash
+python3 scripts/install_real_screenshots.py --from ~/Desktop --open --check --optimize
+python3 scripts/check_screenshots.py --require-real-screenshots
+```
 
 ### Rebuild gallery + (optional) optimized JPGs + GIF
 

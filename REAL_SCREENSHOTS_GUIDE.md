@@ -76,6 +76,16 @@ Right now those files exist as **copies of the placeholders** (generated PNGs). 
 - Run `Approvals → Help / Docs`.
 - Capture the sidebar.
 
+## Optional: generate a capture pack zip (for another machine / VA)
+
+If you want to delegate capture, generate a small zip that contains the shotlist + installer + checker:
+
+```bash
+python3 scripts/make_real_screenshot_capture_pack.py
+```
+
+Hand off the zip in `dist/` and have them follow the included README.
+
 ## After capture
 
 ### Option A — Manual rename/move
@@ -98,6 +108,11 @@ python3 scripts/install_real_screenshots.py --from ~/Desktop --check --optimize
 ```
 
 - `--check` runs `scripts/check_screenshots.py` after copying (fails if any placeholders/"real-ish" mocks remain).
+- For a strict final gate, run:
+
+```bash
+python3 scripts/check_screenshots.py --require-real-screenshots
+```
 - `--optimize` runs the JPG/PNG optimizer after copying to shrink file sizes.
 
 The installer will prompt you to pick which captured file maps to each target filename and copy them into `docs/screenshots/`. (With `--non-interactive`, it auto-maps the newest files to 01→06.)

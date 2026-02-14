@@ -4,6 +4,8 @@ If you want an internal Google Sheet to behave like a lightweight approval syste
 
 ## Packages (fixed price)
 
+Quick overview one-pager: **`ONE_PAGER.md`**.
+
 ### 1) "Install + Configure" (fast)
 - Install script into your Google Sheet
 - Configure tracked columns + approvers

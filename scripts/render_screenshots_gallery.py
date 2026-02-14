@@ -23,6 +23,7 @@ SHOT_DIR = ROOT / "docs" / "screenshots"
 MANIFEST = SHOT_DIR / "manifest.json"
 OUT_README = SHOT_DIR / "README.md"
 OUT_HTML = SHOT_DIR / "gallery.html"
+OUT_DECK = SHOT_DIR / "deck.html"
 
 
 def main() -> int:
@@ -40,6 +41,8 @@ def main() -> int:
     md.append("If you haven’t captured real screenshots yet, the repo ships placeholder PNGs with the same filenames.\n\n")
 
     md.append("## Screenshot set\n")
+
+    md.append("Tip: there’s also a simple, printable ‘deck’ view at [`deck.html`](./deck.html) (generated from the same manifest).\n")
 
     for it in items:
         heading = it.get("heading") or it.get("id")
@@ -131,8 +134,57 @@ def main() -> int:
     parts.append("</body>\n</html>\n")
     OUT_HTML.write_text("".join(parts), encoding="utf-8")
 
+    # deck.html (print-friendly)
+    deck = []
+    deck.append("<!doctype html>\n")
+    deck.append("<html lang=\"en\">\n")
+    deck.append("<head>\n")
+    deck.append("  <meta charset=\"utf-8\"/>\n")
+    deck.append("  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/>\n")
+    deck.append(f"  <title>{html.escape(title)} — Deck</title>\n")
+    deck.append("  <style>\n")
+    deck.append("    :root{--max:1100px;--border:#e5e7eb;--muted:#6b7280}\n")
+    deck.append("    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;line-height:1.35;margin:24px;background:#fff;color:#111827}\n")
+    deck.append("    header{max-width:var(--max);margin:0 auto 20px}\n")
+    deck.append("    h1{margin:0 0 6px;font-size:28px}\n")
+    deck.append("    .sub{color:var(--muted);font-size:14px}\n")
+    deck.append("    .slide{max-width:var(--max);margin:18px auto;padding:16px;border:1px solid var(--border);border-radius:12px}\n")
+    deck.append("    .slide h2{margin:0 0 10px;font-size:18px}\n")
+    deck.append("    .slide img{width:100%;height:auto;border-radius:10px;border:1px solid #f3f4f6}\n")
+    deck.append("    .cap{margin-top:10px;color:#374151}\n")
+    deck.append("    .meta{margin-top:6px;color:var(--muted);font-size:12px}\n")
+    deck.append("    @media print{\n")
+    deck.append("      body{margin:0}\n")
+    deck.append("      header{padding:16px 16px 0}\n")
+    deck.append("      .slide{border:none;border-radius:0;page-break-after:always;break-after:page;padding:16px}\n")
+    deck.append("      .slide:last-child{page-break-after:auto;break-after:auto}\n")
+    deck.append("    }\n")
+    deck.append("  </style>\n")
+    deck.append("</head>\n")
+    deck.append("<body>\n")
+    deck.append("  <header>\n")
+    deck.append(f"    <h1>{html.escape(title)} — Deck</h1>\n")
+    deck.append("    <div class=\"sub\">Print-friendly view generated from <code>docs/screenshots/manifest.json</code>.</div>\n")
+    deck.append("  </header>\n")
+
+    for it in items:
+        heading = it.get("heading") or it.get("id")
+        file = it.get("file")
+        caption = (it.get("caption") or "").strip()
+        deck.append("  <section class=\"slide\">\n")
+        deck.append(f"    <h2>{html.escape(heading)}</h2>\n")
+        deck.append(f"    <img src=\"{html.escape(file)}\" alt=\"{html.escape(it.get('id','screenshot'))}\"/>\n")
+        if caption:
+            deck.append(f"    <div class=\"cap\">{html.escape(caption)}</div>\n")
+        deck.append(f"    <div class=\"meta\">{html.escape(it.get('id',''))}</div>\n")
+        deck.append("  </section>\n")
+
+    deck.append("</body>\n</html>\n")
+    OUT_DECK.write_text("".join(deck), encoding="utf-8")
+
     print(f"Wrote {OUT_README.relative_to(ROOT)}")
     print(f"Wrote {OUT_HTML.relative_to(ROOT)}")
+    print(f"Wrote {OUT_DECK.relative_to(ROOT)}")
     return 0
 
 

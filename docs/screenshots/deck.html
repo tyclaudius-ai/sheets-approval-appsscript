@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Sheets Approvals — Screenshot Set — Deck</title>
+  <style>
+    :root{--max:1100px;--border:#e5e7eb;--muted:#6b7280}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;line-height:1.35;margin:24px;background:#fff;color:#111827}
+    header{max-width:var(--max);margin:0 auto 20px}
+    h1{margin:0 0 6px;font-size:28px}
+    .sub{color:var(--muted);font-size:14px}
+    .slide{max-width:var(--max);margin:18px auto;padding:16px;border:1px solid var(--border);border-radius:12px}
+    .slide h2{margin:0 0 10px;font-size:18px}
+    .slide img{width:100%;height:auto;border-radius:10px;border:1px solid #f3f4f6}
+    .cap{margin-top:10px;color:#374151}
+    .meta{margin-top:6px;color:var(--muted);font-size:12px}
+    @media print{
+      body{margin:0}
+      header{padding:16px 16px 0}
+      .slide{border:none;border-radius:0;page-break-after:always;break-after:page;padding:16px}
+      .slide:last-child{page-break-after:auto;break-after:auto}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Sheets Approvals — Screenshot Set — Deck</h1>
+    <div class="sub">Print-friendly view generated from <code>docs/screenshots/manifest.json</code>.</div>
+  </header>
+  <section class="slide">
+    <h2>1) Menu (Approvals)</h2>
+    <img src="01-menu.png" alt="01-menu"/>
+    <div class="cap">Custom menu entry for Approvals actions (Approve/Reject, Create demo, Help).</div>
+    <div class="meta">01-menu</div>
+  </section>
+  <section class="slide">
+    <h2>2) Requests sheet (pending)</h2>
+    <img src="02-requests-pending.png" alt="02-requests-pending"/>
+    <div class="cap">Example request rows in PENDING state, ready for review/approval.</div>
+    <div class="meta">02-requests-pending</div>
+  </section>
+  <section class="slide">
+    <h2>3) Approved row</h2>
+    <img src="03-approved-row.png" alt="03-approved-row"/>
+    <div class="cap">A request row marked APPROVED (showing status + timestamp/user columns as configured).</div>
+    <div class="meta">03-approved-row</div>
+  </section>
+  <section class="slide">
+    <h2>4) Audit trail entry</h2>
+    <img src="04-audit-entry.png" alt="04-audit-entry"/>
+    <div class="cap">Append-only audit log row capturing who approved/rejected what and when.</div>
+    <div class="meta">04-audit-entry</div>
+  </section>
+  <section class="slide">
+    <h2>5) Re-approval required</h2>
+    <img src="05-reapproval-required.png" alt="05-reapproval-required"/>
+    <div class="cap">An edit to tracked cells triggers REAPPROVAL_REQUIRED (or reverts to PENDING), with an audit event.</div>
+    <div class="meta">05-reapproval-required</div>
+  </section>
+  <section class="slide">
+    <h2>6) Help / Docs sidebar</h2>
+    <img src="06-help-sidebar.png" alt="06-help-sidebar"/>
+    <div class="cap">In-sheet Help sidebar for quick onboarding and usage.</div>
+    <div class="meta">06-help-sidebar</div>
+  </section>
+</body>
+</html>

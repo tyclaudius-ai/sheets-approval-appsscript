@@ -5,6 +5,7 @@ These images are what the landing page (and a product listing) should reference.
 If you haven’t captured real screenshots yet, the repo ships placeholder PNGs with the same filenames.
 
 ## Screenshot set
+Tip: there’s also a simple, printable ‘deck’ view at [`deck.html`](./deck.html) (generated from the same manifest).
 
 1) Menu (Approvals)
 

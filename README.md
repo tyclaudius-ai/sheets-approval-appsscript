@@ -4,6 +4,8 @@ This is a minimal, copy-pasteable **Google Apps Script** that turns a Google She
 
 ## What it does
 
+New? Start with **`START_HERE.md`**.
+
 - Adds a custom menu: **Approvals → Approve row / Reject row / Reset to pending**
 - Operates on the **currently selected row** in a `Requests` sheet
 - Writes approval state back onto the request row (status, approver, timestamp, notes)

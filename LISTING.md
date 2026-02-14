@@ -6,6 +6,8 @@ Use it when you want non-technical teammates to request edits, reviewers to appr
 
 ## What it does
 
+(If you’re navigating the repo, start with `START_HERE.md`.)
+
 - **Request / Approve / Reject** changes via a custom **Approvals** menu
 - Writes an **append-only Audit** tab (timestamped events)
   - Optional: **hash chain** (`PrevChainHash` + `ChainHash`) for stronger tamper-evidence

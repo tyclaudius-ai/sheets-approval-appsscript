@@ -197,7 +197,9 @@ def main() -> int:
         if not args.report_md:
             return
 
-        ok = not missing and not placeholders and (not args.fail_on_realish or not realish)
+        # For the Markdown report, treat any missing/placeholder/real-ish as "needs work".
+        # (CLI exit codes may still be gated by --fail-on-* flags.)
+        ok = (not missing) and (not placeholders) and (not realish)
 
         lines: list[str] = []
         lines.append("# Real screenshots status")

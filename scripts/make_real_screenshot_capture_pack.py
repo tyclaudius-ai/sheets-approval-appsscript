@@ -163,6 +163,21 @@ Goal: replace placeholder screenshots under `docs/screenshots/*.png` with **REAL
 
 ## Install + verify
 
+### Option A (macOS): double-click runner
+
+After unzipping, double-click:
+
+- `CAPTURE_MAC.command`
+
+It will:
+- open the capture checklist
+- run a guided installer that waits for 6 **new** screenshots on your Desktop
+- verify + optimize them
+
+macOS may warn about running downloaded scripts; if so, right-click → Open.
+
+### Option B (any OS): run the pipeline
+
 Your screenshots usually land on Desktop. From the unzipped folder:
 
 ```bash
@@ -193,6 +208,41 @@ Notes:
         # Convenience: include a pre-generated status report so the capturer can
         # immediately see what needs to be replaced.
         z.writestr("REAL_SCREENSHOTS_STATUS.md", _build_status_report_md())
+
+        # Convenience: a double-clickable macOS runner.
+        # - .command files are meant to be executed by Terminal on macOS.
+        # - This is best-effort; if you're on Linux/Windows you can ignore it.
+        capture_cmd = """#!/bin/bash
+set -euo pipefail
+
+HERE="$(cd "$(dirname "$0")" && pwd)"
+cd "$HERE"
+
+echo "[capture] Installing python requirements (best-effort)…"
+python3 -m pip install -r scripts/requirements.txt >/dev/null || true
+
+echo "[capture] Opening capture checklist…"
+if command -v open >/dev/null 2>&1; then
+  open "docs/screenshots/capture-checklist.html" || true
+  open "docs/screenshots/deck.html" || true
+fi
+
+echo "[capture] Guided install: waiting for 6 new screenshots on Desktop…"
+python3 scripts/install_real_screenshots.py \
+  --from "$HOME/Desktop" \
+  --guided \
+  --since-minutes 60 \
+  --min-bytes 50000 \
+  --check \
+  --optimize
+
+echo "[capture] Done. Open the gallery to sanity-check results:"
+echo "  python3 scripts/serve_landing.py --open"
+"""
+        zi = zipfile.ZipInfo("CAPTURE_MAC.command")
+        # Mark as executable (0755) on Unix-y systems so macOS can double-click it.
+        zi.external_attr = 0o755 << 16
+        z.writestr(zi, capture_cmd)
 
         for rel in INCLUDE_PATHS:
             src = ROOT / rel

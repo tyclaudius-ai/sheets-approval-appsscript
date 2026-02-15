@@ -136,6 +136,24 @@ def main() -> int:
     ]
 
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
+        if not args.require_real_screenshots:
+            z.writestr(
+                "marketplace-pack/WARNING_SCREENSHOTS_DRAFT.md",
+                """# WARNING: screenshots may be placeholders / mock 'real-ish' images\n\n"
+                "This marketplace-pack was built **without** `--require-real-screenshots`.\n\n"
+                "That means the screenshots included under `docs/screenshots/` and in the packaged\n"
+                "`dist/screenshot-pack-*.zip` may contain:\n\n"
+                "- placeholders\n"
+                "- generated/mock 'real-ish' images\n\n"
+                "Before using these assets in a public listing, capture **real** screenshots in Google\n"
+                "Sheets and rebuild with:\n\n"
+                "```bash\n"
+                "python3 scripts/make_marketplace_pack.py --require-real-screenshots\n"
+                "```\n\n"
+                "See: `docs/screenshots/REAL_SCREENSHOTS_STATUS.md` for what is still missing.\n"
+                """,
+            )
+
         # docs/copy
         for rel in include_files:
             p = ROOT / rel

@@ -59,6 +59,14 @@ python3 scripts/install_real_screenshots.py --from ~/Desktop --watch
 
 Then run the pipeline below to validate + optimize + render the gallery.
 
+## Optional: generate a Markdown status report
+
+If you want a quick “what’s real vs placeholder” summary you can paste into an issue/PR:
+
+```bash
+python3 scripts/check_screenshots.py --report-md docs/screenshots/SCREENSHOTS_REPORT.md
+```
+
 ## Install + verify (fast path)
 
 After capturing (usually they land on your Desktop), run:

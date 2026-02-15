@@ -68,6 +68,10 @@ If you prefer individual commands:
 
 ```bash
 python3 scripts/check_screenshots.py
+
+# Optional: generate a shareable Markdown report
+python3 scripts/check_screenshots.py --report-md docs/screenshots/SCREENSHOTS_REPORT.md
+
 python3 scripts/screenshot_status.py --write
 python3 scripts/render_screenshots_gallery.py
 ```

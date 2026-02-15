@@ -44,6 +44,6 @@ python3 scripts/install_real_screenshots.py --from ~/Desktop --open --check --op
 python3 scripts/check_screenshots.py --fail-on-placeholders
 ```
 
-For full details: `REAL_SCREENSHOTS_GUIDE.md`
+For full details: `docs/screenshots/REAL_SCREENSHOTS_GUIDE.md`
 
 For exact framing + consistency across shots: `docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md`

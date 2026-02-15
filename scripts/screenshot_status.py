@@ -97,6 +97,10 @@ def main() -> int:
     md.append("| id | file | status | notes |\n")
     md.append("|---:|---|---|---|\n")
 
+    counts = {"missing": 0, "placeholder": 0, "real-ish": 0, "custom": 0}
+    actionable_placeholder: list[Row] = []
+    actionable_missing: list[Row] = []
+
     for r in rows:
         out_path = TOP / r.file
         ph_path = PLACEHOLDER_DIR / r.file
@@ -107,6 +111,7 @@ def main() -> int:
         if not out_path.exists():
             status = "missing"
             notes.append("canonical file missing")
+            actionable_missing.append(r)
         else:
             out_hash = sha256_file(out_path)
             realish_hash = realish_hashes.get(r.file)
@@ -115,6 +120,7 @@ def main() -> int:
 
             if ph_hash and out_hash == ph_hash:
                 status = "placeholder"
+                actionable_placeholder.append(r)
             elif realish_hash and out_hash == realish_hash:
                 status = "real-ish"
             else:
@@ -122,7 +128,36 @@ def main() -> int:
 
             notes.append(r.heading)
 
+        counts[status] = counts.get(status, 0) + 1
         md.append(f"| `{r.id}` | `{r.file}` | **{status}** | {' — '.join(notes)} |\n")
+
+    md.append("\n")
+    md.append("## Summary\n\n")
+    md.append(
+        f"- custom (looks manually captured): **{counts['custom']}**\n"
+        f"- real-ish (generated): **{counts['real-ish']}**\n"
+        f"- placeholder (needs replacement): **{counts['placeholder']}**\n"
+        f"- missing: **{counts['missing']}**\n"
+    )
+
+    if actionable_placeholder or actionable_missing:
+        md.append("\n## Next actions (for real listing screenshots)\n\n")
+        md.append(
+            "Replace *placeholder*/*missing* canonical PNGs under `docs/screenshots/` with real captures.\n"
+            "Use `docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md` + `REAL_SCREENSHOTS_QUICKRUN.md` for the exact flow.\n\n"
+        )
+
+        if actionable_missing:
+            md.append("### Missing\n\n")
+            for r in actionable_missing:
+                md.append(f"- `{r.file}` — {r.heading}\n")
+            md.append("\n")
+
+        if actionable_placeholder:
+            md.append("### Still placeholders\n\n")
+            for r in actionable_placeholder:
+                md.append(f"- `{r.file}` — {r.heading}\n")
+            md.append("\n")
 
     text = "".join(md)
 

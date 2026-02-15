@@ -1,5 +1,5 @@
 # Screenshot status
-Generated: 2026-02-13T01:48:03.394153+00:00
+Generated: 2026-02-15T08:16:31.139921+00:00
 Legend:
 - **placeholder**: canonical PNG matches docs/screenshots/png/<file>
 - **real-ish**: canonical PNG matches docs/screenshots/realish-hashes.json
@@ -13,3 +13,10 @@ Legend:
 | `04-audit-entry` | `04-audit-entry.png` | **real-ish** | 4) Audit trail entry |
 | `05-reapproval-required` | `05-reapproval-required.png` | **real-ish** | 5) Re-approval required |
 | `06-help-sidebar` | `06-help-sidebar.png` | **real-ish** | 6) Help / Docs sidebar |
+
+## Summary
+
+- custom (looks manually captured): **0**
+- real-ish (generated): **6**
+- placeholder (needs replacement): **0**
+- missing: **0**

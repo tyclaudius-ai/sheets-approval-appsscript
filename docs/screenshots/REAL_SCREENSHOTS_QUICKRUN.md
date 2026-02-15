@@ -49,6 +49,7 @@ It will step through 01..06, wait for a **new** screenshot each time, and instal
 ```bash
 python3 scripts/install_real_screenshots.py --from ~/Desktop --guided
 # (By default, this opens the current canonical screenshots as a framing reference before each capture.)
+# If your system produces tiny/blank captures sometimes, add e.g. --min-bytes 80000
 ```
 
 If you want the same flow but **no per-shot prompts** (it just waits for each new screenshot in order):

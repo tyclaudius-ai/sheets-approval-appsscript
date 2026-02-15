@@ -31,6 +31,7 @@ Options:
   --open-reference      In --guided/--watch mode, open the current canonical screenshot as a framing reference.
                         (Defaults ON for --guided.)
   --since-minutes       Only consider candidate files modified in the last N minutes.
+  --min-bytes           Ignore candidate images smaller than N bytes (helps skip partial/blank captures).
   --non-interactive     Take the newest N files in order and map to 01..06 automatically (risky)
   --dry-run             Print actions without copying
   --check               After copying, run scripts/check_screenshots.py
@@ -38,6 +39,9 @@ Options:
 
 Tip:
   For best results, set Chrome zoom=100% and Google Sheets zoom=100%.
+
+Defaults:
+  --min-bytes defaults to 50KB. It can be lowered to accept smaller images.
 """
 
 from __future__ import annotations
@@ -137,6 +141,7 @@ def wait_for_new_capture(
     since_ts: float,
     timeout_seconds: int,
     poll_ms: int,
+    min_bytes: int,
 ) -> Path:
     deadline = time.time() + timeout_seconds
     while time.time() < deadline:
@@ -146,6 +151,8 @@ def wait_for_new_capture(
             if c.path in seen_paths:
                 continue
             if c.mtime < since_ts:
+                continue
+            if c.size < min_bytes:
                 continue
             return c.path
         time.sleep(max(0.1, poll_ms / 1000.0))
@@ -193,6 +200,12 @@ def main() -> int:
         "--since-minutes",
         type=int,
         help="Only consider candidate files modified in the last N minutes (helps avoid picking old screenshots).",
+    )
+    ap.add_argument(
+        "--min-bytes",
+        type=int,
+        default=50_000,
+        help="Ignore candidate images smaller than N bytes (default: 50000).",
     )
     ap.add_argument(
         "--open",
@@ -243,6 +256,9 @@ def main() -> int:
         cutoff = datetime.now().timestamp() - (args.since_minutes * 60)
         candidates = [c for c in candidates if c.mtime >= cutoff]
 
+    if args.min_bytes is not None:
+        candidates = [c for c in candidates if c.size >= args.min_bytes]
+
     if not candidates and not (args.guided or args.watch):
         note = "" if args.since_minutes is None else f" (after since-minutes={args.since_minutes})"
         print(f"No candidates found in {src_dir} matching {patterns}{note}", file=sys.stderr)
@@ -260,6 +276,7 @@ def main() -> int:
         print(f"  Watching: {src_dir}")
         print(f"  Patterns: {patterns}")
         print(f"  Timeout:  {args.timeout_seconds}s per shot")
+        print(f"  Min size: {args.min_bytes} bytes")
         print("")
         print(f"Mode: {'--watch (auto-advance)' if args.watch else '--guided (per-shot confirm)'}")
         print("Tip: for each step, take a screenshot (Cmd+Shift+4) and wait for it to appear.")
@@ -293,6 +310,7 @@ def main() -> int:
                     since_ts=since_ts,
                     timeout_seconds=args.timeout_seconds,
                     poll_ms=args.poll_ms,
+                    min_bytes=args.min_bytes,
                 )
             except TimeoutError as e:
                 print(str(e), file=sys.stderr)

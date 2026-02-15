@@ -128,12 +128,26 @@ def main() -> int:
         action="store_true",
         help="Print file size + best-effort pixel dimensions for each screenshot (uses macOS `sips` if available).",
     )
+    ap.add_argument(
+        "--shotlist",
+        action="store_true",
+        help="Print the required screenshot filenames as a capture checklist (useful before doing a real screenshot pass).",
+    )
     args = ap.parse_args()
 
     # Convenience: 'real screenshots' means neither placeholders nor known generated "real-ish" mocks.
     if args.require_real_screenshots:
         args.fail_on_placeholders = True
         args.fail_on_realish = True
+
+    if args.shotlist and not args.json:
+        print("[screenshots] Capture shotlist (required filenames):")
+        for n in NAMES:
+            print(f"  - docs/screenshots/{n}")
+        print("\nGuides:")
+        print("  - Quick cheatsheet: docs/screenshots/CAPTURE-CHEATSHEET.md")
+        print("  - Full guide: REAL_SCREENSHOTS_GUIDE.md")
+        return 0
 
     missing: list[str] = []
     placeholders: list[str] = []
@@ -178,6 +192,7 @@ def main() -> int:
             "missing": missing,
             "placeholders": [f"docs/screenshots/{n}" for n in placeholders],
             "realish": [f"docs/screenshots/{n}" for n in realish],
+            "shotlist": [f"docs/screenshots/{n}" for n in NAMES],
             "info": {k: {"bytes": v.get("bytes"), "width": v.get("width"), "height": v.get("height")} for k, v in info.items()},
             "infoNote": "Pixel dimensions are best-effort (macOS uses `sips`).",
         }

@@ -64,7 +64,15 @@ def main() -> int:
     out_path = Path(args.out) if args.out else (DIST / f"marketplace-pack-{ts}.zip")
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # 0) Optional guardrails: ensure screenshots are truly captured (not placeholders / not known mocks).
+    # 0) Always refresh the real-screenshots status report so the pack reflects current state.
+    _run([
+        "python3",
+        "scripts/check_screenshots.py",
+        "--report-md",
+        "docs/screenshots/REAL_SCREENSHOTS_STATUS.md",
+    ])
+
+    # Optional guardrails: ensure screenshots are truly captured (not placeholders / not known mocks).
     if args.require_real_screenshots:
         _run([
             "python3",

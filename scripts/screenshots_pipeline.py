@@ -12,6 +12,9 @@ Examples
 # Install real screenshots from Desktop, then validate, update STATUS.md, then build optimized JPGs
 python3 scripts/screenshots_pipeline.py --from ~/Desktop --check --fail-on-placeholders --status --optimize --width 1400
 
+# Guided mode (waits for each new capture) and avoids selecting old screenshots
+python3 scripts/screenshots_pipeline.py --from ~/Desktop --guided --since-minutes 30 --open --check --require-real-screenshots --status --optimize --render-gallery
+
 # Then generate the approval-flow.gif used in README/landing previews
 python3 scripts/screenshots_pipeline.py --make-gif --gif-width 900 --gif-ms 900
 
@@ -45,6 +48,21 @@ def main() -> int:
         "--from",
         dest="from_dir",
         help="Directory containing captured screenshots (e.g. ~/Desktop).",
+    )
+    ap.add_argument(
+        "--guided",
+        action="store_true",
+        help="When used with --from, run the installer in guided mode (waits for each new capture).",
+    )
+    ap.add_argument(
+        "--since-minutes",
+        type=int,
+        help="When used with --from, only consider screenshots modified in the last N minutes.",
+    )
+    ap.add_argument(
+        "--open",
+        action="store_true",
+        help="When used with --from, open selected candidates in Preview during selection (macOS).",
     )
     ap.add_argument(
         "--check",
@@ -130,7 +148,14 @@ def main() -> int:
 
     if args.from_dir:
         from_dir = os.path.expanduser(args.from_dir)
-        run([sys.executable, "scripts/install_real_screenshots.py", "--from", from_dir])
+        cmd = [sys.executable, "scripts/install_real_screenshots.py", "--from", from_dir]
+        if args.guided:
+            cmd.append("--guided")
+        if args.since_minutes is not None:
+            cmd += ["--since-minutes", str(args.since_minutes)]
+        if args.open:
+            cmd.append("--open")
+        run(cmd)
 
     if args.check or args.fail_on_placeholders or args.fail_on_realish:
         cmd = [sys.executable, "scripts/check_screenshots.py"]

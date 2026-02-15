@@ -28,6 +28,8 @@ Options:
   --timeout-seconds     Per-shot timeout for --watch/--guided (default: 600)
   --poll-ms             Poll interval for --watch/--guided (default: 750)
   --open               When selecting a candidate, open it in Preview (macOS `open`).
+  --open-reference      In --guided/--watch mode, open the current canonical screenshot as a framing reference.
+                        (Defaults ON for --guided.)
   --since-minutes       Only consider candidate files modified in the last N minutes.
   --non-interactive     Take the newest N files in order and map to 01..06 automatically (risky)
   --dry-run             Print actions without copying
@@ -197,6 +199,14 @@ def main() -> int:
         action="store_true",
         help="When selecting a candidate, open it in Preview (macOS `open`).",
     )
+    ap.add_argument(
+        "--open-reference",
+        action="store_true",
+        help=(
+            "In --guided/--watch mode, open the current canonical screenshot (often a real-ish mock) "
+            "as a framing reference before you capture the real shot."
+        ),
+    )
     ap.add_argument("--non-interactive", action="store_true", help="Map newest N files to targets without prompts")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--check", action="store_true", help="Run scripts/check_screenshots.py after copying")
@@ -242,6 +252,10 @@ def main() -> int:
     dest_dir.mkdir(parents=True, exist_ok=True)
 
     if args.guided or args.watch:
+        # Default: in guided mode, opening a reference image is usually helpful.
+        if args.guided and not args.open_reference:
+            args.open_reference = True
+
         print("Screenshot install")
         print(f"  Watching: {src_dir}")
         print(f"  Patterns: {patterns}")
@@ -257,6 +271,14 @@ def main() -> int:
 
         planned: list[tuple[Path, Path, str]] = []
         for (target_fname, desc) in TARGETS:
+            if args.open_reference:
+                ref = dest_dir / target_fname
+                if ref.exists():
+                    try:
+                        subprocess.run(["open", str(ref)], check=False)
+                    except Exception:
+                        pass
+
             if args.guided:
                 prompt(
                     f"\nReady for {target_fname} — {desc}. Press Enter when you are about to capture… "

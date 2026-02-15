@@ -1,122 +1,39 @@
-# Real screenshot capture guide (Google Sheets Approvals + Audit Trail)
+# REAL screenshots guide (5–10 minutes)
 
-Goal: replace the placeholder images with **real** screenshots while keeping filenames stable so the landing page and docs don’t need edits.
+This repo ships with placeholder / “real‑ish” screenshots so the docs look good even without a Google login.
 
-Note: if you need something that looks non-placeholder *without* signing into Google, you can run `python3 scripts/generate_realish_screenshots.py`. It generates “real‑ish” screenshots by adding simple browser/Sheets chrome around the placeholder images. True Google Sheets captures are still preferred when available.
+For a Marketplace listing you’ll eventually want **REAL** screenshots captured from an actual Google Sheet.
 
-Safety tip: when sharing the mocks publicly, consider `--watermark` (or `--watermark-text "…"`) so they can't be mistaken for true Google Sheets screenshots.
+## Start here
 
-## Quick rules (so the shots look clean)
+- Quick run (fastest): `docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md`
+- Exact framing + filenames: `docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md`
+- Capture cheat sheet: `docs/screenshots/CAPTURE-CHEATSHEET.md`
 
-- Use a **fresh demo copy** of the sheet (no client names/data).
-- Use one browser (Chrome preferred) and keep the same:
-  - zoom (recommend **100%** browser zoom)
-  - Sheet zoom (recommend **100%**)
-  - window size (recommend ~1280×720 or larger)
-- Keep the UI **English** (if possible) so labels match docs.
-- Hide any:
-  - profile photo
-  - email addresses (if they show in the top-right)
-  - Drive folder names
+## Recommended pipeline
 
-## File locations + names (IMPORTANT)
-
-Put the final screenshots here:
-
-- `docs/screenshots/01-menu.png`
-- `docs/screenshots/02-requests-pending.png`
-- `docs/screenshots/03-approved-row.png`
-- `docs/screenshots/04-audit-entry.png`
-- `docs/screenshots/05-reapproval-required.png` (nice-to-have)
-- `docs/screenshots/06-help-sidebar.png` (nice-to-have)
-
-These paths are what the landing page references.
-
-Right now those files exist as **copies of the placeholders** (generated PNGs). You’ll overwrite them with real screenshots.
-
-## Suggested capture flow (5–10 min)
-
-1) **Open the demo sheet**
-   - Create a new Google Sheet.
-   - Extensions → Apps Script → paste `Code.gs`.
-   - Save.
-   - Reload the Sheet.
-
-2) **Seed demo data**
-   - Run `Approvals → Create demo setup`.
-   - Open `Approvals → Screenshot tour (capture helper)` for one-click staging.
-     - Bonus: the tour sidebar includes **copy buttons** for the exact target filenames (01–06), so renaming is painless.
-   - Confirm you now have two tabs: `Requests` and `Audit`.
-
-3) Capture each screenshot (use macOS screenshot tool)
-   - Press **Cmd+Shift+4**, drag a clean rectangle around the relevant UI.
-   - Avoid capturing the whole browser chrome unless it helps.
-
-### 01 — Custom menu visible (`01-menu.png`)
-- Show the top menu with the **Approvals** menu open.
-
-### 02 — Requests sheet pending (`02-requests-pending.png`)
-- On `Requests`, show a couple rows with `Status = PENDING`.
-
-### 03 — Approved row (`03-approved-row.png`)
-- Select a pending row.
-- Run `Approvals → Approve row`.
-- Capture the row showing `Status = APPROVED` plus `Approver` and `DecisionAt`.
-
-### 04 — Audit entry appended (`04-audit-entry.png`)
-- Switch to `Audit`.
-- Capture the last row showing the newly appended event.
-
-### 05 — Re-approval required (`05-reapproval-required.png`)
-- Edit a tracked cell on an approved row (e.g., amount/description).
-- Show it reverting to `PENDING`.
-- Bonus: also show the `Audit` event `REAPPROVAL_REQUIRED` (either in the same shot if visible, or prioritize the Requests revert).
-
-### 06 — Help/Docs sidebar (`06-help-sidebar.png`)
-- Run `Approvals → Help / Docs`.
-- Capture the sidebar.
-
-## Optional: generate a capture pack zip (for another machine / VA)
-
-If you want to delegate capture, generate a small zip that contains the shotlist + installer + checker:
+After you capture screenshots (they usually land in `~/Desktop` on macOS):
 
 ```bash
-python3 scripts/make_real_screenshot_capture_pack.py
+python3 scripts/screenshots_pipeline.py \
+  --from ~/Desktop \
+  --check \
+  --require-real-screenshots \
+  --optimize \
+  --width 1400 \
+  --status \
+  --render-gallery \
+  --open-gallery
 ```
 
-Hand off the zip in `dist/` and have them follow the included README.
-
-## After capture
-
-### Option A — Manual rename/move
-
-1) Rename/move screenshots to exactly the filenames above.
-2) Sanity check locally by opening:
-   - `landing/index.html`
-   - confirm the gallery now shows the real screenshots.
-
-### Option B — Use the helper script (recommended)
-
-If you captured your screenshots to Desktop with macOS’ default naming ("Screenshot … .png"), you can install them with:
+Guided mode (waits for each new screenshot and installs them one-by-one):
 
 ```bash
-# interactive mapping (recommended)
-python3 scripts/install_real_screenshots.py --from ~/Desktop --check --optimize
-
-# fastest path if you just took the screenshots in the right order (newest → oldest)
-# python3 scripts/install_real_screenshots.py --from ~/Desktop --non-interactive --check --optimize
+python3 scripts/install_real_screenshots.py --from ~/Desktop --guided
 ```
 
-- `--check` runs `scripts/check_screenshots.py` after copying (fails if any placeholders/"real-ish" mocks remain).
-- For a strict final gate, run:
+## Why this file exists
 
-```bash
-python3 scripts/check_screenshots.py --require-real-screenshots
-```
-- `--optimize` runs the JPG/PNG optimizer after copying to shrink file sizes.
-
-The installer will prompt you to pick which captured file maps to each target filename and copy them into `docs/screenshots/`. (With `--non-interactive`, it auto-maps the newest files to 01→06.)
-
-## If you want *zero* personal info visible
-
-Use a separate Chrome profile (no signed-in avatar), or blur the top-right profile area before saving.
+Older docs + scripts referenced `REAL_SCREENSHOTS_GUIDE.md` at repo root.
+The real instructions now live under `docs/screenshots/`.
+This file stays as a stable entrypoint.

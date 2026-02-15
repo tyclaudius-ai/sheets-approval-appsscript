@@ -101,6 +101,11 @@ def main() -> int:
         help="Regenerate docs/screenshots/README.md + gallery.html from manifest.json.",
     )
     ap.add_argument(
+        "--open-gallery",
+        action="store_true",
+        help="After --render-gallery, open docs/screenshots/gallery.html in your default browser (macOS).",
+    )
+    ap.add_argument(
         "--status",
         action="store_true",
         help="Regenerate docs/screenshots/STATUS.md (placeholder vs real-ish vs custom).",
@@ -139,6 +144,7 @@ def main() -> int:
         or args.require_real_screenshots
         or args.optimize
         or args.render_gallery
+        or args.open_gallery
         or args.status
         or args.make_gif
     ):
@@ -174,6 +180,13 @@ def main() -> int:
 
     if args.render_gallery:
         run([sys.executable, "scripts/render_screenshots_gallery.py"])
+
+        if args.open_gallery:
+            gallery = REPO_ROOT / "docs" / "screenshots" / "gallery.html"
+            if sys.platform == "darwin":
+                run(["open", str(gallery)])
+            else:
+                print(f"(note) --open-gallery is currently macOS-only; open this file manually: {gallery}")
 
     if args.make_gif:
         run(

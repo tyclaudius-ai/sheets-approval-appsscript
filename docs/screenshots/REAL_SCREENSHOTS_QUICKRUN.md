@@ -70,7 +70,8 @@ python3 scripts/screenshots_pipeline.py \
   --optimize \
   --width 1400 \
   --status \
-  --render-gallery
+  --render-gallery \
+  --open-gallery
 ```
 
 This will:

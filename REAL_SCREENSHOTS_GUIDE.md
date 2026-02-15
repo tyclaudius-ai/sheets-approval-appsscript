@@ -6,7 +6,8 @@ For a Marketplace listing you’ll eventually want **REAL** screenshots captured
 
 ## Start here
 
-- Quick run (fastest): `docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md`
+- Marketplace unblock checklist (fastest path): `docs/screenshots/UNBLOCK_MARKETPLACE.md`
+- Quick run (fastest capture flow): `docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md`
 - Exact framing + filenames: `docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md`
 - Capture cheat sheet: `docs/screenshots/CAPTURE-CHEATSHEET.md`
 

@@ -11,6 +11,7 @@ This script produces a zip containing:
 - docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md (what to capture)
 - docs/screenshots/CAPTURE-CHEATSHEET.md (fast capture workflow)
 - docs/screenshots/manifest.json (canonical filenames)
+- docs/screenshots/deck.html + gallery.html (printable views)
 - scripts/install_real_screenshots.py (+ requirements)
 - scripts/check_screenshots.py (verification)
 
@@ -38,15 +39,21 @@ INCLUDE_PATHS = [
     Path("Code.gs"),
 
     # The actual capture instructions
+    Path("docs/screenshots/README.md"),
     Path("docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md"),
     Path("docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md"),
     Path("docs/screenshots/CAPTURE-CHEATSHEET.md"),
     Path("docs/screenshots/manifest.json"),
 
+    # Handy printable views (generated from manifest.json)
+    Path("docs/screenshots/deck.html"),
+    Path("docs/screenshots/gallery.html"),
+
     # Install + verification helpers
     Path("scripts/install_real_screenshots.py"),
     Path("scripts/check_screenshots.py"),
     Path("scripts/screenshots_pipeline.py"),
+    Path("scripts/render_screenshots_gallery.py"),
     Path("scripts/requirements.txt"),
 ]
 

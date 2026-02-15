@@ -2,5 +2,8 @@
 /dist/
 *.zip
 
+# scratch
+/tmp/
+
 # mac
 .DS_Store

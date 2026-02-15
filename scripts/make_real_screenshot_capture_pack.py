@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import os
 from pathlib import Path
+import subprocess
 import time
 import zipfile
 
@@ -61,6 +62,51 @@ INCLUDE_PATHS = [
 def _timestamp_slug() -> str:
     # UTC timestamp, filesystem safe.
     return time.strftime("%Y%m%d-%H%M%SZ", time.gmtime())
+
+
+def _build_status_report_md() -> str:
+    """Generate a Markdown status report describing current screenshot state.
+
+    This is intended as a convenience inside the capture pack zip so whoever
+    is capturing screenshots can see exactly what’s missing (without running
+    anything first).
+
+    Best-effort: if generation fails for any reason, return a short note.
+    """
+
+    try:
+        tmp = ROOT / "tmp"
+        tmp.mkdir(parents=True, exist_ok=True)
+        out = tmp / "real-screenshots-status.md"
+
+        # Best-effort: always succeed (check_screenshots may exit non-zero when
+        # placeholders/real-ish are present).
+        subprocess.run(
+            [
+                "python3",
+                str(ROOT / "scripts" / "check_screenshots.py"),
+                "--report-md",
+                str(out),
+            ],
+            check=False,
+            cwd=str(ROOT),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+
+        if out.exists():
+            return out.read_text(encoding="utf-8")
+    except Exception:
+        pass
+
+    return (
+        "# Real screenshots status\n\n"
+        "(Status report generation failed on the packaging machine.)\n\n"
+        "Run this after unzipping:\n\n"
+        "```bash\n"
+        "python3 scripts/check_screenshots.py --report-md tmp/real-screenshots-status.md\n"
+        "```\n"
+    )
 
 
 def main() -> int:
@@ -142,6 +188,10 @@ Notes:
 - No Google login automation is attempted.
 """
         z.writestr("README_CAPTURE_PACK.md", readme)
+
+        # Convenience: include a pre-generated status report so the capturer can
+        # immediately see what needs to be replaced.
+        z.writestr("REAL_SCREENSHOTS_STATUS.md", _build_status_report_md())
 
         for rel in INCLUDE_PATHS:
             src = ROOT / rel

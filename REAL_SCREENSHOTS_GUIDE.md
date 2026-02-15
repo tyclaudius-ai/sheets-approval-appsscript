@@ -24,7 +24,8 @@ python3 scripts/screenshots_pipeline.py \
   --width 1400 \
   --status \
   --render-gallery \
-  --open-gallery
+  --open-gallery \
+  --pack
 ```
 
 Guided mode (waits for each new screenshot and installs them one-by-one):

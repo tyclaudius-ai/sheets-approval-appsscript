@@ -55,10 +55,13 @@ If you want a “handoff bundle” to send to whoever will do the capture, you c
 python3 scripts/make_real_screenshot_capture_pack.py
 ```
 
-After capturing, the easiest path is to run the all-in-one pipeline (installs, validates, refreshes STATUS.md, and re-renders the gallery):
+After capturing, the easiest path is to run the all-in-one pipeline (installs, validates, refreshes STATUS.md, re-renders the gallery, and can optionally build a listing-ready ZIP):
 
 ```bash
 python3 scripts/screenshots_pipeline.py --from ~/Desktop --check --fail-on-placeholders --status --render-gallery
+
+# optional: build dist/screenshot-pack-*.zip
+python3 scripts/screenshots_pipeline.py --pack
 ```
 
 If you prefer individual commands:

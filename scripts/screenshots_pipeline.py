@@ -18,6 +18,9 @@ python3 scripts/screenshots_pipeline.py --from ~/Desktop --guided --since-minute
 # Then generate the approval-flow.gif used in README/landing previews
 python3 scripts/screenshots_pipeline.py --make-gif --gif-width 900 --gif-ms 900
 
+# Package a listing-ready screenshot ZIP (PNG + optimized JPG + gif + manifest/status)
+python3 scripts/screenshots_pipeline.py --pack
+
 # Just validate what's currently in docs/screenshots
 python3 scripts/screenshots_pipeline.py --check --fail-on-placeholders
 
@@ -116,6 +119,11 @@ def main() -> int:
         help="Generate docs/screenshots/approval-flow.gif from optimized JPGs.",
     )
     ap.add_argument(
+        "--pack",
+        action="store_true",
+        help="Build a listing-ready screenshot ZIP under dist/ (wraps scripts/make_screenshot_pack.py).",
+    )
+    ap.add_argument(
         "--gif-width",
         type=int,
         default=900,
@@ -147,6 +155,7 @@ def main() -> int:
         or args.open_gallery
         or args.status
         or args.make_gif
+        or args.pack
     ):
         args.check = True
         args.render_gallery = True
@@ -199,6 +208,9 @@ def main() -> int:
                 str(args.gif_ms),
             ]
         )
+
+    if args.pack:
+        run([sys.executable, "scripts/make_screenshot_pack.py"])
 
     return 0
 

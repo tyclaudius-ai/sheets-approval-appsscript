@@ -49,6 +49,7 @@ INCLUDE_PATHS = [
     # Handy printable views (generated from manifest.json)
     Path("docs/screenshots/deck.html"),
     Path("docs/screenshots/gallery.html"),
+    Path("docs/screenshots/capture-checklist.html"),
 
     # Install + verification helpers
     Path("scripts/install_real_screenshots.py"),

@@ -24,6 +24,7 @@ MANIFEST = SHOT_DIR / "manifest.json"
 OUT_README = SHOT_DIR / "README.md"
 OUT_HTML = SHOT_DIR / "gallery.html"
 OUT_DECK = SHOT_DIR / "deck.html"
+OUT_CAPTURE = SHOT_DIR / "capture-checklist.html"
 
 
 def main() -> int:
@@ -43,6 +44,7 @@ def main() -> int:
     md.append("## Screenshot set\n")
 
     md.append("Tip: there’s also a simple, printable ‘deck’ view at [`deck.html`](./deck.html) (generated from the same manifest).\n")
+    md.append("If you’re capturing real screenshots, there’s a printable checklist at [`capture-checklist.html`](./capture-checklist.html).\n")
 
     for it in items:
         heading = it.get("heading") or it.get("id")
@@ -182,9 +184,84 @@ def main() -> int:
     deck.append("</body>\n</html>\n")
     OUT_DECK.write_text("".join(deck), encoding="utf-8")
 
+    # capture-checklist.html (printable checklist + thumbnails)
+    cap = []
+    cap.append("<!doctype html>\n")
+    cap.append('<html lang="en">\n')
+    cap.append("<head>\n")
+    cap.append("  <meta charset=\"utf-8\"/>\n")
+    cap.append("  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/>\n")
+    cap.append(f"  <title>{html.escape(title)} — Capture checklist</title>\n")
+    cap.append("  <style>\n")
+    cap.append("    :root{--max:1100px;--border:#e5e7eb;--muted:#6b7280}\n")
+    cap.append("    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;line-height:1.35;margin:24px;background:#fff;color:#111827}\n")
+    cap.append("    header{max-width:var(--max);margin:0 auto 18px}\n")
+    cap.append("    h1{margin:0 0 6px;font-size:26px}\n")
+    cap.append("    .sub{color:var(--muted);font-size:14px}\n")
+    cap.append("    .links{margin-top:10px;font-size:14px}\n")
+    cap.append("    .links a{margin-right:12px}\n")
+    cap.append("    .item{max-width:var(--max);margin:16px auto;padding:14px;border:1px solid var(--border);border-radius:12px}\n")
+    cap.append("    .row{display:flex;gap:16px;align-items:flex-start}\n")
+    cap.append("    .thumb{width:44%;min-width:320px}\n")
+    cap.append("    img{width:100%;height:auto;border-radius:10px;border:1px solid #f3f4f6}\n")
+    cap.append("    .meta{flex:1}\n")
+    cap.append("    .meta h2{margin:0 0 6px;font-size:18px}\n")
+    cap.append("    .file{color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px}\n")
+    cap.append("    .cap{margin-top:8px;color:#374151}\n")
+    cap.append("    .check{margin-top:10px;font-size:14px}\n")
+    cap.append("    .check input{transform:scale(1.15);margin-right:8px}\n")
+    cap.append("    @media print{\n")
+    cap.append("      body{margin:0}\n")
+    cap.append("      header{padding:16px 16px 0}\n")
+    cap.append("      .item{border:none;border-radius:0;page-break-inside:avoid;break-inside:avoid;padding:12px 16px}\n")
+    cap.append("      a{color:#111827;text-decoration:none}\n")
+    cap.append("    }\n")
+    cap.append("  </style>\n")
+    cap.append("</head>\n")
+    cap.append("<body>\n")
+    cap.append("  <header>\n")
+    cap.append(f"    <h1>{html.escape(title)} — Capture checklist</h1>\n")
+    cap.append("    <div class=\"sub\">Print this (or keep it open) while you capture REAL screenshots. Generated from <code>docs/screenshots/manifest.json</code>.</div>\n")
+    cap.append("    <div class=\"links\">\n")
+    cap.append("      Helpful: ")
+    cap.append("<a href=\"REAL_SCREENSHOTS_QUICKRUN.md\">quick run</a>")
+    cap.append("<a href=\"REAL_SCREENSHOTS_SHOTLIST.md\">shotlist</a>")
+    cap.append("<a href=\"CAPTURE-CHEATSHEET.md\">cheatsheet</a>")
+    cap.append("<a href=\"gallery.html\">gallery</a>")
+    cap.append("<a href=\"deck.html\">deck</a>\n")
+    cap.append("    </div>\n")
+    cap.append("  </header>\n")
+
+    for idx, it in enumerate(items, start=1):
+        heading = it.get("heading") or it.get("id")
+        file = it.get("file")
+        caption = (it.get("caption") or "").strip()
+        item_id = it.get("id", "")
+
+        cap.append("  <section class=\"item\">\n")
+        cap.append("    <div class=\"row\">\n")
+        cap.append("      <div class=\"thumb\">\n")
+        cap.append(f"        <img src=\"{html.escape(file)}\" alt=\"{html.escape(item_id or 'screenshot')}\"/>\n")
+        cap.append("      </div>\n")
+        cap.append("      <div class=\"meta\">\n")
+        cap.append(f"        <h2>{idx:02d} — {html.escape(heading)}</h2>\n")
+        cap.append(f"        <div class=\"file\">Expected filename: {html.escape(file)}</div>\n")
+        if caption:
+            cap.append(f"        <div class=\"cap\">{html.escape(caption)}</div>\n")
+        cap.append("        <div class=\"check\">\n")
+        cap.append(f"          <label><input type=\"checkbox\"/>Captured (real)</label>\n")
+        cap.append("        </div>\n")
+        cap.append("      </div>\n")
+        cap.append("    </div>\n")
+        cap.append("  </section>\n")
+
+    cap.append("</body>\n</html>\n")
+    OUT_CAPTURE.write_text("".join(cap), encoding="utf-8")
+
     print(f"Wrote {OUT_README.relative_to(ROOT)}")
     print(f"Wrote {OUT_HTML.relative_to(ROOT)}")
     print(f"Wrote {OUT_DECK.relative_to(ROOT)}")
+    print(f"Wrote {OUT_CAPTURE.relative_to(ROOT)}")
     return 0
 
 

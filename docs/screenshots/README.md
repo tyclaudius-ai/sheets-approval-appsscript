@@ -6,6 +6,7 @@ If you haven’t captured real screenshots yet, the repo ships placeholder PNGs 
 
 ## Screenshot set
 Tip: there’s also a simple, printable ‘deck’ view at [`deck.html`](./deck.html) (generated from the same manifest).
+If you’re capturing real screenshots, there’s a printable checklist at [`capture-checklist.html`](./capture-checklist.html).
 
 1) Menu (Approvals)
 
@@ -47,7 +48,7 @@ In-sheet Help sidebar for quick onboarding and usage.
 
 Fast path (10 minutes): [`REAL_SCREENSHOTS_QUICKRUN.md`](./REAL_SCREENSHOTS_QUICKRUN.md)
 
-Full guide: [`REAL_SCREENSHOTS_GUIDE.md`](./REAL_SCREENSHOTS_GUIDE.md)
+Full guide: [`REAL_SCREENSHOTS_GUIDE.md`](../../REAL_SCREENSHOTS_GUIDE.md)
 
 If you want a “handoff bundle” to send to whoever will do the capture, you can build a small zip with the shotlist + install/check scripts:
 
@@ -55,23 +56,16 @@ If you want a “handoff bundle” to send to whoever will do the capture, you c
 python3 scripts/make_real_screenshot_capture_pack.py
 ```
 
-After capturing, the easiest path is to run the all-in-one pipeline (installs, validates, refreshes STATUS.md, re-renders the gallery, and can optionally build a listing-ready ZIP):
+After capturing, the easiest path is to run the all-in-one pipeline (installs, validates, refreshes STATUS.md, and re-renders the gallery):
 
 ```bash
 python3 scripts/screenshots_pipeline.py --from ~/Desktop --check --fail-on-placeholders --status --render-gallery
-
-# optional: build dist/screenshot-pack-*.zip
-python3 scripts/screenshots_pipeline.py --pack
 ```
 
 If you prefer individual commands:
 
 ```bash
 python3 scripts/check_screenshots.py
-
-# Optional: generate a shareable Markdown report
-python3 scripts/check_screenshots.py --report-md docs/screenshots/SCREENSHOTS_REPORT.md
-
 python3 scripts/screenshot_status.py --write
 python3 scripts/render_screenshots_gallery.py
 ```

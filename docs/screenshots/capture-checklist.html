@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Sheets Approvals — Screenshot Set — Capture checklist</title>
+  <style>
+    :root{--max:1100px;--border:#e5e7eb;--muted:#6b7280}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;line-height:1.35;margin:24px;background:#fff;color:#111827}
+    header{max-width:var(--max);margin:0 auto 18px}
+    h1{margin:0 0 6px;font-size:26px}
+    .sub{color:var(--muted);font-size:14px}
+    .links{margin-top:10px;font-size:14px}
+    .links a{margin-right:12px}
+    .item{max-width:var(--max);margin:16px auto;padding:14px;border:1px solid var(--border);border-radius:12px}
+    .row{display:flex;gap:16px;align-items:flex-start}
+    .thumb{width:44%;min-width:320px}
+    img{width:100%;height:auto;border-radius:10px;border:1px solid #f3f4f6}
+    .meta{flex:1}
+    .meta h2{margin:0 0 6px;font-size:18px}
+    .file{color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px}
+    .cap{margin-top:8px;color:#374151}
+    .check{margin-top:10px;font-size:14px}
+    .check input{transform:scale(1.15);margin-right:8px}
+    @media print{
+      body{margin:0}
+      header{padding:16px 16px 0}
+      .item{border:none;border-radius:0;page-break-inside:avoid;break-inside:avoid;padding:12px 16px}
+      a{color:#111827;text-decoration:none}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Sheets Approvals — Screenshot Set — Capture checklist</h1>
+    <div class="sub">Print this (or keep it open) while you capture REAL screenshots. Generated from <code>docs/screenshots/manifest.json</code>.</div>
+    <div class="links">
+      Helpful: <a href="REAL_SCREENSHOTS_QUICKRUN.md">quick run</a><a href="REAL_SCREENSHOTS_SHOTLIST.md">shotlist</a><a href="CAPTURE-CHEATSHEET.md">cheatsheet</a><a href="gallery.html">gallery</a><a href="deck.html">deck</a>
+    </div>
+  </header>
+  <section class="item">
+    <div class="row">
+      <div class="thumb">
+        <img src="01-menu.png" alt="01-menu"/>
+      </div>
+      <div class="meta">
+        <h2>01 — 1) Menu (Approvals)</h2>
+        <div class="file">Expected filename: 01-menu.png</div>
+        <div class="cap">Custom menu entry for Approvals actions (Approve/Reject, Create demo, Help).</div>
+        <div class="check">
+          <label><input type="checkbox"/>Captured (real)</label>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="item">
+    <div class="row">
+      <div class="thumb">
+        <img src="02-requests-pending.png" alt="02-requests-pending"/>
+      </div>
+      <div class="meta">
+        <h2>02 — 2) Requests sheet (pending)</h2>
+        <div class="file">Expected filename: 02-requests-pending.png</div>
+        <div class="cap">Example request rows in PENDING state, ready for review/approval.</div>
+        <div class="check">
+          <label><input type="checkbox"/>Captured (real)</label>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="item">
+    <div class="row">
+      <div class="thumb">
+        <img src="03-approved-row.png" alt="03-approved-row"/>
+      </div>
+      <div class="meta">
+        <h2>03 — 3) Approved row</h2>
+        <div class="file">Expected filename: 03-approved-row.png</div>
+        <div class="cap">A request row marked APPROVED (showing status + timestamp/user columns as configured).</div>
+        <div class="check">
+          <label><input type="checkbox"/>Captured (real)</label>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="item">
+    <div class="row">
+      <div class="thumb">
+        <img src="04-audit-entry.png" alt="04-audit-entry"/>
+      </div>
+      <div class="meta">
+        <h2>04 — 4) Audit trail entry</h2>
+        <div class="file">Expected filename: 04-audit-entry.png</div>
+        <div class="cap">Append-only audit log row capturing who approved/rejected what and when.</div>
+        <div class="check">
+          <label><input type="checkbox"/>Captured (real)</label>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="item">
+    <div class="row">
+      <div class="thumb">
+        <img src="05-reapproval-required.png" alt="05-reapproval-required"/>
+      </div>
+      <div class="meta">
+        <h2>05 — 5) Re-approval required</h2>
+        <div class="file">Expected filename: 05-reapproval-required.png</div>
+        <div class="cap">An edit to tracked cells triggers REAPPROVAL_REQUIRED (or reverts to PENDING), with an audit event.</div>
+        <div class="check">
+          <label><input type="checkbox"/>Captured (real)</label>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="item">
+    <div class="row">
+      <div class="thumb">
+        <img src="06-help-sidebar.png" alt="06-help-sidebar"/>
+      </div>
+      <div class="meta">
+        <h2>06 — 6) Help / Docs sidebar</h2>
+        <div class="file">Expected filename: 06-help-sidebar.png</div>
+        <div class="cap">In-sheet Help sidebar for quick onboarding and usage.</div>
+        <div class="check">
+          <label><input type="checkbox"/>Captured (real)</label>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

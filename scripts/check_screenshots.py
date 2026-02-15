@@ -145,8 +145,9 @@ def main() -> int:
         for n in NAMES:
             print(f"  - docs/screenshots/{n}")
         print("\nGuides:")
-        print("  - Quick cheatsheet: docs/screenshots/CAPTURE-CHEATSHEET.md")
-        print("  - Full guide: REAL_SCREENSHOTS_GUIDE.md")
+        print("  - Quick run: docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md")
+        print("  - Shotlist + framing: docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md")
+        print("  - Cheatsheet: docs/screenshots/CAPTURE-CHEATSHEET.md")
         return 0
 
     missing: list[str] = []
@@ -229,9 +230,11 @@ def main() -> int:
             print(f"  - docs/screenshots/{n}")
 
         print("\nNext steps:")
-        print("  - Quick cheatsheet: docs/screenshots/CAPTURE-CHEATSHEET.md")
-        print("  - Full guide: REAL_SCREENSHOTS_GUIDE.md")
+        print("  - Quick run: docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md")
+        print("  - Shotlist + framing: docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md")
+        print("  - Cheatsheet: docs/screenshots/CAPTURE-CHEATSHEET.md")
         print("  - Helper installer: python3 scripts/install_real_screenshots.py --from ~/Desktop")
+        print("  - Optional capture pack zip: python3 scripts/make_real_screenshot_capture_pack.py")
 
         if args.fail_on_placeholders:
             return 2
@@ -243,7 +246,10 @@ def main() -> int:
             print(f"  - docs/screenshots/{n}")
 
         print("\nNext steps (preferred):")
-        print("  - Capture true screenshots: REAL_SCREENSHOTS_GUIDE.md")
+        print("  - Quick run: docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md")
+        print("  - Shotlist + framing: docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md")
+        print("  - Install helper: python3 scripts/install_real_screenshots.py --from ~/Desktop --check --optimize")
+        print("  - Optional capture pack zip: python3 scripts/make_real_screenshot_capture_pack.py")
         print("  - Then re-check: python3 scripts/check_screenshots.py --fail-on-placeholders --fail-on-realish")
 
         if args.fail_on_realish:

@@ -25,11 +25,14 @@ If you’re doing both, publish the DIY download and use it as an upsell into se
 
 Recommended: capture these real screenshots (shot list: `docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md`; quick flow: `docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md`).
 
-### Check placeholder status
+### Check placeholder / real-ish status (and write a status report)
 
 ```bash
-python3 scripts/check_screenshots.py
+python3 scripts/check_screenshots.py --report-md docs/screenshots/REAL_SCREENSHOTS_STATUS.md
 ```
+
+Optional checklist file for the capture run:
+- `docs/screenshots/REAL_SCREENSHOTS_TODO.md`
 
 ### Optional: helper pack for capturing “real” screenshots (recommended if you’re delegating)
 

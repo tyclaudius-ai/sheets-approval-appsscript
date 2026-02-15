@@ -50,6 +50,12 @@ It will step through 01..06, wait for a **new** screenshot each time, and instal
 python3 scripts/install_real_screenshots.py --from ~/Desktop --guided
 ```
 
+If you want the same flow but **no per-shot prompts** (it just waits for each new screenshot in order):
+
+```bash
+python3 scripts/install_real_screenshots.py --from ~/Desktop --watch
+```
+
 Then run the pipeline below to validate + optimize + render the gallery.
 
 ## Install + verify (fast path)

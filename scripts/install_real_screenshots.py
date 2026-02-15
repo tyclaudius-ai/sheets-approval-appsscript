@@ -10,8 +10,9 @@ This helper copies/renames those captures into the exact filenames the docs expe
   docs/screenshots/02-requests-pending.png
   ...
 
-It supports three workflows:
-- guided: wait for you to capture each screenshot (01..06) and auto-install sequentially
+It supports four workflows:
+- watch: auto-advance the shotlist and wait for a *new* capture each step (non-interactive)
+- guided: wait for you to confirm each shot, then wait for a *new* capture each step
 - interactive: choose which existing captures map to each target filename
 - non-interactive: map newest N files to 01..06 automatically (risky)
 
@@ -22,12 +23,13 @@ Options:
   --from DIR            Directory to scan for source images (default: ~/Desktop)
   --glob PATTERN        Glob pattern(s). Repeatable. (defaults: Screenshot*.png, Screen Shot*.png)
   --include-jpg         Also include *.jpg/*.jpeg matches (off by default)
+  --watch               Auto-advance the shotlist and install each new capture (non-interactive).
   --guided              Step through the shotlist and wait for a *new* capture each step.
-  --timeout-seconds     Per-shot timeout for --guided (default: 600)
-  --poll-ms             Poll interval for --guided (default: 750)
+  --timeout-seconds     Per-shot timeout for --watch/--guided (default: 600)
+  --poll-ms             Poll interval for --watch/--guided (default: 750)
   --open               When selecting a candidate, open it in Preview (macOS `open`).
   --since-minutes       Only consider candidate files modified in the last N minutes.
-  --non-interactive     Take the newest N files in order and map to 01..06 (risky)
+  --non-interactive     Take the newest N files in order and map to 01..06 automatically (risky)
   --dry-run             Print actions without copying
   --check               After copying, run scripts/check_screenshots.py
   --optimize            After copying, run scripts/optimize_screenshots.mjs (reads manifest.json)
@@ -55,7 +57,10 @@ TARGETS = [
     ("02-requests-pending.png", "02 — Requests sheet showing PENDING rows"),
     ("03-approved-row.png", "03 — Approved row (Status=APPROVED + approver/time)"),
     ("04-audit-entry.png", "04 — Audit tab showing appended event"),
-    ("05-reapproval-required.png", "05 — Re-approval required after edit (optional but recommended)"),
+    (
+        "05-reapproval-required.png",
+        "05 — Re-approval required after edit (optional but recommended)",
+    ),
     ("06-help-sidebar.png", "06 — Help/Docs sidebar open (optional but recommended)"),
 ]
 
@@ -135,7 +140,7 @@ def wait_for_new_capture(
     while time.time() < deadline:
         candidates = find_candidates(src_dir, patterns)
         for c in candidates:
-            # In guided mode we want *new* files, but allow brand new names even if timestamps jitter.
+            # In watch/guided mode we want *new* files, but allow brand new names even if timestamps jitter.
             if c.path in seen_paths:
                 continue
             if c.mtime < since_ts:
@@ -160,6 +165,11 @@ def main() -> int:
     ap.add_argument("--include-jpg", action="store_true", help="Also include Screenshot*.jpg/jpeg")
 
     ap.add_argument(
+        "--watch",
+        action="store_true",
+        help="Watch mode: auto-advance the shotlist and install each NEW capture (non-interactive).",
+    )
+    ap.add_argument(
         "--guided",
         action="store_true",
         help="Guided mode: step through the shotlist and wait for a NEW capture each step.",
@@ -168,13 +178,13 @@ def main() -> int:
         "--timeout-seconds",
         type=int,
         default=600,
-        help="Per-shot timeout for --guided (default: 600).",
+        help="Per-shot timeout for --watch/--guided (default: 600).",
     )
     ap.add_argument(
         "--poll-ms",
         type=int,
         default=750,
-        help="Poll interval for --guided (default: 750).",
+        help="Poll interval for --watch/--guided (default: 750).",
     )
 
     ap.add_argument(
@@ -193,8 +203,12 @@ def main() -> int:
     ap.add_argument("--optimize", action="store_true", help="Run scripts/optimize_screenshots.mjs after copying")
     args = ap.parse_args()
 
-    if args.guided and args.non_interactive:
-        print("--guided and --non-interactive are mutually exclusive", file=sys.stderr)
+    if args.watch and args.guided:
+        print("--watch and --guided are mutually exclusive", file=sys.stderr)
+        return 2
+
+    if (args.watch or args.guided) and args.non_interactive:
+        print("--watch/--guided and --non-interactive are mutually exclusive", file=sys.stderr)
         return 2
 
     src_dir = expand(args.src)
@@ -219,7 +233,7 @@ def main() -> int:
         cutoff = datetime.now().timestamp() - (args.since_minutes * 60)
         candidates = [c for c in candidates if c.mtime >= cutoff]
 
-    if not candidates and not args.guided:
+    if not candidates and not (args.guided or args.watch):
         note = "" if args.since_minutes is None else f" (after since-minutes={args.since_minutes})"
         print(f"No candidates found in {src_dir} matching {patterns}{note}", file=sys.stderr)
         return 1
@@ -227,12 +241,13 @@ def main() -> int:
     dest_dir = Path(__file__).resolve().parent.parent / "docs" / "screenshots"
     dest_dir.mkdir(parents=True, exist_ok=True)
 
-    if args.guided:
-        print("Guided screenshot install")
+    if args.guided or args.watch:
+        print("Screenshot install")
         print(f"  Watching: {src_dir}")
         print(f"  Patterns: {patterns}")
         print(f"  Timeout:  {args.timeout_seconds}s per shot")
         print("")
+        print(f"Mode: {'--watch (auto-advance)' if args.watch else '--guided (per-shot confirm)'}")
         print("Tip: for each step, take a screenshot (Cmd+Shift+4) and wait for it to appear.")
         print("")
 
@@ -242,7 +257,12 @@ def main() -> int:
 
         planned: list[tuple[Path, Path, str]] = []
         for (target_fname, desc) in TARGETS:
-            prompt(f"\nReady for {target_fname} — {desc}. Press Enter when you are about to capture… ")
+            if args.guided:
+                prompt(
+                    f"\nReady for {target_fname} — {desc}. Press Enter when you are about to capture… "
+                )
+            else:
+                print(f"\nWaiting for {target_fname} — {desc} …")
             try:
                 p = wait_for_new_capture(
                     src_dir=src_dir,
@@ -274,15 +294,16 @@ def main() -> int:
             print("\nDry run; no files copied.")
             return 0
 
-        ok = prompt("\nProceed? [y/N]: ").strip().lower()
-        if ok != "y":
-            print("Cancelled.")
-            return 0
+        if args.guided:
+            ok = prompt("\nProceed? [y/N]: ").strip().lower()
+            if ok != "y":
+                print("Cancelled.")
+                return 0
 
         for src_path, dest_path, _desc in planned:
             shutil.copy2(src_path, dest_path)
 
-        print("\nDone. Copied all guided screenshots.")
+        print("\nDone. Copied all screenshots.")
 
     else:
         print("Found candidates (newest first):")
@@ -382,7 +403,11 @@ def main() -> int:
 
     if args.optimize:
         print("\n[screenshots] Running optimize_screenshots.mjs …")
-        subprocess.run(["node", str(repo_root / "scripts" / "optimize_screenshots.mjs")], cwd=str(repo_root), check=False)
+        subprocess.run(
+            ["node", str(repo_root / "scripts" / "optimize_screenshots.mjs")],
+            cwd=str(repo_root),
+            check=False,
+        )
 
     print("\nSanity check: open landing/index.html and confirm the screenshot gallery looks right.")
     print("Preview helper: python3 scripts/serve_landing.py --open")

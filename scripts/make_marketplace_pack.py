@@ -99,21 +99,32 @@ def main() -> int:
 
     # 2) Create the final marketplace pack.
     include_files = [
-        "LISTING.md",
-        "SALES.md",
-        "OUTREACH-TEMPLATES.md",
-        "INTAKE_QUESTIONS.md",
-        "CLIENT-HANDOFF.md",
+        # top-level navigation / quickstart
+        "START_HERE.md",
         "README.md",
-        "ONE_PAGER.md",
+        "QUICKSTART.md",
         "SETUP-CHECKLIST.md",
+        "TROUBLESHOOTING.md",
+        "TEMPLATE-INSTRUCTIONS.md",
+
+        # product + delivery docs
+        "CLIENT-HANDOFF.md",
+        "ONE_PAGER.md",
         "DEMO.md",
         "DEMO-WALKTHROUGH.md",
         "DEMO-TEMPLATE.md",
+
+        # screenshots
         "SCREENSHOTS.md",
         "REAL_SCREENSHOTS_GUIDE.md",
-        "TROUBLESHOOTING.md",
+
+        # marketplace / sales assets
+        "LISTING.md",
+        "MARKETPLACE-LISTING-COPY.md",
         "MARKETPLACE-CHECKLIST.md",
+        "SALES.md",
+        "OUTREACH-TEMPLATES.md",
+        "INTAKE_QUESTIONS.md",
     ]
 
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as z:

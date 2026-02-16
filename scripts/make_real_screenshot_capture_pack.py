@@ -236,8 +236,13 @@ python3 scripts/install_real_screenshots.py \
   --check \
   --optimize
 
-echo "[capture] Done. Open the gallery to sanity-check results:"
-echo "  python3 scripts/serve_landing.py --open"
+echo "[capture] Done. Opening the gallery to sanity-check results…"
+if command -v open >/dev/null 2>&1; then
+  open "docs/screenshots/gallery.html" || true
+fi
+
+echo "[capture] If you want to re-run verification later:"
+echo "  python3 scripts/check_screenshots.py --report-md docs/screenshots/REAL_SCREENSHOTS_STATUS.md"
 """
         zi = zipfile.ZipInfo("CAPTURE_MAC.command")
         # Mark as executable (0755) on Unix-y systems so macOS can double-click it.

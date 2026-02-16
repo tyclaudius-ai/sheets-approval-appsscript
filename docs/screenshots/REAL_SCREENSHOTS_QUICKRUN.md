@@ -47,7 +47,8 @@ If you want to avoid hunting through a pile of Desktop screenshots, you can run 
 It will step through 01..06, wait for a **new** screenshot each time, and install them automatically.
 
 ```bash
-python3 scripts/install_real_screenshots.py --from ~/Desktop --guided
+python3 scripts/install_real_screenshots.py --from AUTO --guided
+# AUTO picks whichever of ~/Desktop or ~/Downloads has the newest matching screenshot.
 # (By default, this opens the current canonical screenshots as a framing reference before each capture.)
 # If your system produces tiny/blank captures sometimes, add e.g. --min-bytes 80000
 ```
@@ -55,7 +56,7 @@ python3 scripts/install_real_screenshots.py --from ~/Desktop --guided
 If you want the same flow but **no per-shot prompts** (it just waits for each new screenshot in order):
 
 ```bash
-python3 scripts/install_real_screenshots.py --from ~/Desktop --watch
+python3 scripts/install_real_screenshots.py --from AUTO --watch
 ```
 
 Then run the pipeline below to validate + optimize + render the gallery.
@@ -74,7 +75,7 @@ After capturing (usually they land on your Desktop), run:
 
 ```bash
 python3 scripts/screenshots_pipeline.py \
-  --from ~/Desktop \
+  --from AUTO \
   --check \
   --require-real-screenshots \
   --optimize \

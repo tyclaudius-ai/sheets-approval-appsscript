@@ -82,6 +82,37 @@ def expand(p: str) -> Path:
     return Path(os.path.expanduser(p)).resolve()
 
 
+def pick_auto_src_dir(patterns: list[str]) -> Path:
+    """Pick a reasonable default screenshots directory (Desktop vs Downloads).
+
+    We keep this tiny on purpose: most macOS screenshot captures land on Desktop,
+    but many people (or corporate profiles) route them into Downloads.
+
+    Selection rule: choose the directory that contains the *newest* matching file.
+    """
+
+    candidates_dirs = [expand("~/Desktop"), expand("~/Downloads")]
+    newest: tuple[float, Path] | None = None
+
+    for d in candidates_dirs:
+        if not d.exists() or not d.is_dir():
+            continue
+        hits = find_candidates(d, patterns)
+        if not hits:
+            continue
+        top = hits[0]
+        if newest is None or top.mtime > newest[0]:
+            newest = (top.mtime, d)
+
+    if newest is None:
+        raise FileNotFoundError(
+            "AUTO mode couldn't find any matching screenshots on ~/Desktop or ~/Downloads. "
+            "Pass --from explicitly (e.g. --from ~/Desktop)."
+        )
+
+    return newest[1]
+
+
 def find_candidates(src_dir: Path, patterns: list[str]) -> list[Candidate]:
     hits: list[Candidate] = []
     for pat in patterns:
@@ -164,7 +195,12 @@ def wait_for_new_capture(
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--from", dest="src", default="~/Desktop", help="Directory to scan for screenshots")
+    ap.add_argument(
+        "--from",
+        dest="src",
+        default="~/Desktop",
+        help="Directory to scan for screenshots (or 'AUTO' to choose Desktop/Downloads)",
+    )
     ap.add_argument(
         "--glob",
         dest="globs",
@@ -234,7 +270,13 @@ def main() -> int:
         print("--watch/--guided and --non-interactive are mutually exclusive", file=sys.stderr)
         return 2
 
+    patterns = args.globs or ["Screenshot*.png", "Screen Shot*.png"]
+    if args.include_jpg:
+        patterns += ["Screenshot*.jpg", "Screenshot*.jpeg", "Screen Shot*.jpg", "Screen Shot*.jpeg"]
+
     src_dir = expand(args.src)
+    if str(args.src).strip().upper() == "AUTO":
+        src_dir = pick_auto_src_dir(patterns)
     if not src_dir.exists():
         print(f"Source dir does not exist: {src_dir}", file=sys.stderr)
         return 2

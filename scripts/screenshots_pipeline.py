@@ -40,6 +40,19 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
+def pick_auto_from_dir() -> str:
+    """Resolve 'AUTO' to a concrete directory (Desktop vs Downloads).
+
+    The heavy lifting (globs, guided/watch modes, etc.) lives in install_real_screenshots.py.
+    Here we just pick the most likely base folder.
+    """
+
+    for d in [Path.home() / "Desktop", Path.home() / "Downloads"]:
+        if d.exists() and d.is_dir():
+            return str(d)
+    return str(Path.home())
+
+
 def run(cmd: list[str]) -> None:
     print("+", " ".join(cmd))
     subprocess.run(cmd, cwd=str(REPO_ROOT), check=True)
@@ -50,7 +63,7 @@ def main() -> int:
     ap.add_argument(
         "--from",
         dest="from_dir",
-        help="Directory containing captured screenshots (e.g. ~/Desktop).",
+        help="Directory containing captured screenshots (e.g. ~/Desktop). Use 'AUTO' to choose Desktop/Downloads.",
     )
     ap.add_argument(
         "--guided",
@@ -162,7 +175,11 @@ def main() -> int:
         args.status = True
 
     if args.from_dir:
-        from_dir = os.path.expanduser(args.from_dir)
+        raw_from = args.from_dir.strip()
+        if raw_from.upper() == "AUTO":
+            from_dir = pick_auto_from_dir()
+        else:
+            from_dir = os.path.expanduser(raw_from)
         cmd = [sys.executable, "scripts/install_real_screenshots.py", "--from", from_dir]
         if args.guided:
             cmd.append("--guided")

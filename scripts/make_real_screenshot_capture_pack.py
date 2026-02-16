@@ -54,6 +54,7 @@ INCLUDE_PATHS = [
     # Install + verification helpers
     Path("scripts/install_real_screenshots.py"),
     Path("scripts/check_screenshots.py"),
+    Path("scripts/capture_clipboard_shotlist.py"),
     Path("scripts/screenshots_pipeline.py"),
     Path("scripts/render_screenshots_gallery.py"),
     Path("scripts/requirements.txt"),
@@ -176,7 +177,19 @@ It will:
 
 macOS may warn about running downloaded scripts; if so, right-click → Open.
 
-### Option B (any OS): run the pipeline
+### Option B (macOS): capture from clipboard (recommended)
+
+From the unzipped folder:
+
+```bash
+python3 -m pip install -r scripts/requirements.txt
+python3 scripts/capture_clipboard_shotlist.py --target-dir docs/screenshots
+python3 scripts/screenshots_pipeline.py --check --require-real-screenshots --optimize --width 1400 --status --render-gallery
+```
+
+Tip: use **Cmd+Ctrl+Shift+4** to capture to the clipboard (not a file).
+
+### Option C (any OS): run the pipeline (file-based)
 
 Your screenshots usually land on Desktop. From the unzipped folder:
 
@@ -229,15 +242,19 @@ if command -v open >/dev/null 2>&1; then
   open "docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md" || true
 fi
 
-echo "[capture] Guided install: waiting for 6 new screenshots (Desktop/Downloads)…"
-python3 scripts/install_real_screenshots.py \
-  --from AUTO \
-  --guided \
-  --open-reference \
-  --since-minutes 60 \
-  --min-bytes 50000 \
+echo "[capture] Clipboard capture mode (fastest):"
+echo "  Use Cmd+Ctrl+Shift+4 to capture to clipboard (not file)."
+echo "  This will prompt you 6 times and write into docs/screenshots/*.png"
+python3 scripts/capture_clipboard_shotlist.py --target-dir docs/screenshots
+
+echo "[capture] Verifying + optimizing…"
+python3 scripts/screenshots_pipeline.py \
   --check \
-  --optimize
+  --require-real-screenshots \
+  --optimize \
+  --width 1400 \
+  --status \
+  --render-gallery
 
 echo "[capture] Done. Opening the gallery to sanity-check results…"
 if command -v open >/dev/null 2>&1; then

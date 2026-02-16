@@ -108,5 +108,6 @@ python3 scripts/screenshots_pipeline.py
 When you have real PNGs, overwrite `docs/screenshots/01..06-*.png` 1:1 and re-run:
 
 ```bash
-python3 scripts/screenshots_pipeline.py --fail-on-placeholders
+python3 scripts/screenshots_pipeline.py
+python3 scripts/check_screenshots.py --require-real-screenshots
 ```

@@ -75,4 +75,17 @@ This repo also includes *top-level* PNGs at:
 - `docs/screenshots/05-reapproval-required.png`
 - `docs/screenshots/06-help-sidebar.png`
 
-Right now they are just copies of the placeholders. For a real listing, overwrite the top-level PNGs with real screenshots using the same filenames.
+These are intended to be the “canonical” screenshot filenames that the landing page references.
+
+- In early drafts they may be **placeholder-derived** (either direct placeholder copies or *real-ish* generated mocks).
+- For a real listing, overwrite the top-level PNGs with **true Google Sheets captures** using the same filenames.
+
+To verify you’re no longer using placeholders/mocks:
+
+```bash
+python3 scripts/check_screenshots.py --require-real-screenshots
+```
+
+If you want a one-click workflow for capture+install on macOS, use the bundled capture pack zip:
+
+- `dist/real-screenshots-capture-pack-DRAFT-latest.zip`

@@ -30,6 +30,7 @@ Options:
   --open               When selecting a candidate, open it in Preview (macOS `open`).
   --open-reference      In --guided/--watch mode, open the current canonical screenshot as a framing reference.
                         (Defaults ON for --guided.)
+  --open-guides         macOS: open the quick-run + shotlist + cheatsheet guides (recommended before a capture pass).
   --since-minutes       Only consider candidate files modified in the last N minutes.
   --min-bytes           Ignore candidate images smaller than N bytes (helps skip partial/blank captures).
   --non-interactive     Take the newest N files in order and map to 01..06 automatically (risky)
@@ -256,6 +257,11 @@ def main() -> int:
             "as a framing reference before you capture the real shot."
         ),
     )
+    ap.add_argument(
+        "--open-guides",
+        action="store_true",
+        help="macOS: open the quick-run + shotlist + cheatsheet guides in the default app.",
+    )
     ap.add_argument("--non-interactive", action="store_true", help="Map newest N files to targets without prompts")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--check", action="store_true", help="Run scripts/check_screenshots.py after copying")
@@ -308,6 +314,21 @@ def main() -> int:
 
     dest_dir = Path(__file__).resolve().parent.parent / "docs" / "screenshots"
     dest_dir.mkdir(parents=True, exist_ok=True)
+
+    if args.open_guides:
+        # Best-effort macOS convenience: open the docs you’ll want while capturing.
+        repo_root = Path(__file__).resolve().parent.parent
+        guide_paths = [
+            repo_root / "docs" / "screenshots" / "REAL_SCREENSHOTS_QUICKRUN.md",
+            repo_root / "docs" / "screenshots" / "REAL_SCREENSHOTS_SHOTLIST.md",
+            repo_root / "docs" / "screenshots" / "CAPTURE-CHEATSHEET.md",
+        ]
+        for gp in guide_paths:
+            if gp.exists():
+                try:
+                    subprocess.run(["open", str(gp)], check=False)
+                except Exception:
+                    pass
 
     if args.guided or args.watch:
         # Default: in guided mode, opening a reference image is usually helpful.

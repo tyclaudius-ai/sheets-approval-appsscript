@@ -4,22 +4,40 @@ Goal: replace the current **“real-ish” generated** PNGs in `docs/screenshots
 
 When you’re done, `docs/screenshots/REAL_SCREENSHOTS_STATUS.md` should **NOT** list “Real-ish generated screenshots detected”.
 
-## 1) Generate the capture pack (optional but recommended)
-From repo root:
+## 1) Use the capture pack (recommended)
+Fast path:
+
+- Use the latest zip already built in `dist/`:
 
 ```bash
 cd sheets-approval-appsscript
-python3 scripts/make_real_screenshot_capture_pack.py --out ~/Desktop/real-screenshots-capture-pack.zip
-open ~/Desktop/real-screenshots-capture-pack.zip
+open dist/real-screenshots-capture-pack-DRAFT-latest.zip
 ```
 
-(You can also just follow the guides directly without the zip.)
+Unzip it, then **double-click `CAPTURE_MAC.command`**.
+
+It will:
+- open the shotlist/checklist
+- wait for 6 NEW screenshots (Desktop)
+- install + validate + optimize them
+
+(Alternative: you can regenerate the pack any time via `python3 scripts/make_real_screenshot_capture_pack.py`.)
 
 ## 2) In Google Sheets, open the demo template
 - Use the repo’s demo/template sheet (the one used for screenshots).
 - Run the custom menu item to create/populate demo rows if needed.
 
 Tip: maximize the browser window; keep zoom consistent across shots.
+
+Even easier capture method (no Desktop file juggling):
+- Use **Cmd+Ctrl+Shift+4** (screenshot → clipboard)
+- Then from the unzipped capture pack folder run:
+
+```bash
+python3 -m pip install -r scripts/requirements.txt
+python3 scripts/capture_clipboard_shotlist.py --target-dir docs/screenshots
+python3 scripts/screenshots_pipeline.py --check --require-real-screenshots --optimize --width 1400 --status --render-gallery
+```
 
 ## 3) Capture these 6 shots (exact filenames)
 Save each capture to **Desktop** with these exact names:

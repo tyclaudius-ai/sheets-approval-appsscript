@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import json
 from pathlib import Path
 import subprocess
 import zipfile
@@ -34,6 +35,11 @@ DIST = ROOT / "dist"
 
 def _run(cmd: list[str]) -> None:
     subprocess.check_call(cmd, cwd=ROOT)
+
+
+def _run_json(cmd: list[str]) -> dict:
+    out = subprocess.check_output(cmd, cwd=ROOT)
+    return json.loads(out.decode("utf-8"))
 
 
 def main() -> int:
@@ -61,8 +67,6 @@ def main() -> int:
     args = ap.parse_args()
 
     ts = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%d-%H%M%SZ")
-    out_path = Path(args.out) if args.out else (DIST / f"marketplace-pack-{ts}.zip")
-    out_path.parent.mkdir(parents=True, exist_ok=True)
 
     # 0) Always refresh the real-screenshots status report so the pack reflects current state.
     _run([
@@ -72,14 +76,30 @@ def main() -> int:
         "docs/screenshots/REAL_SCREENSHOTS_STATUS.md",
     ])
 
+    ss = _run_json([
+        "python3",
+        "scripts/check_screenshots.py",
+        "--json",
+    ])
+    has_non_real = bool(ss.get("missing") or ss.get("placeholders") or ss.get("realish"))
+
     # Optional guardrails: ensure screenshots are truly captured (not placeholders / not known mocks).
-    if args.require_real_screenshots:
+    if args.require_real_screenshots and has_non_real:
         _run([
             "python3",
             "scripts/check_screenshots.py",
             "--fail-on-placeholders",
             "--fail-on-realish",
         ])
+
+    # If user didn't specify an output path, make the default filename explicit when it's a draft.
+    if args.out:
+        out_path = Path(args.out)
+    else:
+        suffix = "-DRAFT" if (has_non_real and not args.require_real_screenshots) else ""
+        out_path = DIST / f"marketplace-pack{suffix}-{ts}.zip"
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
 
     # 1) Build the inner artifacts.
     bundle_out = args.bundle_out
@@ -136,22 +156,43 @@ def main() -> int:
     ]
 
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
-        if not args.require_real_screenshots:
+        if not args.require_real_screenshots and has_non_real:
+            missing = ss.get("missing") or []
+            placeholders = ss.get("placeholders") or []
+            realish = ss.get("realish") or []
+
+            def _fmt(items: list[str]) -> str:
+                return "\n".join([f"- {x}" for x in items]) if items else "- (none)"
+
             z.writestr(
                 "marketplace-pack/WARNING_SCREENSHOTS_DRAFT.md",
-                """# WARNING: screenshots may be placeholders / mock 'real-ish' images\n\n"
-                "This marketplace-pack was built **without** `--require-real-screenshots`.\n\n"
-                "That means the screenshots included under `docs/screenshots/` and in the packaged\n"
-                "`dist/screenshot-pack-*.zip` may contain:\n\n"
-                "- placeholders\n"
-                "- generated/mock 'real-ish' images\n\n"
-                "Before using these assets in a public listing, capture **real** screenshots in Google\n"
-                "Sheets and rebuild with:\n\n"
-                "```bash\n"
-                "python3 scripts/make_marketplace_pack.py --require-real-screenshots\n"
-                "```\n\n"
-                "See: `docs/screenshots/REAL_SCREENSHOTS_STATUS.md` for what is still missing.\n"
-                """,
+                "\n".join(
+                    [
+                        "# WARNING: DRAFT screenshots in this pack",
+                        "",
+                        "This marketplace-pack was built **without** `--require-real-screenshots`.",
+                        "",
+                        "Current screenshot status (from `scripts/check_screenshots.py --json`):",
+                        "",
+                        "## Missing",
+                        _fmt(missing),
+                        "",
+                        "## Placeholders",
+                        _fmt(placeholders),
+                        "",
+                        "## Real-ish mocks (generated)",
+                        _fmt(realish),
+                        "",
+                        "Before using these assets in a public listing, capture **real** screenshots in Google Sheets and rebuild with:",
+                        "",
+                        "```bash",
+                        "python3 scripts/make_marketplace_pack.py --require-real-screenshots",
+                        "```",
+                        "",
+                        "See: `docs/screenshots/REAL_SCREENSHOTS_STATUS.md` for details.",
+                        "",
+                    ]
+                ),
             )
 
         # docs/copy

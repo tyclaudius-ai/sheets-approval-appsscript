@@ -1,0 +1,52 @@
+name: screenshots-status
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  screenshots-status:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Generate screenshots status report (non-blocking)
+        id: report
+        continue-on-error: true
+        run: |
+          python3 scripts/check_screenshots.py \
+            --dir docs/screenshots \
+            --fail-on-placeholders \
+            --fail-on-realish \
+            --report-md REAL_SCREENSHOTS_STATUS_CI.md
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-screenshots-status
+          path: REAL_SCREENSHOTS_STATUS_CI.md
+
+      - name: Job summary
+        if: always()
+        run: |
+          echo "## Real screenshots status" >> $GITHUB_STEP_SUMMARY
+          if [ -f REAL_SCREENSHOTS_STATUS_CI.md ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            cat REAL_SCREENSHOTS_STATUS_CI.md >> $GITHUB_STEP_SUMMARY
+          else
+            echo "(report file missing)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ steps.report.outcome }}" != "success" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "> **Note:** This workflow is **non-blocking**. It reports missing/placeholder/real-ish screenshots but does not fail PR checks." >> $GITHUB_STEP_SUMMARY
+          fi

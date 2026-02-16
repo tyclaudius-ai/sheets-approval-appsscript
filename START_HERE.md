@@ -19,6 +19,7 @@ Fastest flow:
 - **90-second setup:** `QUICKSTART.md`
 - **Full setup checklist:** `SETUP-CHECKLIST.md`
 - **Troubleshooting (menus / permissions / triggers):** `TROUBLESHOOTING.md`
+- **Uninstall / remove triggers:** `UNINSTALL.md`
 - **Sheet schema / column contract:** `SHEET-SCHEMA.md`
 
 If you want a “one-click copy” experience:

@@ -133,6 +133,7 @@ def main() -> int:
         "QUICKSTART.md",
         "SETUP-CHECKLIST.md",
         "TROUBLESHOOTING.md",
+        "UNINSTALL.md",
         "TEMPLATE-INSTRUCTIONS.md",
 
         # product + delivery docs

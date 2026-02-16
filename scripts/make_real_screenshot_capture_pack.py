@@ -127,6 +127,10 @@ def main() -> int:
     )
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
+    # When using the default output path, also maintain a stable “latest” filename
+    # so humans can just grab one file without hunting for the newest timestamp.
+    latest_path = None if args.out else (ROOT / "dist" / "real-screenshots-capture-pack-DRAFT-latest.zip")
+
     missing: list[str] = []
     for rel in INCLUDE_PATHS:
         p = ROOT / rel
@@ -272,6 +276,17 @@ echo "  python3 scripts/check_screenshots.py --report-md docs/screenshots/REAL_S
         for rel in INCLUDE_PATHS:
             src = ROOT / rel
             z.write(src, arcname=str(rel))
+
+    # Keep a stable “latest” copy for convenience (best-effort).
+    if latest_path is not None:
+        try:
+            import shutil
+
+            shutil.copyfile(out_path, latest_path)
+            latest_kb = os.path.getsize(latest_path) / 1024
+            print(f"Wrote {latest_path} ({latest_kb:.1f} KB)")
+        except Exception:
+            pass
 
     size_kb = os.path.getsize(out_path) / 1024
     print(f"Wrote {out_path} ({size_kb:.1f} KB)")

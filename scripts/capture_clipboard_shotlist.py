@@ -44,6 +44,8 @@ DEFAULT_SHOTLIST = [
     "06-help-sidebar.png",
 ]
 
+DEFAULT_SHOTLIST_MD = "docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md"
+
 
 def _sha256(path: Path) -> str:
     h = hashlib.sha256()
@@ -82,6 +84,55 @@ def _needs_replacement(target: Path, realish_hashes: set[str]) -> bool:
         return True
 
 
+def _parse_shot_instructions(md_path: Path) -> dict[str, str]:
+    """Return {"01-menu.png": "...markdown snippet...", ...}.
+
+    We parse sections like:
+      ## 01 — `01-menu.png` (...)
+      ...
+
+    and capture text until the next "##" header.
+    """
+
+    if not md_path.exists():
+        return {}
+
+    out: dict[str, str] = {}
+    cur_name: str | None = None
+    cur_lines: list[str] = []
+
+    lines = md_path.read_text(encoding="utf-8").splitlines()
+    for line in lines:
+        if line.startswith("## "):
+            # flush previous
+            if cur_name and cur_lines:
+                out[cur_name] = "\n".join(cur_lines).strip()
+
+            cur_name = None
+            cur_lines = []
+
+            # find `filename.png` inside backticks
+            if "`" in line:
+                parts = line.split("`")
+                for p in parts:
+                    if p.endswith(".png"):
+                        cur_name = p
+                        break
+
+            # keep the header as context (minus leading ##)
+            if cur_name:
+                cur_lines.append(line)
+            continue
+
+        if cur_name is not None:
+            cur_lines.append(line)
+
+    if cur_name and cur_lines:
+        out[cur_name] = "\n".join(cur_lines).strip()
+
+    return out
+
+
 def _write_clipboard_png(out_path: Path) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -112,6 +163,11 @@ def main() -> int:
         help="Capture all shots (default captures only missing or real-ish-generated ones)",
     )
     ap.add_argument(
+        "--shotlist-md",
+        default=DEFAULT_SHOTLIST_MD,
+        help=f"Optional Markdown shotlist with per-shot instructions (default: {DEFAULT_SHOTLIST_MD})",
+    )
+    ap.add_argument(
         "--dry-run",
         action="store_true",
         help="Print what would be captured and exit",
@@ -126,6 +182,7 @@ def main() -> int:
 
     target_dir = ROOT / args.target_dir
     realish_hashes = _load_realish_hashes(ROOT / "docs/screenshots/realish-hashes.json")
+    instructions = _parse_shot_instructions(ROOT / args.shotlist_md)
 
     targets: list[Path] = []
     for name in DEFAULT_SHOTLIST:
@@ -149,7 +206,12 @@ def main() -> int:
 
     for i, out_path in enumerate(targets, start=1):
         rel = out_path.relative_to(ROOT)
+        fname = out_path.name
         print(f"[{i}/{len(targets)}] Ready for: {rel}")
+        if fname in instructions:
+            # keep it readable in terminal: indent slightly
+            snippet = "\n".join("  " + ln for ln in instructions[fname].splitlines())
+            print(snippet)
         input("  Take screenshot → clipboard, then press Enter (or Ctrl+C to abort)… ")
 
         tmp = out_path.with_suffix(".tmp.png")

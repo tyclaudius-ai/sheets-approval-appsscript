@@ -225,12 +225,15 @@ echo "[capture] Opening capture checklist…"
 if command -v open >/dev/null 2>&1; then
   open "docs/screenshots/capture-checklist.html" || true
   open "docs/screenshots/deck.html" || true
+  open "docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md" || true
+  open "docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md" || true
 fi
 
-echo "[capture] Guided install: waiting for 6 new screenshots on Desktop…"
+echo "[capture] Guided install: waiting for 6 new screenshots (Desktop/Downloads)…"
 python3 scripts/install_real_screenshots.py \
-  --from "$HOME/Desktop" \
+  --from AUTO \
   --guided \
+  --open-reference \
   --since-minutes 60 \
   --min-bytes 50000 \
   --check \

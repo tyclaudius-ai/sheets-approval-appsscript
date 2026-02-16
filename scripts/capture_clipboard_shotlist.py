@@ -212,28 +212,40 @@ def main() -> int:
             # keep it readable in terminal: indent slightly
             snippet = "\n".join("  " + ln for ln in instructions[fname].splitlines())
             print(snippet)
-        input("  Take screenshot → clipboard, then press Enter (or Ctrl+C to abort)… ")
+        while True:
+            resp = input(
+                "  Take screenshot → clipboard, then press Enter (or type 's' to skip, 'q' to quit)… "
+            ).strip().lower()
+            if resp == "q":
+                print("Aborted.")
+                return 130
+            if resp == "s":
+                print("  Skipped.")
+                break
 
-        tmp = out_path.with_suffix(".tmp.png")
-        try:
-            if tmp.exists():
-                tmp.unlink()
-            _write_clipboard_png(tmp)
-        except subprocess.CalledProcessError:
-            if tmp.exists():
-                tmp.unlink()
-            print("  ERROR: clipboard did not contain an image PNG. Try capturing again.")
-            return 2
+            tmp = out_path.with_suffix(".tmp.png")
+            try:
+                if tmp.exists():
+                    tmp.unlink()
+                _write_clipboard_png(tmp)
+            except subprocess.CalledProcessError:
+                if tmp.exists():
+                    tmp.unlink()
+                print("  ERROR: clipboard did not contain an image PNG. Retake and press Enter.")
+                continue
 
-        size = tmp.stat().st_size if tmp.exists() else 0
-        if size < args.min_bytes:
-            tmp.unlink(missing_ok=True)
-            print(f"  ERROR: capture too small ({size} bytes < {args.min_bytes}). Retake.")
-            return 2
+            size = tmp.stat().st_size if tmp.exists() else 0
+            if size < args.min_bytes:
+                tmp.unlink(missing_ok=True)
+                print(
+                    f"  ERROR: capture too small ({size} bytes < {args.min_bytes}). Retake and press Enter."
+                )
+                continue
 
-        # Atomic-ish replace
-        tmp.replace(out_path)
-        print(f"  Saved {rel} ({size} bytes)")
+            # Atomic-ish replace
+            tmp.replace(out_path)
+            print(f"  Saved {rel} ({size} bytes)")
+            break
 
         # give the user a breath between shots
         time.sleep(0.15)

@@ -12,6 +12,21 @@ Status: ⚠️ Needs work
 - `docs/screenshots/05-reapproval-required.png`
 - `docs/screenshots/06-help-sidebar.png`
 
+## Next actions
+Replace these with true Google Sheets captures (not placeholders / not generated real-ish mocks).
+- `docs/screenshots/01-menu.png`
+- `docs/screenshots/02-requests-pending.png`
+- `docs/screenshots/03-approved-row.png`
+- `docs/screenshots/04-audit-entry.png`
+- `docs/screenshots/05-reapproval-required.png`
+- `docs/screenshots/06-help-sidebar.png`
+
+Suggested flow:
+1. Read: `docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md`
+2. Capture using: `docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md`
+3. Install: `python3 scripts/install_real_screenshots.py --from ~/Desktop --check --optimize`
+4. Gate: `python3 scripts/check_screenshots.py --require-real-screenshots`
+
 ## 'Real-ish' generated screenshots detected
 These match the known generated hashes in `docs/screenshots/realish-hashes.json` (good for docs; not ideal for marketplace listings).
 - `docs/screenshots/01-menu.png`

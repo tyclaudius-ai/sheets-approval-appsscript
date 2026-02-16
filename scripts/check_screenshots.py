@@ -134,6 +134,14 @@ def main() -> int:
         help="Print the required screenshot filenames as a capture checklist (useful before doing a real screenshot pass).",
     )
     ap.add_argument(
+        "--next",
+        action="store_true",
+        help=(
+            "Print a short prioritized 'what to do next' list (missing/placeholder/real-ish screenshots) "
+            "with suggested commands."
+        ),
+    )
+    ap.add_argument(
         "--report-md",
         metavar="PATH",
         help=(
@@ -206,6 +214,31 @@ def main() -> int:
         except OSError:
             missing.append(name)
 
+    needs_attention: list[str] = []
+    # Order: missing first (must exist), then placeholders, then known real-ish mocks.
+    needs_attention += [f"docs/screenshots/{Path(m).name}" for m in missing]
+    needs_attention += [f"docs/screenshots/{n}" for n in placeholders]
+    needs_attention += [f"docs/screenshots/{n}" for n in realish]
+
+    def print_next() -> None:
+        if not args.next or args.json:
+            return
+        if not needs_attention:
+            print("[screenshots] NEXT: nothing to do — screenshots look real.")
+            return
+
+        print("[screenshots] NEXT actions (replace these files with true Google Sheets captures):")
+        for p in needs_attention[:10]:
+            print(f"  - {p}")
+        print("")
+        print("Suggested flow:")
+        print("  1) Open guides: python3 scripts/check_screenshots.py --open-guides")
+        print("  2) (macOS) Reveal files to replace: python3 scripts/check_screenshots.py --reveal")
+        print("  3) After capturing, install+optimize: python3 scripts/install_real_screenshots.py --from ~/Desktop --check --optimize")
+        print("  4) Re-check gate: python3 scripts/check_screenshots.py --require-real-screenshots")
+
+    print_next()
+
     def write_report_md() -> None:
         if not args.report_md:
             return
@@ -226,6 +259,19 @@ def main() -> int:
         for n in NAMES:
             lines.append(f"- `docs/screenshots/{n}`")
         lines.append("")
+
+        if not ok:
+            lines.append("## Next actions")
+            lines.append("Replace these with true Google Sheets captures (not placeholders / not generated real-ish mocks).")
+            for p in needs_attention[:6]:
+                lines.append(f"- `{p}`")
+            lines.append("")
+            lines.append("Suggested flow:")
+            lines.append("1. Read: `docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md`")
+            lines.append("2. Capture using: `docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md`")
+            lines.append("3. Install: `python3 scripts/install_real_screenshots.py --from ~/Desktop --check --optimize`")
+            lines.append("4. Gate: `python3 scripts/check_screenshots.py --require-real-screenshots`")
+            lines.append("")
 
         if missing:
             lines.append("## Missing")
@@ -310,6 +356,7 @@ def main() -> int:
             "placeholders": [f"docs/screenshots/{n}" for n in placeholders],
             "realish": [f"docs/screenshots/{n}" for n in realish],
             "shotlist": [f"docs/screenshots/{n}" for n in NAMES],
+            "needsAttention": needs_attention,
             "info": {k: {"bytes": v.get("bytes"), "width": v.get("width"), "height": v.get("height")} for k, v in info.items()},
             "infoNote": "Pixel dimensions are best-effort (macOS uses `sips`).",
         }

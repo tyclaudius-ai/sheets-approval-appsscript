@@ -39,4 +39,6 @@ This should pass:
 python3 scripts/check_screenshots.py --fail-on-placeholders --fail-on-realish
 ```
 
-If it fails, open `docs/screenshots/STATUS.md` and fix whatever is flagged.
+If it fails:
+- Open `docs/screenshots/REAL_SCREENSHOTS_STATUS.md` for the exact “what’s wrong / what to do next” gate report, and
+- (Optionally) open `docs/screenshots/STATUS.md` for the quick placeholder/real-ish/custom table.

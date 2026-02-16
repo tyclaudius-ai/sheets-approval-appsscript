@@ -141,6 +141,19 @@ def main() -> int:
             "Includes shotlist + current classification (missing/placeholder/real-ish/ok)."
         ),
     )
+    ap.add_argument(
+        "--reveal",
+        action="store_true",
+        help=(
+            "macOS: reveal screenshot files in Finder (uses `open -R`). "
+            "Reveals any files that are placeholders or real-ish mocks (i.e., the ones you should replace)."
+        ),
+    )
+    ap.add_argument(
+        "--open-guides",
+        action="store_true",
+        help="macOS: open the quick-run + shotlist + cheatsheet guides in the default app.",
+    )
     args = ap.parse_args()
 
     # Convenience: 'real screenshots' means neither placeholders nor known generated "real-ish" mocks.
@@ -265,6 +278,28 @@ def main() -> int:
         Path(args.report_md).write_text(out, encoding="utf-8")
 
     write_report_md()
+
+    # Optional helpers for a fast real-screenshot pass (macOS only).
+    if (args.reveal or args.open_guides) and shutil.which("open") is not None:
+        try:
+            if args.open_guides:
+                for rel in [
+                    "docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md",
+                    "docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md",
+                    "docs/screenshots/CAPTURE-CHEATSHEET.md",
+                ]:
+                    p = ROOT / rel
+                    if p.exists():
+                        subprocess.run(["open", str(p)], check=False)
+
+            if args.reveal:
+                # Reveal only the files that need replacement (placeholder or known real-ish).
+                for n in sorted(set(placeholders + realish)):
+                    p = TOP_DIR / n
+                    if p.exists():
+                        subprocess.run(["open", "-R", str(p)], check=False)
+        except Exception:
+            pass
 
     if args.json:
         payload = {

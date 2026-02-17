@@ -1,0 +1,62 @@
+{
+  "ok": false,
+  "missing": [],
+  "placeholders": [],
+  "realish": [
+    "docs/screenshots/01-menu.png",
+    "docs/screenshots/02-requests-pending.png",
+    "docs/screenshots/03-approved-row.png",
+    "docs/screenshots/04-audit-entry.png",
+    "docs/screenshots/05-reapproval-required.png",
+    "docs/screenshots/06-help-sidebar.png"
+  ],
+  "shotlist": [
+    "docs/screenshots/01-menu.png",
+    "docs/screenshots/02-requests-pending.png",
+    "docs/screenshots/03-approved-row.png",
+    "docs/screenshots/04-audit-entry.png",
+    "docs/screenshots/05-reapproval-required.png",
+    "docs/screenshots/06-help-sidebar.png"
+  ],
+  "needsAttention": [
+    "docs/screenshots/01-menu.png",
+    "docs/screenshots/02-requests-pending.png",
+    "docs/screenshots/03-approved-row.png",
+    "docs/screenshots/04-audit-entry.png",
+    "docs/screenshots/05-reapproval-required.png",
+    "docs/screenshots/06-help-sidebar.png"
+  ],
+  "info": {
+    "01-menu.png": {
+      "bytes": 49957,
+      "width": 1688,
+      "height": 1008
+    },
+    "02-requests-pending.png": {
+      "bytes": 56746,
+      "width": 1688,
+      "height": 1008
+    },
+    "03-approved-row.png": {
+      "bytes": 46600,
+      "width": 1688,
+      "height": 1008
+    },
+    "04-audit-entry.png": {
+      "bytes": 43533,
+      "width": 1688,
+      "height": 1008
+    },
+    "05-reapproval-required.png": {
+      "bytes": 92707,
+      "width": 1688,
+      "height": 1008
+    },
+    "06-help-sidebar.png": {
+      "bytes": 93921,
+      "width": 1688,
+      "height": 1008
+    }
+  },
+  "infoNote": "Pixel dimensions are best-effort (macOS uses `sips`)."
+}

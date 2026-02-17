@@ -79,20 +79,22 @@ Then run the pipeline below to validate + optimize + render the gallery.
 If you want a quick “what’s real vs placeholder” summary you can paste into an issue/PR:
 
 ```bash
-python3 scripts/check_screenshots.py --report-md docs/screenshots/SCREENSHOTS_REPORT.md
+python3 scripts/check_screenshots.py --report-md docs/screenshots/REAL_SCREENSHOTS_STATUS.md
 ```
 
 If you want a visual report with thumbnails (easier to sanity-check framing):
 
 ```bash
-python3 scripts/check_screenshots.py --report-html docs/screenshots/SCREENSHOTS_REPORT.html
+python3 scripts/check_screenshots.py --report-html docs/screenshots/REAL_SCREENSHOTS_STATUS.html
 ```
 
 If you want machine-readable output (nice for dashboards/automation):
 
 ```bash
-python3 scripts/check_screenshots.py --report-json docs/screenshots/SCREENSHOTS_REPORT.json
+python3 scripts/check_screenshots.py --report-json docs/screenshots/REAL_SCREENSHOTS_STATUS.json
 ```
+
+(Those `REAL_SCREENSHOTS_STATUS.*` paths are the repo’s canonical “latest” status outputs.)
 
 ## Install + verify (fast path)
 

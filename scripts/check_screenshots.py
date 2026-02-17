@@ -26,6 +26,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -147,6 +148,14 @@ def main() -> int:
         help=(
             "Write a Markdown status report to PATH (use '-' for stdout). "
             "Includes shotlist + current classification (missing/placeholder/real-ish/ok)."
+        ),
+    )
+    ap.add_argument(
+        "--report-html",
+        metavar="PATH",
+        help=(
+            "Write an HTML status report to PATH (use '-' for stdout). "
+            "Includes thumbnails + current classification (missing/placeholder/real-ish/ok)."
         ),
     )
     ap.add_argument(
@@ -356,6 +365,134 @@ def main() -> int:
         Path(args.report_md).write_text(out, encoding="utf-8")
 
     write_report_md()
+
+    def write_report_html() -> None:
+        if not args.report_html:
+            return
+
+        ok = (not missing) and (not placeholders) and (not realish)
+
+        def esc(s: str) -> str:
+            return (
+                s.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace('"', "&quot;")
+            )
+
+        missing_names = {Path(m).name for m in missing}
+
+        output_dir = (ROOT if args.report_html == "-" else Path(args.report_html).resolve().parent)
+
+        rows: list[str] = []
+        for name in NAMES:
+            status = "OK"
+            if name in missing_names:
+                status = "MISSING"
+            elif name in placeholders:
+                status = "PLACEHOLDER"
+            elif name in realish:
+                status = "REALISH"
+
+            v = info.get(name) or {}
+            b = v.get("bytes")
+            w = v.get("width")
+            h = v.get("height")
+            bs = f"{b}" if b is not None else "—"
+            px = f"{w}×{h}" if (w and h) else "—"
+
+            img_path = TOP_DIR / name
+            rel = os.path.relpath(str(img_path), str(output_dir))
+            if status != "MISSING":
+                img_cell = (
+                    f'<a href="{esc(rel)}" target="_blank">'
+                    f'<img src="{esc(rel)}" style="max-width: 320px; border: 1px solid #ddd;" />'
+                    f"</a>"
+                )
+            else:
+                img_cell = "(missing)"
+
+            rows.append(
+                "\n".join(
+                    [
+                        "<tr>",
+                        f"  <td><code>{esc(name)}</code></td>",
+                        f"  <td>{esc(status)}</td>",
+                        f"  <td style=\"text-align:right\">{esc(bs)}</td>",
+                        f"  <td style=\"text-align:right\">{esc(px)}</td>",
+                        f"  <td>{img_cell}</td>",
+                        "</tr>",
+                    ]
+                )
+            )
+
+        next_list = "".join([f"<li><code>{esc(p)}</code></li>" for p in needs_attention[:10]])
+        if ok:
+            next_block = ""
+        else:
+            next_block = (
+                "<h2>Next actions</h2>\n"
+                "<p>Replace these with true Google Sheets captures (not placeholders / not generated real-ish mocks).</p>\n"
+                f"<ul>{next_list}</ul>\n"
+                "<p>Suggested flow:</p>\n"
+                "<ol>\n"
+                "  <li>Read: <code>docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md</code></li>\n"
+                "  <li>Capture using: <code>docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md</code></li>\n"
+                "  <li>Install: <code>python3 scripts/install_real_screenshots.py --from ~/Desktop --check --optimize</code></li>\n"
+                "  <li>Gate: <code>python3 scripts/check_screenshots.py --require-real-screenshots</code></li>\n"
+                "</ol>\n"
+            )
+
+        html = "\n".join(
+            [
+                "<!doctype html>",
+                "<html>",
+                "<head>",
+                "  <meta charset=\"utf-8\" />",
+                "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />",
+                "  <title>Real screenshots status</title>",
+                "  <style>",
+                "    body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 20px; }",
+                "    code { background: #f6f8fa; padding: 2px 4px; border-radius: 4px; }",
+                "    table { border-collapse: collapse; width: 100%; }",
+                "    th, td { border: 1px solid #eee; padding: 8px; vertical-align: top; }",
+                "    th { background: #fafafa; text-align: left; }",
+                "    .ok { color: #116329; font-weight: 600; }",
+                "    .bad { color: #b62324; font-weight: 600; }",
+                "  </style>",
+                "</head>",
+                "<body>",
+                "  <h1>Real screenshots status</h1>",
+                f"  <p>Generated by <code>python3 scripts/check_screenshots.py --report-html {esc(args.report_html)}</code></p>",
+                f"  <p>Status: <span class=\"{ 'ok' if ok else 'bad' }\">{ 'OK' if ok else 'NEEDS WORK' }</span></p>",
+                next_block,
+                "  <h2>Files</h2>",
+                "  <table>",
+                "    <thead>",
+                "      <tr><th>File</th><th>Status</th><th>Bytes</th><th>Pixels</th><th>Preview</th></tr>",
+                "    </thead>",
+                "    <tbody>",
+                "\n".join(rows),
+                "    </tbody>",
+                "  </table>",
+                "  <h2>Guides</h2>",
+                "  <ul>",
+                "    <li><code>docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md</code></li>",
+                "    <li><code>docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md</code></li>",
+                "    <li><code>docs/screenshots/CAPTURE-CHEATSHEET.md</code></li>",
+                "  </ul>",
+                "</body>",
+                "</html>",
+                "",
+            ]
+        )
+
+        if args.report_html == "-":
+            print(html)
+            return
+        Path(args.report_html).write_text(html, encoding="utf-8")
+
+    write_report_html()
 
     def write_report_jaxon() -> None:
         if not args.report_jaxon:

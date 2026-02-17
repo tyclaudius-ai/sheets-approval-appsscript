@@ -91,12 +91,15 @@ In `Code.gs`:
 Rule of thumb: if `REAPPROVAL_TRACKED_HEADERS` is empty, **any non-exempt edit** triggers re-approval.
 
 ## Suggested screenshot set (for a listing / landing page)
-Use `SCREENSHOTS.md` as canonical, but the usual set is:
+Use `SCREENSHOTS.md` as canonical.
+
+Recommended 6-shot set (matches `docs/screenshots/01..06-*.png`):
 1. Approvals menu visible
 2. Requests sheet (pending)
 3. Approved outcome (Status/Approver/DecisionAt)
 4. Audit entry appended (hash visible)
-5. Edit approved row → revert to PENDING + audit event
+5. Edit approved row → revert to PENDING + `REAPPROVAL_REQUIRED`
+6. Help / Docs sidebar open
 
 If you’re not logged into Google on this machine, you can generate *real-ish* placeholders:
 

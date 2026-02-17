@@ -69,12 +69,18 @@ def main() -> int:
 
     ts = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%d-%H%M%SZ")
 
-    # 0) Always refresh the real-screenshots status report so the pack reflects current state.
+    # 0) Always refresh the real-screenshots status reports so the pack reflects current state.
     _run([
         "python3",
         "scripts/check_screenshots.py",
         "--report-md",
         "docs/screenshots/REAL_SCREENSHOTS_STATUS.md",
+    ])
+    _run([
+        "python3",
+        "scripts/check_screenshots.py",
+        "--report-html",
+        "docs/screenshots/REAL_SCREENSHOTS_STATUS.html",
     ])
 
     ss = _run_json([
@@ -191,7 +197,7 @@ def main() -> int:
                         "python3 scripts/make_marketplace_pack.py --require-real-screenshots",
                         "```",
                         "",
-                        "See: `docs/screenshots/REAL_SCREENSHOTS_STATUS.md` for details.",
+                        "See: `docs/screenshots/REAL_SCREENSHOTS_STATUS.md` (or `.html`) for details.",
                         "",
                     ]
                 ),

@@ -74,7 +74,7 @@ python3 scripts/install_real_screenshots.py --from AUTO --watch
 
 Then run the pipeline below to validate + optimize + render the gallery.
 
-## Optional: generate a status report (Markdown or HTML)
+## Optional: generate a status report (Markdown / HTML / JSON)
 
 If you want a quick “what’s real vs placeholder” summary you can paste into an issue/PR:
 
@@ -86,6 +86,12 @@ If you want a visual report with thumbnails (easier to sanity-check framing):
 
 ```bash
 python3 scripts/check_screenshots.py --report-html docs/screenshots/SCREENSHOTS_REPORT.html
+```
+
+If you want machine-readable output (nice for dashboards/automation):
+
+```bash
+python3 scripts/check_screenshots.py --report-json docs/screenshots/SCREENSHOTS_REPORT.json
 ```
 
 ## Install + verify (fast path)

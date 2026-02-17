@@ -159,6 +159,14 @@ def main() -> int:
         ),
     )
     ap.add_argument(
+        "--report-json",
+        metavar="PATH",
+        help=(
+            "Write a machine-readable JSON status report to PATH (use '-' for stdout). "
+            "Equivalent payload to --json, but doesn't suppress normal output unless you also pass --json."
+        ),
+    )
+    ap.add_argument(
         "--report-jaxon",
         metavar="PATH",
         help=(
@@ -555,8 +563,8 @@ def main() -> int:
         except Exception:
             pass
 
-    if args.json:
-        payload = {
+    def build_payload() -> dict:
+        return {
             "ok": not missing
             and not placeholders
             and (not args.fail_on_realish or not realish),
@@ -565,9 +573,23 @@ def main() -> int:
             "realish": [f"docs/screenshots/{n}" for n in realish],
             "shotlist": [f"docs/screenshots/{n}" for n in NAMES],
             "needsAttention": needs_attention,
-            "info": {k: {"bytes": v.get("bytes"), "width": v.get("width"), "height": v.get("height")} for k, v in info.items()},
+            "info": {
+                k: {"bytes": v.get("bytes"), "width": v.get("width"), "height": v.get("height")}
+                for k, v in info.items()
+            },
             "infoNote": "Pixel dimensions are best-effort (macOS uses `sips`).",
         }
+
+    if args.report_json:
+        payload = build_payload()
+        out = json.dumps(payload, indent=2) + "\n"
+        if args.report_json.strip() == "-":
+            print(out, end="")
+        else:
+            Path(args.report_json).write_text(out, encoding="utf-8")
+
+    if args.json:
+        payload = build_payload()
         print(json.dumps(payload, indent=2))
         if missing:
             return 3

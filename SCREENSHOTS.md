@@ -86,6 +86,13 @@ To verify you’re no longer using placeholders/mocks:
 python3 scripts/check_screenshots.py --require-real-screenshots
 ```
 
-If you want a one-click workflow for capture+install on macOS, use the bundled capture pack zip:
+If you want a one-click workflow for capture+install on macOS:
 
-- `dist/real-screenshots-capture-pack-DRAFT-latest.zip`
+- From the repo root, run:
+
+```bash
+./CAPTURE_MAC.command
+```
+
+- Or use the bundled capture pack zip:
+  - `dist/real-screenshots-capture-pack-DRAFT-latest.zip`

@@ -114,3 +114,9 @@ When you have real PNGs, overwrite `docs/screenshots/01..06-*.png` 1:1 and re-ru
 python3 scripts/screenshots_pipeline.py
 python3 scripts/check_screenshots.py --require-real-screenshots
 ```
+
+macOS fastest path (recommended):
+
+```bash
+./CAPTURE_MAC.command
+```

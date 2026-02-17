@@ -27,6 +27,7 @@ import json
 from pathlib import Path
 import subprocess
 import zipfile
+import shutil
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -217,6 +218,23 @@ def main() -> int:
                 if fp.name in {".DS_Store"}:
                     continue
                 z.write(fp, f"marketplace-pack/{fp.relative_to(ROOT)}")
+
+    # 3) Write stable "latest" pointers for convenience (easy upload scripts, etc.).
+    # Keep both DRAFT and non-draft latest names so callers can pin what they want.
+    def _write_latest(src: Path, latest_name: str) -> Path:
+        latest = DIST / latest_name
+        latest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, latest)
+        return latest
+
+    # Bundle + screenshots
+    _write_latest(bundle_path, "sheets-approval-appsscript-bundle-latest.zip")
+    _write_latest(screens_path, "screenshot-pack-latest.zip")
+
+    # Marketplace pack
+    _write_latest(out_path, "marketplace-pack-latest.zip")
+    if has_non_real and not args.require_real_screenshots:
+        _write_latest(out_path, "marketplace-pack-DRAFT-latest.zip")
 
     size_kb = out_path.stat().st_size / 1024.0
     print(f"Wrote: {out_path} ({size_kb:.1f} KB)")

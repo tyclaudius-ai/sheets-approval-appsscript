@@ -296,6 +296,30 @@ def main() -> int:
                 lines.append(f"- `docs/screenshots/{n}`")
             lines.append("")
 
+        # Always include a compact per-file status table (faster than scanning sections).
+        lines.append("## Files")
+        lines.append("")
+        lines.append("| File | Status | Bytes | Pixels |")
+        lines.append("|---|---|---:|---:|")
+        missing_names = {Path(m).name for m in missing}
+        for name in NAMES:
+            status = "OK"
+            if name in missing_names:
+                status = "MISSING"
+            elif name in placeholders:
+                status = "PLACEHOLDER"
+            elif name in realish:
+                status = "REALISH"
+
+            v = info.get(name) or {}
+            b = v.get("bytes")
+            w = v.get("width")
+            h = v.get("height")
+            bs = f"{b}" if b is not None else "—"
+            px = f"{w}×{h}" if (w and h) else "—"
+            lines.append(f"| `{name}` | {status} | {bs} | {px} |")
+        lines.append("")
+
         lines.append("## How to capture & install")
         lines.append("- Quick run: `docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md`")
         lines.append("- Shotlist + framing: `docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md`")

@@ -36,6 +36,17 @@ These match the known generated hashes in `docs/screenshots/realish-hashes.json`
 - `docs/screenshots/05-reapproval-required.png`
 - `docs/screenshots/06-help-sidebar.png`
 
+## Files
+
+| File | Status | Bytes | Pixels |
+|---|---|---:|---:|
+| `01-menu.png` | REALISH | 49957 | 1688×1008 |
+| `02-requests-pending.png` | REALISH | 56746 | 1688×1008 |
+| `03-approved-row.png` | REALISH | 46600 | 1688×1008 |
+| `04-audit-entry.png` | REALISH | 43533 | 1688×1008 |
+| `05-reapproval-required.png` | REALISH | 92707 | 1688×1008 |
+| `06-help-sidebar.png` | REALISH | 93921 | 1688×1008 |
+
 ## How to capture & install
 - Quick run: `docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md`
 - Shotlist + framing: `docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md`

@@ -92,6 +92,16 @@ This will:
 - refresh `docs/screenshots/STATUS.md`
 - re-render the HTML gallery
 
+## Optional: redact PII (blur account avatar/email)
+
+If your captures include account-identifying info (usually top-right), you can redact after install:
+
+```bash
+python3 scripts/redact_screenshots.py --preset sheets_account_topright --in docs/screenshots --inplace
+```
+
+See: `docs/screenshots/REDACTION.md`
+
 If you want an animated preview:
 
 ```bash

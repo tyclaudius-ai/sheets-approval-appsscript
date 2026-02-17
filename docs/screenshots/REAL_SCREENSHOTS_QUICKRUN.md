@@ -41,6 +41,19 @@ Expected output filenames:
 - `05-reapproval-required.png`
 - `06-help-sidebar.png`
 
+## Optional: one-click macOS runner (fastest)
+
+If you’re on macOS, you can double-click:
+
+- `CAPTURE_MAC.command` (repo root)
+
+It will:
+- open the checklist + shotlist
+- prompt you 6 times to capture each screenshot to your clipboard
+- install + verify + optimize + re-render the gallery
+
+If macOS warns about running a downloaded script, right-click → Open.
+
 ## Optional: guided capture + install (fastest, least error-prone)
 
 If you want to avoid hunting through a pile of Desktop screenshots, you can run the installer in **guided** mode.

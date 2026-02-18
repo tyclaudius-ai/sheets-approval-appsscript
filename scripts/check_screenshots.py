@@ -637,7 +637,7 @@ def main() -> int:
         ok_strict = (not missing) and (not placeholders) and (not realish) and dim_ok
         ok_by_flags = (
             (not missing)
-            and (not placeholders)
+            and (not args.fail_on_placeholders or not placeholders)
             and (not args.fail_on_realish or not realish)
             and (not args.fail_on_dim_mismatch or dim_ok)
         )

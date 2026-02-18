@@ -108,7 +108,29 @@ python3 scripts/check_screenshots.py --report-json docs/screenshots/REAL_SCREENS
 
 ## Install + verify (fast path)
 
-After capturing (usually they land on your Desktop), run:
+After capturing (usually they land on your Desktop), run **one command**:
+
+```bash
+python3 scripts/real_screenshots_quickrun.py
+```
+
+Optional pixel gate (recommended if you’ve ever had accidental zoom/crop drift):
+
+```bash
+python3 scripts/real_screenshots_quickrun.py --require-pixels 1688x1008 --fail-on-dim-mismatch
+```
+
+This will:
+- write fresh `REAL_SCREENSHOTS_STATUS.{md,html,json}`
+- rename/copy screenshots into `docs/screenshots/*.png`
+- verify they’re **not** placeholders or real-ish mocks
+- (optionally) enforce pixel dimensions
+- generate `docs/screenshots/optimized/*.jpg`
+- refresh `docs/screenshots/STATUS.md`
+- re-render the HTML gallery
+- open the status + gallery on macOS
+
+If you prefer the underlying pipeline call directly, this is the equivalent:
 
 ```bash
 python3 scripts/screenshots_pipeline.py \
@@ -121,13 +143,6 @@ python3 scripts/screenshots_pipeline.py \
   --render-gallery \
   --open-gallery
 ```
-
-This will:
-- rename/copy screenshots into `docs/screenshots/*.png`
-- verify they’re **not** placeholders or real-ish mocks
-- generate `docs/screenshots/optimized/*.jpg`
-- refresh `docs/screenshots/STATUS.md`
-- re-render the HTML gallery
 
 ## Optional: redact PII (blur account avatar/email)
 

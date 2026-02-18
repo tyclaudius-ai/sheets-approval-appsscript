@@ -82,7 +82,11 @@ Then run the pipeline below to validate + optimize + render the gallery.
 python3 scripts/screenshots_pipeline.py --check --require-pixels 1688x1008 --fail-on-dim-mismatch
 ```
 
-(Or call the underlying checker directly: `python3 scripts/check_screenshots.py --require-pixels 1688x1008 --fail-on-dim-mismatch`.)
+Or use the stricter “marketplace ready” gate (real screenshots + standard pixels) in one flag:
+
+```bash
+python3 scripts/check_screenshots.py --require-marketplace
+```
 
 ## Optional: generate a status report (Markdown / HTML / JSON)
 

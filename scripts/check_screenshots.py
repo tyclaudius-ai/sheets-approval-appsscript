@@ -120,6 +120,15 @@ def main() -> int:
         help="Convenience flag: equivalent to --fail-on-placeholders --fail-on-realish.",
     )
     ap.add_argument(
+        "--require-marketplace",
+        action="store_true",
+        help=(
+            "Stricter convenience gate for marketplace readiness: requires real screenshots (no placeholders/real-ish mocks) "
+            "AND enforces the standard pixel size (defaults to 1688x1008). Equivalent to: "
+            "--require-real-screenshots --require-pixels 1688x1008 --fail-on-dim-mismatch."
+        ),
+    )
+    ap.add_argument(
         "--json",
         action="store_true",
         help="Emit machine-readable JSON (still prints nothing else).",
@@ -217,6 +226,13 @@ def main() -> int:
             return (w, h)
         except Exception:
             return None
+
+    # Convenience: marketplace readiness gate.
+    if args.require_marketplace:
+        args.require_real_screenshots = True
+        if not args.require_pixels:
+            args.require_pixels = "1688x1008"
+        args.fail_on_dim_mismatch = True
 
     required_pixels = parse_pixels(args.require_pixels) if args.require_pixels else None
 

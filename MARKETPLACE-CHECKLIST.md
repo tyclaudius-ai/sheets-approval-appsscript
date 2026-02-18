@@ -42,6 +42,9 @@ python3 scripts/make_real_screenshot_capture_pack.py
 
 This generates a zip under `dist/real-screenshots-capture-pack-<ts>.zip` that you can hand to yourself/another machine/VA.
 
+It also writes a stable pointer you can always grab:
+- `dist/real-screenshots-capture-pack-DRAFT-latest.zip`
+
 After unzipping on the capture machine:
 
 ```bash
@@ -78,6 +81,11 @@ python3 scripts/make_marketplace_pack.py
 ```
 
 The marketplace pack is designed to be uploaded as the downloadable artifact.
+
+It also writes stable pointers:
+- `dist/marketplace-pack-latest.zip` (or `dist/marketplace-pack-DRAFT-latest.zip` when screenshots aren’t real)
+- `dist/bundle-latest.zip`
+- `dist/screenshot-pack-latest.zip`
 
 ## 4) Listing copy
 

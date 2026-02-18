@@ -441,6 +441,8 @@ def main() -> int:
             return
 
         ok = (not missing) and (not placeholders) and (not realish)
+        if required_pixels and (dim_unknown or dim_mismatch):
+            ok = False
 
         def esc(s: str) -> str:
             return (
@@ -569,6 +571,8 @@ def main() -> int:
             return
 
         ok = (not missing) and (not placeholders) and (not realish)
+        if required_pixels and (dim_unknown or dim_mismatch):
+            ok = False
         lines: list[str] = []
         lines.append("# Jaxon — Real screenshots next actions")
         lines.append("")

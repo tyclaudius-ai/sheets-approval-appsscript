@@ -97,6 +97,19 @@ def main() -> int:
             "  python3 scripts/install_real_screenshots.py --from AUTO --guided\n",
             file=sys.stderr,
         )
+
+        # On macOS, pop open the quickrun docs so the user can recover fast.
+        if is_macos():
+            quickrun_md = REPO_ROOT / "docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md"
+            shotlist_md = REPO_ROOT / "docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md"
+            cheatsheet_md = REPO_ROOT / "docs/screenshots/CAPTURE-CHEATSHEET.md"
+            for p in (quickrun_md, shotlist_md, cheatsheet_md):
+                if p.exists():
+                    try:
+                        run(["open", str(p)])
+                    except Exception:
+                        pass
+
         return e.returncode
 
     # 3) Validate that everything is truly REAL (not placeholder/real-ish) + (optionally) pixel dims

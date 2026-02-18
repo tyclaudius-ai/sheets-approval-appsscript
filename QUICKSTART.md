@@ -40,4 +40,4 @@ This creates:
 - Replace placeholder screenshots with real PNGs: `REAL_SCREENSHOTS_GUIDE.md`
 - Local preview of the landing page: `python3 scripts/serve_landing.py --open`
 
-If you want a talk-track style walkthrough, see `DEMO-TEMPLATE.md`.
+If you want a talk-track style walkthrough, see `DEMO.md` (or start at `START_HERE.md`).

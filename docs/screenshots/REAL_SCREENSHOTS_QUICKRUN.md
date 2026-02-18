@@ -27,6 +27,8 @@ If Google prompts for authorization, complete it once.
 - Sheets zoom (bottom-right): **100%**
 - Tight crops: no browser tabs / address bar / macOS menu bar
 - Wide enough that right-side columns like `Status`, `Approver`, `DecisionAt` are visible
+- Target pixel dimensions (recommended): **1688x1008**
+  - This repo’s current canonical placeholders are 1688×1008; matching dims makes it easier to compare framing and keeps Marketplace assets consistent.
 
 ## Shotlist
 
@@ -73,6 +75,14 @@ python3 scripts/install_real_screenshots.py --from AUTO --watch
 ```
 
 Then run the pipeline below to validate + optimize + render the gallery.
+
+## Optional: validate pixel dimensions (prevents accidental wrong zoom/crop)
+
+```bash
+python3 scripts/screenshots_pipeline.py --check --require-pixels 1688x1008 --fail-on-dim-mismatch
+```
+
+(Or call the underlying checker directly: `python3 scripts/check_screenshots.py --require-pixels 1688x1008 --fail-on-dim-mismatch`.)
 
 ## Optional: generate a status report (Markdown / HTML / JSON)
 

@@ -86,6 +86,15 @@ def main() -> int:
         help="Run scripts/check_screenshots.py to validate expected files exist.",
     )
     ap.add_argument(
+        "--require-pixels",
+        help="When used with --check, require exact pixel dimensions WxH (example: 1688x1008).",
+    )
+    ap.add_argument(
+        "--fail-on-dim-mismatch",
+        action="store_true",
+        help="When used with --require-pixels, exit non-zero if any screenshot does not match (or cannot be inspected).",
+    )
+    ap.add_argument(
         "--fail-on-placeholders",
         action="store_true",
         help="Fail if docs/screenshots/*.png are still placeholders.",
@@ -160,6 +169,8 @@ def main() -> int:
     if not (
         args.from_dir
         or args.check
+        or args.require_pixels
+        or args.fail_on_dim_mismatch
         or args.fail_on_placeholders
         or args.fail_on_realish
         or args.require_real_screenshots
@@ -189,12 +200,16 @@ def main() -> int:
             cmd.append("--open")
         run(cmd)
 
-    if args.check or args.fail_on_placeholders or args.fail_on_realish:
+    if args.check or args.require_pixels or args.fail_on_placeholders or args.fail_on_realish:
         cmd = [sys.executable, "scripts/check_screenshots.py"]
         if args.fail_on_placeholders:
             cmd.append("--fail-on-placeholders")
         if args.fail_on_realish:
             cmd.append("--fail-on-realish")
+        if args.require_pixels:
+            cmd += ["--require-pixels", args.require_pixels]
+            if args.fail_on_dim_mismatch:
+                cmd.append("--fail-on-dim-mismatch")
         run(cmd)
 
     if args.optimize:

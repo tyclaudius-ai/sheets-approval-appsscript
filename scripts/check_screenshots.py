@@ -634,11 +634,21 @@ def main() -> int:
         if required_pixels and (dim_unknown or dim_mismatch):
             dim_ok = False
 
-        return {
-            "ok": (not missing)
+        ok_strict = (not missing) and (not placeholders) and (not realish) and dim_ok
+        ok_by_flags = (
+            (not missing)
             and (not placeholders)
             and (not args.fail_on_realish or not realish)
-            and (not args.fail_on_dim_mismatch or dim_ok),
+            and (not args.fail_on_dim_mismatch or dim_ok)
+        )
+
+        return {
+            # Strict truth: are the listing screenshots fully ready (no placeholders, no known generated mocks,
+            # and pixel dimensions match if required)?
+            "ok": ok_strict,
+            # Back-compat / diagnostics: reflects whether the current invocation would consider the state OK
+            # given fail-on flags.
+            "okByFlags": ok_by_flags,
             "missing": missing,
             "placeholders": [f"docs/screenshots/{n}" for n in placeholders],
             "realish": [f"docs/screenshots/{n}" for n in realish],

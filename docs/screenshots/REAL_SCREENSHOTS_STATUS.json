@@ -1,5 +1,6 @@
 {
   "ok": false,
+  "okByFlags": true,
   "missing": [],
   "placeholders": [],
   "realish": [
@@ -10,6 +11,9 @@
     "docs/screenshots/05-reapproval-required.png",
     "docs/screenshots/06-help-sidebar.png"
   ],
+  "requiredPixels": "1688x1008",
+  "dimUnknown": [],
+  "dimMismatch": [],
   "shotlist": [
     "docs/screenshots/01-menu.png",
     "docs/screenshots/02-requests-pending.png",

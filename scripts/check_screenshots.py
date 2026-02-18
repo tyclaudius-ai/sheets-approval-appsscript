@@ -130,6 +130,19 @@ def main() -> int:
         help="Print file size + best-effort pixel dimensions for each screenshot (uses macOS `sips` if available).",
     )
     ap.add_argument(
+        "--require-pixels",
+        metavar="WxH",
+        help=(
+            "Optional: require all screenshots to match an exact pixel size (e.g., 1280x800). "
+            "When set, the JSON/report outputs include mismatches, and --fail-on-dim-mismatch can gate CI."
+        ),
+    )
+    ap.add_argument(
+        "--fail-on-dim-mismatch",
+        action="store_true",
+        help="Exit non-zero (5) if any screenshot does not match --require-pixels (or dimensions cannot be determined).",
+    )
+    ap.add_argument(
         "--shotlist",
         action="store_true",
         help="Print the required screenshot filenames as a capture checklist (useful before doing a real screenshot pass).",
@@ -189,6 +202,24 @@ def main() -> int:
     )
     args = ap.parse_args()
 
+    def parse_pixels(s: str) -> tuple[int, int] | None:
+        s = (s or "").strip().lower().replace(" ", "")
+        if not s:
+            return None
+        if "x" not in s:
+            return None
+        a, b = s.split("x", 1)
+        try:
+            w = int(a)
+            h = int(b)
+            if w <= 0 or h <= 0:
+                return None
+            return (w, h)
+        except Exception:
+            return None
+
+    required_pixels = parse_pixels(args.require_pixels) if args.require_pixels else None
+
     # Convenience: 'real screenshots' means neither placeholders nor known generated "real-ish" mocks.
     if args.require_real_screenshots:
         args.fail_on_placeholders = True
@@ -207,6 +238,9 @@ def main() -> int:
     missing: list[str] = []
     placeholders: list[str] = []
     realish: list[str] = []
+
+    dim_mismatch: list[str] = []
+    dim_unknown: list[str] = []
 
     info: dict[str, dict[str, int | None]] = {}
 
@@ -236,14 +270,23 @@ def main() -> int:
             except Exception:
                 size = None
             info[name] = {"bytes": size, "width": w, "height": h}
+
+            if required_pixels:
+                rw, rh = required_pixels
+                if w is None or h is None:
+                    dim_unknown.append(name)
+                elif w != rw or h != rh:
+                    dim_mismatch.append(name)
         except OSError:
             missing.append(name)
 
     needs_attention: list[str] = []
-    # Order: missing first (must exist), then placeholders, then known real-ish mocks.
+    # Order: missing first (must exist), then placeholders, then known real-ish mocks, then pixel-dimension mismatches.
     needs_attention += [f"docs/screenshots/{Path(m).name}" for m in missing]
     needs_attention += [f"docs/screenshots/{n}" for n in placeholders]
     needs_attention += [f"docs/screenshots/{n}" for n in realish]
+    needs_attention += [f"docs/screenshots/{n}" for n in dim_unknown]
+    needs_attention += [f"docs/screenshots/{n}" for n in dim_mismatch]
 
     def print_next() -> None:
         if not args.next or args.json:
@@ -268,9 +311,11 @@ def main() -> int:
         if not args.report_md:
             return
 
-        # For the Markdown report, treat any missing/placeholder/real-ish as "needs work".
+        # For the Markdown report, treat any missing/placeholder/real-ish/dimension mismatch as "needs work".
         # (CLI exit codes may still be gated by --fail-on-* flags.)
         ok = (not missing) and (not placeholders) and (not realish)
+        if required_pixels and (dim_unknown or dim_mismatch):
+            ok = False
 
         lines: list[str] = []
         lines.append("# Real screenshots status")
@@ -319,6 +364,23 @@ def main() -> int:
             )
             for n in realish:
                 lines.append(f"- `docs/screenshots/{n}`")
+            lines.append("")
+
+        if required_pixels and (dim_unknown or dim_mismatch):
+            lines.append("## Pixel dimension mismatches")
+            lines.append(f"Required: `{required_pixels[0]}x{required_pixels[1]}`")
+            if dim_unknown:
+                lines.append("### Unknown pixel dimensions")
+                for n in dim_unknown:
+                    lines.append(f"- `docs/screenshots/{n}`")
+            if dim_mismatch:
+                lines.append("### Mismatched pixels")
+                for n in dim_mismatch:
+                    v = info.get(n) or {}
+                    w = v.get("width")
+                    h = v.get("height")
+                    got = f"{w}×{h}" if (w and h) else "(unknown)"
+                    lines.append(f"- `docs/screenshots/{n}` (got {got})")
             lines.append("")
 
         # Always include a compact per-file status table (faster than scanning sections).
@@ -564,13 +626,21 @@ def main() -> int:
             pass
 
     def build_payload() -> dict:
+        dim_ok = True
+        if required_pixels and (dim_unknown or dim_mismatch):
+            dim_ok = False
+
         return {
-            "ok": not missing
-            and not placeholders
-            and (not args.fail_on_realish or not realish),
+            "ok": (not missing)
+            and (not placeholders)
+            and (not args.fail_on_realish or not realish)
+            and (not args.fail_on_dim_mismatch or dim_ok),
             "missing": missing,
             "placeholders": [f"docs/screenshots/{n}" for n in placeholders],
             "realish": [f"docs/screenshots/{n}" for n in realish],
+            "requiredPixels": (f"{required_pixels[0]}x{required_pixels[1]}" if required_pixels else None),
+            "dimUnknown": [f"docs/screenshots/{n}" for n in dim_unknown],
+            "dimMismatch": [f"docs/screenshots/{n}" for n in dim_mismatch],
             "shotlist": [f"docs/screenshots/{n}" for n in NAMES],
             "needsAttention": needs_attention,
             "info": {
@@ -597,6 +667,8 @@ def main() -> int:
             return 2
         if realish and args.fail_on_realish:
             return 4
+        if (dim_unknown or dim_mismatch) and args.fail_on_dim_mismatch:
+            return 5
         return 0
 
     if args.show_info and not missing:
@@ -648,6 +720,21 @@ def main() -> int:
         if args.fail_on_realish:
             return 4
         return 0
+
+    if required_pixels and (dim_unknown or dim_mismatch):
+        rp = f"{required_pixels[0]}×{required_pixels[1]}"
+        if dim_unknown:
+            print(f"[screenshots] WARNING — could not determine pixel dimensions for: {', '.join(dim_unknown)} (required {rp})")
+        if dim_mismatch:
+            print(f"[screenshots] WARNING — pixel dimension mismatch (required {rp}):")
+            for n in dim_mismatch:
+                v = info.get(n) or {}
+                w = v.get("width")
+                h = v.get("height")
+                got = f"{w}×{h}" if (w and h) else "(unknown)"
+                print(f"  - docs/screenshots/{n} (got {got})")
+        if args.fail_on_dim_mismatch:
+            return 5
 
     print("[screenshots] OK — screenshots are not placeholders (and do not match known real-ish mocks).")
     return 0

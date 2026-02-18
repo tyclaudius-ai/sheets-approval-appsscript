@@ -18,7 +18,7 @@ fi
 echo "[capture] Clipboard capture mode (fastest):"
 echo "  Use Cmd+Ctrl+Shift+4 to capture to clipboard (not file)."
 echo "  This will prompt you 6 times and write into docs/screenshots/*.png"
-python3 scripts/capture_clipboard_shotlist.py --target-dir docs/screenshots
+python3 scripts/capture_clipboard_shotlist.py --target-dir docs/screenshots --redact-preset sheets_account_topright_large
 
 echo "[capture] Verifying + optimizing…"
 python3 scripts/screenshots_pipeline.py \

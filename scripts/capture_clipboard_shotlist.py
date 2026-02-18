@@ -19,6 +19,9 @@ Usage:
   python3 scripts/capture_clipboard_shotlist.py
   python3 scripts/capture_clipboard_shotlist.py --all
   python3 scripts/capture_clipboard_shotlist.py --target-dir docs/screenshots
+
+  # Optional: auto-redact the Google account area after each capture
+  python3 scripts/capture_clipboard_shotlist.py --redact-preset sheets_account_topright_large
 """
 
 from __future__ import annotations
@@ -178,6 +181,14 @@ def main() -> int:
         default=50_000,
         help="Reject captures smaller than this many bytes (default: 50000)",
     )
+    ap.add_argument(
+        "--redact-preset",
+        default=None,
+        help=(
+            "Optional: immediately redact each captured screenshot in-place using "
+            "scripts/redact_screenshots.py. Example: sheets_account_topright_large"
+        ),
+    )
     args = ap.parse_args()
 
     target_dir = ROOT / args.target_dir
@@ -245,6 +256,28 @@ def main() -> int:
             # Atomic-ish replace
             tmp.replace(out_path)
             print(f"  Saved {rel} ({size} bytes)")
+
+            if args.redact_preset:
+                try:
+                    subprocess.run(
+                        [
+                            sys.executable,
+                            "scripts/redact_screenshots.py",
+                            "--preset",
+                            args.redact_preset,
+                            "--in",
+                            str(target_dir),
+                            "--inplace",
+                            "--only",
+                            str(out_path.relative_to(target_dir)),
+                        ],
+                        cwd=str(ROOT),
+                        check=True,
+                    )
+                    print(f"  Redacted in-place (preset={args.redact_preset}).")
+                except Exception as e:
+                    print(f"  WARNING: redaction failed ({e}). Keeping unredacted capture.")
+
             break
 
         # give the user a breath between shots

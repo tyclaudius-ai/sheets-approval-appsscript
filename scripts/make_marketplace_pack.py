@@ -142,6 +142,7 @@ def main() -> int:
         "TROUBLESHOOTING.md",
         "UNINSTALL.md",
         "TEMPLATE-INSTRUCTIONS.md",
+        "CHANGELOG.md",
 
         # product + delivery docs
         "CLIENT-HANDOFF.md",

@@ -1,46 +1,66 @@
 # Jaxon: capture REAL screenshots (10 minutes)
 
-Goal: replace the current **“real-ish” generated** PNGs in `docs/screenshots/` with **real Google Sheets screenshots** (same filenames).
+Goal: replace the current **REALISH (generated)** PNGs in `docs/screenshots/` with **real Google Sheets screenshots** (same filenames).
 
-When you’re done, `docs/screenshots/REAL_SCREENSHOTS_STATUS.md` should **NOT** list “Real-ish generated screenshots detected”.
+Success criteria:
+- `docs/screenshots/REAL_SCREENSHOTS_STATUS.md` shows **Status: ✅ OK**
+- It does **not** list “Real-ish generated screenshots detected”.
 
-## 1) Use the capture pack (recommended)
-Fast path:
+## Option A (recommended): use the capture pack (fastest)
 
-- Use the latest zip already built in `dist/`:
+1) Unzip the latest capture pack:
 
 ```bash
 cd sheets-approval-appsscript
 open dist/real-screenshots-capture-pack-DRAFT-latest.zip
 ```
 
-Unzip it, then **double-click `CAPTURE_MAC.command`**.
+2) In the unzipped folder, double-click:
+- `CAPTURE_MAC.command`
 
 It will:
-- open the shotlist/checklist
-- wait for 6 NEW screenshots (Desktop)
-- install + validate + optimize them
+- open the shotlist + framing cheatsheet
+- wait for **6 new screenshots** to appear on your **Desktop**
+- install them into `docs/screenshots/`
+- run validation + generate the status reports + optimize
 
-(Alternative: you can regenerate the pack any time via `python3 scripts/make_real_screenshot_capture_pack.py`.)
-
-## 2) In Google Sheets, open the demo template
-- Use the repo’s demo/template sheet (the one used for screenshots).
-- Run the custom menu item to create/populate demo rows if needed.
-
-Tip: maximize the browser window; keep zoom consistent across shots.
-
-Even easier capture method (no Desktop file juggling):
-- Use **Cmd+Ctrl+Shift+4** (screenshot → clipboard)
-- Then from the unzipped capture pack folder run:
+If you prefer, you can regenerate the pack any time:
 
 ```bash
-python3 -m pip install -r scripts/requirements.txt
-python3 scripts/capture_clipboard_shotlist.py --target-dir docs/screenshots --require-pixels 1688x1008
-python3 scripts/screenshots_pipeline.py --check --require-real-screenshots --optimize --width 1400 --status --render-gallery
+python3 scripts/make_real_screenshot_capture_pack.py
 ```
 
-## 3) Capture these 6 shots (exact filenames)
-Save each capture to **Desktop** with these exact names:
+## Option B: clipboard capture (avoids Desktop renaming)
+
+Use macOS screenshot-to-clipboard:
+- Press **Cmd+Ctrl+Shift+4** (selection → clipboard)
+
+Then run the guided shotlist capture:
+
+```bash
+cd sheets-approval-appsscript
+python3 -m pip install -r scripts/requirements.txt
+python3 scripts/capture_clipboard_shotlist.py \
+  --target-dir docs/screenshots \
+  --require-pixels 1688x1008
+```
+
+Finish with the pipeline:
+
+```bash
+python3 scripts/screenshots_pipeline.py \
+  --check \
+  --require-real-screenshots \
+  --fail-on-placeholders \
+  --fail-on-realish \
+  --status \
+  --render-gallery \
+  --optimize
+```
+
+## Shotlist (must match EXACT filenames)
+
+You need these 6 files (exact names):
 
 - `01-menu.png`
 - `02-requests-pending.png`
@@ -49,32 +69,21 @@ Save each capture to **Desktop** with these exact names:
 - `05-reapproval-required.png`
 - `06-help-sidebar.png`
 
-Framing reference:
+Framing references:
 - Shotlist: `docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md`
 - Cheatsheet: `docs/screenshots/CAPTURE-CHEATSHEET.md`
 
-## 4) Install + validate + optimize
-From repo root:
+Tip: maximize the browser window and keep zoom consistent across all 6 shots.
+
+## Sanity: build the marketplace pack
+
+Once status is ✅ OK:
 
 ```bash
 cd sheets-approval-appsscript
-python3 scripts/screenshots_pipeline.py \
-  --from ~/Desktop \
-  --check \
-  --min-bytes 50000 \
-  --fail-on-placeholders \
-  --fail-on-realish \
-  --status \
-  --render-gallery \
-  --optimize
-```
-
-If this passes, the repo is now listing-ready.
-
-## 5) Build the marketplace pack (sanity)
-
-```bash
 python3 scripts/make_marketplace_pack.py --require-real-screenshots
 ```
 
-If it fails, open `docs/screenshots/REAL_SCREENSHOTS_STATUS.md` and it will tell you exactly what’s wrong.
+If anything fails, open:
+- `docs/screenshots/REAL_SCREENSHOTS_STATUS.md`
+- `docs/screenshots/REAL_SCREENSHOTS_STATUS.html` (thumbnail view)

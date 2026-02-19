@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-19T08:46:43Z",
+  "generatedAt": "2026-02-19T09:00:59Z",
   "ok": false,
   "okByFlags": true,
   "missing": [],
@@ -12,7 +12,7 @@
     "docs/screenshots/05-reapproval-required.png",
     "docs/screenshots/06-help-sidebar.png"
   ],
-  "requiredPixels": "1688x1008",
+  "requiredPixels": null,
   "dimUnknown": [],
   "dimMismatch": [],
   "shotlist": [

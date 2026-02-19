@@ -57,6 +57,7 @@ def main() -> int:
 
     md.append("\n## Capturing real screenshots\n\n")
     md.append("Fast path (10 minutes): [`REAL_SCREENSHOTS_QUICKRUN.md`](./REAL_SCREENSHOTS_QUICKRUN.md)\n\n")
+    md.append("Jaxon-specific (copy/paste commands): [`JAXON_REAL_SCREENSHOTS_10MIN.md`](./JAXON_REAL_SCREENSHOTS_10MIN.md)\n\n")
     md.append("Full guide: [`REAL_SCREENSHOTS_GUIDE.md`](../../REAL_SCREENSHOTS_GUIDE.md)\n\n")
     md.append(
         "If you want a “handoff bundle” to send to whoever will do the capture, you can build a small zip with the shotlist + install/check scripts:\n\n"
@@ -185,6 +186,54 @@ def main() -> int:
     OUT_DECK.write_text("".join(deck), encoding="utf-8")
 
     # capture-checklist.html (printable checklist + thumbnails)
+    #
+    # If REAL_SCREENSHOTS_STATUS.json exists, embed a static status badge per image
+    # so the checklist doubles as a "what's still broken" dashboard.
+    status = None
+    status_path = SHOT_DIR / "REAL_SCREENSHOTS_STATUS.json"
+    if status_path.exists():
+        try:
+            status = json.loads(status_path.read_text(encoding="utf-8"))
+        except Exception:
+            status = None
+
+    def _status_for_file(filename: str) -> tuple[str, str]:
+        """Return (label, cssClass)."""
+        if not status:
+            return ("", "")
+        # Status JSON stores full paths like docs/screenshots/01-menu.png
+        fp = f"docs/screenshots/{filename}"
+        if fp in set(status.get("missing", [])):
+            return ("MISSING", "st-missing")
+        if fp in set(status.get("placeholders", [])):
+            return ("PLACEHOLDER", "st-placeholder")
+        if fp in set(status.get("dimMismatch", [])):
+            return ("DIM MISMATCH", "st-dim")
+        if fp in set(status.get("dimUnknown", [])):
+            return ("DIM UNKNOWN", "st-dim")
+        if fp in set(status.get("realish", [])):
+            return ("REALISH (VERIFY)", "st-realish")
+        # If it exists in shotlist and isn't flagged, treat as OK.
+        if fp in set(status.get("shotlist", [])):
+            return ("OK", "st-ok")
+        return ("", "")
+
+    def _meta_for_file(filename: str) -> str:
+        if not status:
+            return ""
+        info = (status.get("info") or {}).get(filename)
+        if not info:
+            return ""
+        w = info.get("width")
+        h = info.get("height")
+        b = info.get("bytes")
+        parts = []
+        if w and h:
+            parts.append(f"{w}×{h}")
+        if b:
+            parts.append(f"{b:,} bytes")
+        return " — ".join(parts)
+
     cap = []
     cap.append("<!doctype html>\n")
     cap.append('<html lang="en">\n')
@@ -193,13 +242,20 @@ def main() -> int:
     cap.append("  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/>\n")
     cap.append(f"  <title>{html.escape(title)} — Capture checklist</title>\n")
     cap.append("  <style>\n")
-    cap.append("    :root{--max:1100px;--border:#e5e7eb;--muted:#6b7280}\n")
-    cap.append("    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;line-height:1.35;margin:24px;background:#fff;color:#111827}\n")
+    cap.append("    :root{--max:1100px;--border:#e5e7eb;--muted:#6b7280;--bg:#fff}\n")
+    cap.append("    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;line-height:1.35;margin:24px;background:var(--bg);color:#111827}\n")
     cap.append("    header{max-width:var(--max);margin:0 auto 18px}\n")
     cap.append("    h1{margin:0 0 6px;font-size:26px}\n")
     cap.append("    .sub{color:var(--muted);font-size:14px}\n")
     cap.append("    .links{margin-top:10px;font-size:14px}\n")
     cap.append("    .links a{margin-right:12px}\n")
+    cap.append("    .summary{margin-top:10px;font-size:13px;color:#374151}\n")
+    cap.append("    .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;margin-left:8px;border:1px solid var(--border)}\n")
+    cap.append("    .st-ok{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}\n")
+    cap.append("    .st-realish{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}\n")
+    cap.append("    .st-placeholder{background:#fef3c7;border-color:#fde68a;color:#92400e}\n")
+    cap.append("    .st-missing{background:#fee2e2;border-color:#fecaca;color:#991b1b}\n")
+    cap.append("    .st-dim{background:#f3e8ff;border-color:#e9d5ff;color:#6b21a8}\n")
     cap.append("    .item{max-width:var(--max);margin:16px auto;padding:14px;border:1px solid var(--border);border-radius:12px}\n")
     cap.append("    .row{display:flex;gap:16px;align-items:flex-start}\n")
     cap.append("    .thumb{width:44%;min-width:320px}\n")
@@ -207,6 +263,7 @@ def main() -> int:
     cap.append("    .meta{flex:1}\n")
     cap.append("    .meta h2{margin:0 0 6px;font-size:18px}\n")
     cap.append("    .file{color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px}\n")
+    cap.append("    .meta2{color:var(--muted);font-size:12px;margin-top:6px}\n")
     cap.append("    .cap{margin-top:8px;color:#374151}\n")
     cap.append("    .check{margin-top:10px;font-size:14px}\n")
     cap.append("    .check input{transform:scale(1.15);margin-right:8px}\n")
@@ -215,6 +272,7 @@ def main() -> int:
     cap.append("      header{padding:16px 16px 0}\n")
     cap.append("      .item{border:none;border-radius:0;page-break-inside:avoid;break-inside:avoid;padding:12px 16px}\n")
     cap.append("      a{color:#111827;text-decoration:none}\n")
+    cap.append("      .pill{border:1px solid #d1d5db}\n")
     cap.append("    }\n")
     cap.append("  </style>\n")
     cap.append("</head>\n")
@@ -230,6 +288,12 @@ def main() -> int:
     cap.append("<a href=\"gallery.html\">gallery</a>")
     cap.append("<a href=\"deck.html\">deck</a>\n")
     cap.append("    </div>\n")
+    if status:
+        gen = status.get("generatedAt") or ""
+        ok = status.get("ok")
+        cap.append("    <div class=\"summary\">\n")
+        cap.append(f"      Status snapshot: <code>{html.escape(gen)}</code> — <b>{'OK' if ok else 'NEEDS ATTENTION'}</b>.\n")
+        cap.append("    </div>\n")
     cap.append("  </header>\n")
 
     for idx, it in enumerate(items, start=1):
@@ -238,18 +302,27 @@ def main() -> int:
         caption = (it.get("caption") or "").strip()
         item_id = it.get("id", "")
 
+        label, css = _status_for_file(file)
+        meta2 = _meta_for_file(file)
+
         cap.append("  <section class=\"item\">\n")
         cap.append("    <div class=\"row\">\n")
         cap.append("      <div class=\"thumb\">\n")
         cap.append(f"        <img src=\"{html.escape(file)}\" alt=\"{html.escape(item_id or 'screenshot')}\"/>\n")
         cap.append("      </div>\n")
         cap.append("      <div class=\"meta\">\n")
-        cap.append(f"        <h2>{idx:02d} — {html.escape(heading)}</h2>\n")
+        cap.append("        <div>")
+        cap.append(f"<h2 style=\"display:inline\">{idx:02d} — {html.escape(heading)}</h2>")
+        if label:
+            cap.append(f"<span class=\"pill {css}\">{html.escape(label)}</span>")
+        cap.append("</div>\n")
         cap.append(f"        <div class=\"file\">Expected filename: {html.escape(file)}</div>\n")
+        if meta2:
+            cap.append(f"        <div class=\"meta2\">{html.escape(meta2)}</div>\n")
         if caption:
             cap.append(f"        <div class=\"cap\">{html.escape(caption)}</div>\n")
         cap.append("        <div class=\"check\">\n")
-        cap.append(f"          <label><input type=\"checkbox\"/>Captured (real)</label>\n")
+        cap.append("          <label><input type=\"checkbox\"/>Captured (real)</label>\n")
         cap.append("        </div>\n")
         cap.append("      </div>\n")
         cap.append("    </div>\n")

@@ -47,6 +47,7 @@ In-sheet Help sidebar for quick onboarding and usage.
 ## Capturing real screenshots
 
 Fast path (10 minutes): [`REAL_SCREENSHOTS_QUICKRUN.md`](./REAL_SCREENSHOTS_QUICKRUN.md)
+
 Jaxon-specific (copy/paste commands): [`JAXON_REAL_SCREENSHOTS_10MIN.md`](./JAXON_REAL_SCREENSHOTS_10MIN.md)
 
 Full guide: [`REAL_SCREENSHOTS_GUIDE.md`](../../REAL_SCREENSHOTS_GUIDE.md)

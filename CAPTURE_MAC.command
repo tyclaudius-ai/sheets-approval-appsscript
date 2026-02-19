@@ -18,7 +18,10 @@ fi
 echo "[capture] Clipboard capture mode (fastest):"
 echo "  Use Cmd+Ctrl+Shift+4 to capture to clipboard (not file)."
 echo "  This will prompt you 6 times and write into docs/screenshots/*.png"
-python3 scripts/capture_clipboard_shotlist.py --target-dir docs/screenshots --redact-preset sheets_account_topright_large
+python3 scripts/capture_clipboard_shotlist.py \
+  --target-dir docs/screenshots \
+  --require-pixels 1688x1008 \
+  --redact-preset sheets_account_topright_large
 
 echo "[capture] Verifying + optimizing…"
 python3 scripts/screenshots_pipeline.py \
@@ -32,6 +35,7 @@ python3 scripts/screenshots_pipeline.py \
 echo "[capture] Done. Opening the gallery to sanity-check results…"
 if command -v open >/dev/null 2>&1; then
   open "docs/screenshots/gallery.html" || true
+  open "docs/screenshots/REAL_SCREENSHOTS_STATUS.html" || true
 fi
 
 echo "[capture] If you want to re-run verification later:"

@@ -608,13 +608,24 @@ def main() -> int:
             lines.append("Nothing needed — all 6 listing screenshots look like real captures.")
         else:
             lines.append("## Do this")
-            lines.append("1) Run the guided capture pack (fastest):")
+            lines.append("Target time: ~10 minutes (once the Apps Script authorization is already done).")
+            if required_pixels:
+                lines.append(f"Screenshot size gate: **{required_pixels[0]}×{required_pixels[1]}** pixels.")
+            else:
+                lines.append("Recommended size: **1688×1008** pixels (consistent marketplace framing).")
+            lines.append("")
+            lines.append("1) Fastest: run the guided capture pack")
             lines.append("   - Double-click: `CAPTURE_MAC.command` (repo root)")
-            lines.append("2) Or manual flow:")
+            lines.append("2) Manual flow")
             lines.append("   - Read: `docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md`")
             lines.append("   - Capture: `docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md`")
-            lines.append("   - Install: `python3 scripts/install_real_screenshots.py --from ~/Desktop --check --optimize`")
-            lines.append("   - Verify gate: `python3 scripts/check_screenshots.py --require-real-screenshots`")
+            lines.append("   - Install+optimize: `python3 scripts/install_real_screenshots.py --from ~/Desktop --check --optimize`")
+            lines.append("   - Gate: `python3 scripts/check_screenshots.py --require-real-screenshots`")
+            lines.append("")
+            lines.append("Optional 1-command pipeline (install → gate → optimize → render gallery):")
+            lines.append("```bash")
+            lines.append("python3 scripts/screenshots_pipeline.py --from ~/Desktop --check --require-real-screenshots --optimize --width 1400 --render-gallery")
+            lines.append("```")
             lines.append("")
 
             lines.append("## Files to replace")

@@ -32,12 +32,19 @@ This creates:
 ## 5) Try “re-approval required after change”
 1. Approve a row
 2. Edit a meaningful cell (e.g., `Title`)
-3. The row auto-reverts to `PENDING`
-4. The `Audit` tab logs a `REAPPROVAL_REQUIRED` event
+
+Expected (default config):
+- The row auto-reverts to `PENDING`
+- The `Audit` tab logs a `REAPPROVAL_REQUIRED` event
+
+If it doesn’t revert automatically:
+- Some Google Workspace domains restrict simple triggers.
+- Run **Approvals → Install re-approval trigger (optional)** and edit again.
 
 ## Next: real screenshots / landing page
 - Suggested screenshots checklist: `SCREENSHOTS.md`
-- Replace placeholder screenshots with real PNGs: `REAL_SCREENSHOTS_GUIDE.md`
+- Screenshot set + capture checklist + gallery: `docs/screenshots/README.md`
+- Replace placeholder screenshots with real PNGs: `REAL_SCREENSHOTS_GUIDE.md` (fastest path: `docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md`)
 - Local preview of the landing page: `python3 scripts/serve_landing.py --open`
 
 If you want a talk-track style walkthrough, see `DEMO.md` (or start at `START_HERE.md`).

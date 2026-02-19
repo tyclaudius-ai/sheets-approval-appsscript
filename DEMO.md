@@ -101,6 +101,9 @@ Recommended 6-shot set (matches `docs/screenshots/01..06-*.png`):
 5. Edit approved row → revert to PENDING + `REAPPROVAL_REQUIRED`
 6. Help / Docs sidebar open
 
+For the capture checklist + deck view, see `docs/screenshots/README.md` (includes `capture-checklist.html` + `deck.html`).
+Fastest capture path: `docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md` (or on macOS: `./CAPTURE_MAC.command`).
+
 If you’re not logged into Google on this machine, you can generate *real-ish* placeholders:
 
 ```bash

@@ -29,6 +29,7 @@ import json
 import os
 import shutil
 import subprocess
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -597,6 +598,9 @@ def main() -> int:
             "and is meant to be copy/pasted into chat."
         )
         lines.append("")
+        generated_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+        lines.append(f"Generated: {generated_at}")
+        lines.append("")
         lines.append(f"Status: {'OK' if ok else 'NEEDS REAL SCREENSHOTS'}")
         lines.append("")
 
@@ -658,7 +662,10 @@ def main() -> int:
             and (not args.fail_on_dim_mismatch or dim_ok)
         )
 
+        generated_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
         return {
+            "generatedAt": generated_at,
             # Strict truth: are the listing screenshots fully ready (no placeholders, no known generated mocks,
             # and pixel dimensions match if required)?
             "ok": ok_strict,

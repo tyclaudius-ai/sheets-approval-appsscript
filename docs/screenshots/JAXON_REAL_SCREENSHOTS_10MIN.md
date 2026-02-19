@@ -35,7 +35,7 @@ Even easier capture method (no Desktop file juggling):
 
 ```bash
 python3 -m pip install -r scripts/requirements.txt
-python3 scripts/capture_clipboard_shotlist.py --target-dir docs/screenshots
+python3 scripts/capture_clipboard_shotlist.py --target-dir docs/screenshots --require-pixels 1688x1008
 python3 scripts/screenshots_pipeline.py --check --require-real-screenshots --optimize --width 1400 --status --render-gallery
 ```
 

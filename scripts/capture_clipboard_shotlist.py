@@ -153,6 +153,29 @@ close access outFile
     subprocess.run(["osascript", "-e", script], check=True)
 
 
+def _get_pixels_sips(path: Path) -> tuple[int | None, int | None]:
+    """Return (width, height) using macOS 'sips'."""
+
+    try:
+        p = subprocess.run(
+            ["sips", "-g", "pixelWidth", "-g", "pixelHeight", str(path)],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        w: int | None = None
+        h: int | None = None
+        for line in p.stdout.splitlines():
+            line = line.strip()
+            if line.startswith("pixelWidth:"):
+                w = int(line.split(":", 1)[1].strip())
+            if line.startswith("pixelHeight:"):
+                h = int(line.split(":", 1)[1].strip())
+        return w, h
+    except Exception:
+        return None, None
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument(
@@ -182,6 +205,14 @@ def main() -> int:
         help="Reject captures smaller than this many bytes (default: 50000)",
     )
     ap.add_argument(
+        "--require-pixels",
+        default=None,
+        help=(
+            "Optional: require exact pixel dimensions like 1688x1008. "
+            "If the clipboard capture doesn't match, you will be prompted to retake it."
+        ),
+    )
+    ap.add_argument(
         "--redact-preset",
         default=None,
         help=(
@@ -190,6 +221,20 @@ def main() -> int:
         ),
     )
     args = ap.parse_args()
+
+    require_w: int | None = None
+    require_h: int | None = None
+    if args.require_pixels:
+        try:
+            s = str(args.require_pixels).lower().replace(" ", "")
+            if "x" not in s:
+                raise ValueError("expected WxH like 1688x1008")
+            a, b = s.split("x", 1)
+            require_w = int(a)
+            require_h = int(b)
+        except Exception:
+            print(f"ERROR: invalid --require-pixels value: {args.require_pixels!r} (expected WxH like 1688x1008)")
+            return 2
 
     target_dir = ROOT / args.target_dir
     realish_hashes = _load_realish_hashes(ROOT / "docs/screenshots/realish-hashes.json")
@@ -253,9 +298,21 @@ def main() -> int:
                 )
                 continue
 
+            if require_w is not None and require_h is not None:
+                w, h = _get_pixels_sips(tmp)
+                if (w, h) != (require_w, require_h):
+                    tmp.unlink(missing_ok=True)
+                    print(
+                        f"  ERROR: wrong dimensions ({w}x{h}); expected {require_w}x{require_h}. Retake and press Enter."
+                    )
+                    continue
+
             # Atomic-ish replace
             tmp.replace(out_path)
-            print(f"  Saved {rel} ({size} bytes)")
+            dim_note = ""
+            if require_w is not None and require_h is not None:
+                dim_note = f"; {require_w}x{require_h}px"
+            print(f"  Saved {rel} ({size} bytes{dim_note})")
 
             if args.redact_preset:
                 try:

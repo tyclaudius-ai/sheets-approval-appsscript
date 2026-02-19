@@ -56,6 +56,14 @@ It will:
 
 If macOS warns about running a downloaded script, right-click → Open.
 
+## Optional: one-click macOS *quickrun* (after you already captured files)
+
+If you already captured the 6 PNGs to **Desktop/Downloads**, you can double-click:
+
+- `QUICKRUN_MAC.command` (repo root)
+
+It runs the strict install/validate pipeline (including a **1688×1008** pixel gate) and opens the status + gallery.
+
 ## Optional: guided capture + install (fastest, least error-prone)
 
 If you want to avoid hunting through a pile of Desktop screenshots, you can run the installer in **guided** mode.

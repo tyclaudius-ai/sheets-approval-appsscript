@@ -1,5 +1,5 @@
 # Screenshot status
-Generated: 2026-02-15T08:16:31.139921+00:00
+Generated: 2026-02-20T07:19:25.210928+00:00
 Legend:
 - **placeholder**: canonical PNG matches docs/screenshots/png/<file>
 - **real-ish**: canonical PNG matches docs/screenshots/realish-hashes.json

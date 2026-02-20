@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-02-20T07:19:25Z",
+  "generatedAt": "2026-02-20T15:45:33Z",
   "ok": false,
-  "okByFlags": true,
+  "okByFlags": false,
   "missing": [],
   "placeholders": [],
   "realish": [
@@ -12,7 +12,7 @@
     "docs/screenshots/05-reapproval-required.png",
     "docs/screenshots/06-help-sidebar.png"
   ],
-  "requiredPixels": null,
+  "requiredPixels": "1688x1008",
   "dimUnknown": [],
   "dimMismatch": [],
   "shotlist": [

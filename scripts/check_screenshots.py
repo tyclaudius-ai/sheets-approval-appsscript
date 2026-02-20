@@ -598,9 +598,8 @@ def main() -> int:
             "and is meant to be copy/pasted into chat."
         )
         lines.append("")
-        generated_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
-        lines.append(f"Generated: {generated_at}")
-        lines.append("")
+        # Intentionally omit a generated timestamp so this file is stable in git unless the
+        # actual action items change.
         lines.append(f"Status: {'OK' if ok else 'NEEDS REAL SCREENSHOTS'}")
         lines.append("")
 
@@ -704,7 +703,20 @@ def main() -> int:
         if args.report_json.strip() == "-":
             print(out, end="")
         else:
-            Path(args.report_json).write_text(out, encoding="utf-8")
+            # Avoid needless churn: if the only diff is generatedAt, keep the existing file as-is.
+            out_path = Path(args.report_json)
+            if out_path.exists():
+                try:
+                    existing = json.loads(out_path.read_text(encoding="utf-8"))
+                    if isinstance(existing, dict) and "generatedAt" in existing:
+                        payload_stable = dict(payload)
+                        payload_stable["generatedAt"] = existing.get("generatedAt")
+                        if payload_stable == existing:
+                            out = ""  # signal: no write
+                except Exception:
+                    pass
+            if out:
+                out_path.write_text(out, encoding="utf-8")
 
     if args.json:
         payload = build_payload()

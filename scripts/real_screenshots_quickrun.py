@@ -13,6 +13,8 @@ Usage:
 
 Optional:
   python3 scripts/real_screenshots_quickrun.py --require-pixels 1688x1008 --fail-on-dim-mismatch
+  python3 scripts/real_screenshots_quickrun.py --no-open   # CI/headless
+  python3 scripts/real_screenshots_quickrun.py --open      # force-open status+gallery (macOS)
 """
 
 from __future__ import annotations
@@ -58,6 +60,16 @@ def main() -> int:
         default=None,
         help="Optional redaction preset to run after install (e.g. sheets_account_topright_large).",
     )
+    ap.add_argument(
+        "--open",
+        action="store_true",
+        help="Force opening the HTML status + gallery (macOS only).",
+    )
+    ap.add_argument(
+        "--no-open",
+        action="store_true",
+        help="Never open files automatically (useful for CI/headless).",
+    )
     args = ap.parse_args()
 
     # 1) Always emit a fresh status report first (useful even if nothing else happens)
@@ -98,8 +110,14 @@ def main() -> int:
             file=sys.stderr,
         )
 
+        should_open = (
+            is_macos()
+            and not args.no_open
+            and (args.open or (sys.stdout.isatty() and sys.stderr.isatty()))
+        )
+
         # On macOS, pop open the quickrun docs so the user can recover fast.
-        if is_macos():
+        if should_open:
             quickrun_md = REPO_ROOT / "docs/screenshots/REAL_SCREENSHOTS_QUICKRUN.md"
             shotlist_md = REPO_ROOT / "docs/screenshots/REAL_SCREENSHOTS_SHOTLIST.md"
             cheatsheet_md = REPO_ROOT / "docs/screenshots/CAPTURE-CHEATSHEET.md"
@@ -136,8 +154,14 @@ def main() -> int:
     ]
     run(pipeline_cmd)
 
+    should_open = (
+        is_macos()
+        and not args.no_open
+        and (args.open or (sys.stdout.isatty() and sys.stderr.isatty()))
+    )
+
     # 5) Open the visual status + gallery on macOS for sanity check
-    if is_macos():
+    if should_open:
         status_html = REPO_ROOT / "docs/screenshots/REAL_SCREENSHOTS_STATUS.html"
         gallery_html = REPO_ROOT / "docs/screenshots/gallery.html"
         if status_html.exists():

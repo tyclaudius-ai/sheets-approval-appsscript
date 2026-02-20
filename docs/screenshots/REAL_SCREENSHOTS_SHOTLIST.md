@@ -15,6 +15,13 @@ Use this when you want the **real** screenshot set to look consistent and “pro
 - Window width: wide enough that the right-side columns (`Status`, `Approver`, `DecisionAt`, …) are visible without horizontal scroll.
 - Prefer light mode (default) unless your listing is dark-mode themed.
 
+**PII / account safety**
+- Recommended: use a throwaway/demo Google account for captures.
+- If anything personal leaks into the top-right account area, run the built-in redaction helper:
+  - Read: `docs/screenshots/REDACTION.md`
+  - Common preset: `sheets_account_topright` (and `sheets_account_topright_large` if needed)
+  - This is optional, but it makes “real screenshots” safe to publish.
+
 ## Before you start (demo state)
 
 1) Create a new Google Sheet.
@@ -118,7 +125,15 @@ Tip: If Google prompts for permissions, complete the authorization once; after t
 
 ```bash
 python3 scripts/install_real_screenshots.py --from ~/Desktop --check --optimize
-python3 scripts/check_screenshots.py --fail-on-placeholders
+
+# (Optional) redact top-right Google account area if needed (see docs/screenshots/REDACTION.md)
+# python3 scripts/redact_screenshots.py --preset sheets_account_topright --in docs/screenshots --inplace
+
+# Gate: require *real* (not placeholder + not 'real-ish') screenshots
+python3 scripts/check_screenshots.py --require-real-screenshots
+
+# Stricter gate for marketplace readiness (also enforces 1688x1008)
+python3 scripts/check_screenshots.py --require-marketplace
 ```
 
 Optional: run the full pipeline (install → validate → optimize):

@@ -36,8 +36,10 @@ ROOT = Path(__file__).resolve().parents[1]
 TOP_DIR = ROOT / "docs" / "screenshots"
 PLACEHOLDER_DIR = TOP_DIR / "png"
 REALISH_HASHES_PATH = TOP_DIR / "realish-hashes.json"
+MANIFEST_PATH = TOP_DIR / "manifest.json"
 
-NAMES = [
+# Back-compat fallback if manifest.json is missing/corrupt.
+FALLBACK_NAMES = [
     "01-menu.png",
     "02-requests-pending.png",
     "03-approved-row.png",
@@ -45,6 +47,38 @@ NAMES = [
     "05-reapproval-required.png",
     "06-help-sidebar.png",
 ]
+
+
+def load_required_names() -> list[str]:
+    """Load required screenshot filenames from docs/screenshots/manifest.json.
+
+    Keeping the shotlist in one place prevents drift between:
+      - the landing-page/gallery renderer (manifest)
+      - this validator/checker
+      - docs that reference the required filenames
+    """
+    if not MANIFEST_PATH.exists():
+        return list(FALLBACK_NAMES)
+    try:
+        payload = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+        items = payload.get("items")
+        if not isinstance(items, list):
+            return list(FALLBACK_NAMES)
+        names: list[str] = []
+        for it in items:
+            if not isinstance(it, dict):
+                continue
+            f = it.get("file")
+            if isinstance(f, str) and f.endswith(".png"):
+                names.append(f)
+        # If manifest is present but empty/malformed, fall back.
+        return names or list(FALLBACK_NAMES)
+    except Exception:
+        return list(FALLBACK_NAMES)
+
+
+# The required filenames (in display order).
+NAMES = load_required_names()
 
 
 def sha256(p: Path) -> str:

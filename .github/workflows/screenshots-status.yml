@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Generate screenshots status report (non-blocking)
+      - name: Generate screenshots status reports (non-blocking)
         id: report
         continue-on-error: true
         run: |
@@ -26,14 +26,20 @@ jobs:
             --dir docs/screenshots \
             --fail-on-placeholders \
             --fail-on-realish \
-            --report-md REAL_SCREENSHOTS_STATUS_CI.md
+            --require-pixels 1688x1008 \
+            --report-md REAL_SCREENSHOTS_STATUS_CI.md \
+            --report-html REAL_SCREENSHOTS_STATUS_CI.html \
+            --report-json REAL_SCREENSHOTS_STATUS_CI.json
 
-      - name: Upload report artifact
+      - name: Upload report artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: real-screenshots-status
-          path: REAL_SCREENSHOTS_STATUS_CI.md
+          path: |
+            REAL_SCREENSHOTS_STATUS_CI.md
+            REAL_SCREENSHOTS_STATUS_CI.html
+            REAL_SCREENSHOTS_STATUS_CI.json
 
       - name: Job summary
         if: always()

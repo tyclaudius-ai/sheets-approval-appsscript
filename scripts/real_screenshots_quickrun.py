@@ -72,6 +72,22 @@ def main() -> int:
     )
     args = ap.parse_args()
 
+    def maybe_pbcopy(path: Path) -> None:
+        if not is_macos():
+            return
+        if not path.exists():
+            return
+        if not (sys.stdout.isatty() and sys.stderr.isatty()):
+            return
+        try:
+            # macOS clipboard
+            txt = path.read_text(encoding="utf-8")
+            subprocess.run(["pbcopy"], input=txt.encode("utf-8"), check=True)
+            print(f"[clipboard] Copied {path.as_posix()} to clipboard")
+        except Exception:
+            # Clipboard is a nice-to-have; never fail the run on this.
+            pass
+
     # 1) Always emit a fresh status report first (useful even if nothing else happens)
     run(
         [
@@ -83,8 +99,11 @@ def main() -> int:
             "docs/screenshots/REAL_SCREENSHOTS_STATUS.html",
             "--report-json",
             "docs/screenshots/REAL_SCREENSHOTS_STATUS.json",
+            "--report-jaxon",
+            "docs/screenshots/JAXON_NEXT_ACTIONS.md",
         ]
     )
+    maybe_pbcopy(REPO_ROOT / "docs/screenshots/JAXON_NEXT_ACTIONS.md")
 
     # 2) Attempt install+optimize from the configured directory (or AUTO)
     # This is safe even if the user hasn't captured anything yet; it will error with a clear message.
@@ -153,6 +172,17 @@ def main() -> int:
         "--render-gallery",
     ]
     run(pipeline_cmd)
+
+    # Re-emit next-actions after changes (handy to paste into chat/PR notes).
+    run(
+        [
+            sys.executable,
+            "scripts/check_screenshots.py",
+            "--report-jaxon",
+            "docs/screenshots/JAXON_NEXT_ACTIONS.md",
+        ]
+    )
+    maybe_pbcopy(REPO_ROOT / "docs/screenshots/JAXON_NEXT_ACTIONS.md")
 
     should_open = (
         is_macos()

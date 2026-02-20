@@ -38,5 +38,12 @@ if command -v open >/dev/null 2>&1; then
   open "docs/screenshots/REAL_SCREENSHOTS_STATUS.html" || true
 fi
 
+# Emit a short 'next actions' note (handy for pasting into chat), and copy it to clipboard on macOS.
+python3 scripts/check_screenshots.py --report-jaxon docs/screenshots/JAXON_NEXT_ACTIONS.md || true
+if command -v pbcopy >/dev/null 2>&1; then
+  cat docs/screenshots/JAXON_NEXT_ACTIONS.md | pbcopy || true
+  echo "[capture] Copied docs/screenshots/JAXON_NEXT_ACTIONS.md to clipboard"
+fi
+
 echo "[capture] If you want to re-run verification later:"
 echo "  python3 scripts/check_screenshots.py --report-md docs/screenshots/REAL_SCREENSHOTS_STATUS.md"
